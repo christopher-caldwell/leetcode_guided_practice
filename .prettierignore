@@ -1,0 +1,5 @@
+node_modules
+dist
+.workshop
+assets/reference-solutions.json
+leetcode-interview-prep-project-prompt.md

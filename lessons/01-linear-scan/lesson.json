@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "01-linear-scan",
+  "order": 1,
+  "title": "Find the First Matching Record",
+  "kind": "lesson",
+  "difficulty": "foundation",
+  "skills": ["input contracts", "linear scans", "operation counting", "O(n) reasoning"],
+  "prerequisite": "Comfort reading and writing a TypeScript loop.",
+  "functionNames": ["findFirstIndex"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 30,
+  "hints": [
+    "What single piece of information must you inspect before you can rule an index in or out?",
+    "Choose a loop invariant describing which prefix has already been proven not to contain the answer.",
+    "Stop as soon as equality is established; otherwise exhaust the input and use the absence sentinel."
+  ],
+  "reviewOf": []
+}

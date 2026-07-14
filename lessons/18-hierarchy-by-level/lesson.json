@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "18-hierarchy-by-level",
+  "order": 18,
+  "title": "Process a Hierarchy by Level",
+  "kind": "lesson",
+  "difficulty": "medium",
+  "skills": ["queues", "breadth-first search", "level boundaries"],
+  "prerequisite": "Lesson 17 and array-based queue mechanics.",
+  "functionNames": ["levelOrder"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 65,
+  "hints": [
+    "Which processing order visits every node at depth d before depth d + 1?",
+    "At the start of a level, what does the current queue length tell you?",
+    "Use a queue with a moving read index; consume exactly the current queued count into each level."
+  ],
+  "reviewOf": [9, 17]
+}

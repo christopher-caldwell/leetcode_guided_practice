@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "22-disconnected-service-groups",
+  "order": 22,
+  "title": "Count Disconnected Service Groups",
+  "kind": "lesson",
+  "difficulty": "medium",
+  "skills": ["graph representation", "DFS or BFS", "connected components", "visited sets"],
+  "prerequisite": "Tree traversal from Lessons 17–18.",
+  "functionNames": ["countServiceGroups"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 70,
+  "hints": [
+    "What does starting a traversal from an unvisited service prove about the group count?",
+    "Build a representation that lists every immediate neighbor and retain which services are already assigned.",
+    "For every service not yet visited, increment the count and traverse all reachable neighbors, marking them."
+  ],
+  "reviewOf": [17, 18]
+}

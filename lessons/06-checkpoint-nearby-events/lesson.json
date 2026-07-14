@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "06-checkpoint-nearby-events",
+  "order": 6,
+  "title": "Checkpoint I: Nearby Repeated Events",
+  "kind": "checkpoint",
+  "difficulty": "easy",
+  "skills": ["mixed retrieval", "constraint-driven data-structure selection"],
+  "prerequisite": "Lessons 1–5. The relevant pattern is intentionally not announced.",
+  "functionNames": ["hasNearbyRepeat"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 30,
+  "hints": [
+    "What fact about an event’s history is sufficient when you encounter it again?",
+    "You do not need every earlier index; identify which earlier occurrence gives the smallest distance.",
+    "Retain the most recent index for each event and compare before updating it."
+  ],
+  "reviewOf": [1, 2, 3, 4, 5]
+}

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "19-highest-priority-items",
+  "order": 19,
+  "title": "Retain the Highest-Priority Items",
+  "kind": "lesson",
+  "difficulty": "medium",
+  "skills": ["heaps", "priority queues", "top-k selection", "bounded retained state"],
+  "prerequisite": "Frequency maps from Lesson 4. A tested MinPriorityQueue is supplied.",
+  "functionNames": ["topKFrequent"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 70,
+  "hints": [
+    "Separate counting from selecting; what is one candidate after counting finishes?",
+    "If only k candidates may be retained, which retained candidate should be easiest to evict?",
+    "Keep a min-priority queue bounded to k entries, prioritized by frequency, evicting the smallest frequency."
+  ],
+  "reviewOf": [4]
+}

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "21-checkpoint-concurrent-rooms",
+  "order": 21,
+  "title": "Checkpoint IV: Concurrent Rooms",
+  "kind": "checkpoint",
+  "difficulty": "medium",
+  "skills": ["mixed retrieval", "resource-lifetime reasoning"],
+  "prerequisite": "Lessons 17–20. The relevant pattern is intentionally not announced.",
+  "functionNames": ["minimumConcurrentRooms"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 45,
+  "hints": [
+    "Process meetings in an order that makes resource acquisition chronological.",
+    "Which active meeting determines whether any existing room can be reused next?",
+    "Order by start and retain active end times so the earliest ending room can be released first."
+  ],
+  "reviewOf": [17, 18, 19, 20]
+}

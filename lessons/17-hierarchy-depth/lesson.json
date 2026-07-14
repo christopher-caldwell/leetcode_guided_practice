@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "17-hierarchy-depth",
+  "order": 17,
+  "title": "Measure Hierarchy Depth",
+  "kind": "lesson",
+  "difficulty": "easy",
+  "skills": ["tree recursion", "depth-first search", "structural induction"],
+  "prerequisite": "Recursion from Lesson 15. TreeNode is supplied.",
+  "functionNames": ["maxDepth"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 55,
+  "hints": [
+    "If each child could report its depth, what must the parent compute?",
+    "Choose a base-case depth that makes a leaf’s result follow naturally.",
+    "A nonempty node contributes one plus the larger depth reported by its children."
+  ],
+  "reviewOf": [15]
+}

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "14-first-eligible-record",
+  "order": 14,
+  "title": "Find the First Eligible Record",
+  "kind": "lesson",
+  "difficulty": "easy",
+  "skills": ["boundary binary search", "monotonic predicates", "candidate preservation"],
+  "prerequisite": "Lesson 13.",
+  "functionNames": ["firstAtLeast"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 60,
+  "hints": [
+    "View each index as either definitely ineligible or potentially eligible.",
+    "A qualifying midpoint is evidence, but what remains unknown on its left?",
+    "Preserve a qualifying midpoint as a candidate while continuing to search for an earlier one."
+  ],
+  "reviewOf": [13]
+}

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "11-checkpoint-stable-segment",
+  "order": 11,
+  "title": "Checkpoint II: Longest Stable Segment",
+  "kind": "checkpoint",
+  "difficulty": "medium",
+  "skills": ["mixed retrieval", "invariant-driven optimization"],
+  "prerequisite": "Lessons 7–10. The relevant pattern is intentionally not announced.",
+  "functionNames": ["longestStableSegment"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 40,
+  "hints": [
+    "Define a candidate segment and the exact fact that can make it invalid as it grows.",
+    "What per-identifier information lets the opposite boundary restore validity incrementally?",
+    "Grow one boundary, maintain counts, and move the other boundary until the number of positive counts is allowed."
+  ],
+  "reviewOf": [7, 8, 9, 10]
+}

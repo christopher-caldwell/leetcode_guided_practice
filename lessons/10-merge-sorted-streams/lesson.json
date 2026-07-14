@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "10-merge-sorted-streams",
+  "order": 10,
+  "title": "Merge Sorted Event Streams",
+  "kind": "lesson",
+  "difficulty": "easy",
+  "skills": ["linked-list traversal", "pointer invariants", "sentinel nodes"],
+  "prerequisite": "Two-pointer reasoning from Lesson 5. ListNode is supplied.",
+  "functionNames": ["mergeSortedStreams"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 65,
+  "hints": [
+    "At any moment, where can the smallest remaining value possibly be?",
+    "Maintain one reference to the output head and another to its last confirmed node.",
+    "Attach the smaller current node, advance only that input, then append the remaining list when one ends."
+  ],
+  "reviewOf": [5]
+}

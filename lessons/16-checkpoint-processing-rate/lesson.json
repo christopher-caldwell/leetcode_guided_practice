@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "16-checkpoint-processing-rate",
+  "order": 16,
+  "title": "Checkpoint III: Minimum Processing Rate",
+  "kind": "checkpoint",
+  "difficulty": "medium",
+  "skills": ["mixed retrieval", "monotonic feasibility reasoning"],
+  "prerequisite": "Lessons 12–15. The relevant pattern is intentionally not announced.",
+  "functionNames": ["minimumProcessingRate"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 45,
+  "hints": [
+    "For a proposed rate, can feasibility be evaluated without constructing a schedule?",
+    "As rate increases, describe how the truth of the feasibility predicate changes.",
+    "Search the ordered range of candidate rates for the first feasible value, using ceiling division per job."
+  ],
+  "reviewOf": [12, 13, 14, 15]
+}

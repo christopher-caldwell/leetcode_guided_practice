@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "23-non-adjacent-value",
+  "order": 23,
+  "title": "Maximize Non-Adjacent Value",
+  "kind": "lesson",
+  "difficulty": "medium",
+  "skills": ["dynamic programming", "state transitions", "space optimization"],
+  "prerequisite": "Baseline decomposition and comfort with array iteration.",
+  "functionNames": ["maxNonAdjacentValue"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 75,
+  "hints": [
+    "At index i, partition optimal solutions by whether they include i.",
+    "Which earlier optimal totals are compatible with taking or skipping the current value?",
+    "The best prefix total is the larger of the previous best and the current value plus the best ending before its neighbor."
+  ],
+  "reviewOf": [15]
+}

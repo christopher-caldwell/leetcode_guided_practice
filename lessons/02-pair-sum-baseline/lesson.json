@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "02-pair-sum-baseline",
+  "order": 2,
+  "title": "Pair Sum: Establish a Baseline",
+  "kind": "lesson",
+  "difficulty": "foundation",
+  "skills": ["brute-force baselines", "nested-loop cost", "distinct-index contracts"],
+  "prerequisite": "Lesson 1 and the ability to trace a loop.",
+  "functionNames": ["pairSumBaseline"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 40,
+  "hints": [
+    "For a fixed first index, which later indices could form a distinct pair?",
+    "Draw the index-pair grid and cross out the diagonal and mirrored half.",
+    "Enumerate i from left to right and j only after i; return when nums[i] + nums[j] matches."
+  ],
+  "reviewOf": [1]
+}

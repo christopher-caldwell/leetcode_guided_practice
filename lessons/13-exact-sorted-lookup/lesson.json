@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "13-exact-sorted-lookup",
+  "order": 13,
+  "title": "Locate an Exact Sorted Record",
+  "kind": "lesson",
+  "difficulty": "easy",
+  "skills": ["binary search", "search intervals", "logarithmic complexity"],
+  "prerequisite": "Array indexing and explicit loop invariants.",
+  "functionNames": ["binarySearch"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 55,
+  "hints": [
+    "Which ordering fact lets one comparison eliminate many candidates?",
+    "Choose and write down one precise meaning for both search boundaries.",
+    "Inspect the midpoint; equality returns, and ordering determines which half can still contain the target."
+  ],
+  "reviewOf": [1, 5]
+}

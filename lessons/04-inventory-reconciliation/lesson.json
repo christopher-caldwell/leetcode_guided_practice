@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "04-inventory-reconciliation",
+  "order": 4,
+  "title": "Reconcile Two Inventories",
+  "kind": "lesson",
+  "difficulty": "easy",
+  "skills": ["frequency maps", "multiset equality", "early rejection"],
+  "prerequisite": "Lesson 3 and TypeScript Map iteration.",
+  "functionNames": ["sameInventory"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 45,
+  "hints": [
+    "Which property besides membership distinguishes a multiset from a set?",
+    "Record a numeric fact per identifier while reading one inventory, then reconcile it with the other.",
+    "Reject unequal lengths; increment counts from one input and decrement for the other, rejecting overuse."
+  ],
+  "reviewOf": [1, 3]
+}

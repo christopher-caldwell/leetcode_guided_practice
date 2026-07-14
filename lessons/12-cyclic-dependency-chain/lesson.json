@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "12-cyclic-dependency-chain",
+  "order": 12,
+  "title": "Detect a Cyclic Dependency Chain",
+  "kind": "lesson",
+  "difficulty": "easy",
+  "skills": ["fast and slow pointers", "linked-list cycles", "constant-space reasoning"],
+  "prerequisite": "Linked-list traversal from Lesson 10.",
+  "functionNames": ["hasCycle"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 60,
+  "hints": [
+    "If two observers move through a finite cycle at different rates, what happens to their relative positions?",
+    "Use references moving by different step counts and identify the safe termination conditions.",
+    "Advance one pointer once and another twice; equality means a cycle, while the faster path reaching null means none."
+  ],
+  "reviewOf": [10]
+}

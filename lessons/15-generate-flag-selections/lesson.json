@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "15-generate-flag-selections",
+  "order": 15,
+  "title": "Generate Feature-Flag Selections",
+  "kind": "lesson",
+  "difficulty": "medium",
+  "skills": ["recursion", "backtracking", "decision trees", "state restoration"],
+  "prerequisite": "Basic recursion and array copying.",
+  "functionNames": ["generateSubsets"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 70,
+  "hints": [
+    "For one value, what are the two mutually exclusive choices a subset can make?",
+    "Model a call by the next undecided index and the decisions already made.",
+    "Explore excluding and including each value; snapshot a completed selection and restore mutable state between branches."
+  ],
+  "reviewOf": [2]
+}

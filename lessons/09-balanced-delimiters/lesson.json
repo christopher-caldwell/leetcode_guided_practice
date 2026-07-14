@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "09-balanced-delimiters",
+  "order": 9,
+  "title": "Validate Nested Delimiters",
+  "kind": "lesson",
+  "difficulty": "easy",
+  "skills": ["stacks", "last-in-first-out reasoning", "local invariants"],
+  "prerequisite": "Arrays and basic iteration.",
+  "functionNames": ["hasBalancedDelimiters"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 50,
+  "hints": [
+    "When a closer appears, which unmatched opener must it correspond to?",
+    "Choose a structure whose removal order mirrors nested closing order.",
+    "Push openers; for each closer remove and validate the most recent unmatched opener."
+  ],
+  "reviewOf": [4]
+}

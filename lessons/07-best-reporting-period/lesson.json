@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "07-best-reporting-period",
+  "order": 7,
+  "title": "Best Fixed Reporting Period",
+  "kind": "lesson",
+  "difficulty": "easy",
+  "skills": ["fixed sliding windows", "incremental aggregates", "O(n) reasoning"],
+  "prerequisite": "Comfort with array indexing and Lesson 2 cost analysis.",
+  "functionNames": ["maxWindowSum"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 50,
+  "hints": [
+    "Compare two adjacent windows and identify exactly which values differ.",
+    "Retain the current window’s sum rather than recalculating all its members.",
+    "Build the first full window, then subtract the outgoing value and add the incoming value."
+  ],
+  "reviewOf": [1, 2]
+}

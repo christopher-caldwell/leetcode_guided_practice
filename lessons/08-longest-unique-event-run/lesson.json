@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "08-longest-unique-event-run",
+  "order": 8,
+  "title": "Longest Unique Event Run",
+  "kind": "lesson",
+  "difficulty": "medium",
+  "skills": ["variable sliding windows", "window invariants", "last-seen information"],
+  "prerequisite": "Lessons 3, 6, and 7.",
+  "functionNames": ["longestUniqueRun"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 65,
+  "hints": [
+    "Imagine a valid contiguous region ending at the current index. What can invalidate it?",
+    "When a duplicate appears, which boundary can move while preserving all later candidates?",
+    "Track where events were last seen and keep the left boundary beyond any conflicting occurrence."
+  ],
+  "reviewOf": [3, 6, 7]
+}

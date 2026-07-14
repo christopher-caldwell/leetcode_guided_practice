@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "20-consolidate-schedule-windows",
+  "order": 20,
+  "title": "Consolidate Schedule Windows",
+  "kind": "lesson",
+  "difficulty": "medium",
+  "skills": ["sorting as preprocessing", "interval merging", "output-tail invariants"],
+  "prerequisite": "Array traversal and comparison functions.",
+  "functionNames": ["mergeWindows"],
+  "source": "solutions/typescript/solution.ts",
+  "publicTest": "solutions/typescript/public.test.ts",
+  "recommendedMinutes": 65,
+  "hints": [
+    "What ordering would make all future overlaps with one interval appear together?",
+    "After ordering, compare the next start with one property of the last merged output.",
+    "Sort copies by start; extend the last output end on overlap, otherwise append a new copied interval."
+  ],
+  "reviewOf": [5, 10]
+}
