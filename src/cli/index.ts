@@ -3,15 +3,20 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { loadConfig } from '../core/config.js'
 import { saveDiagnosis, saveReview } from '../core/feedback.js'
-import { validateAnalysis } from '../core/analysis.js'
+import { validateAnalysis, validatePostPassReflection } from '../core/analysis.js'
 import { currentLesson, loadLessons } from '../core/lessons.js'
 import type { CheckFailure, LessonManifest, WorkshopState } from '../core/models.js'
-import { loadState, passedAtMap, resetState, saveState, stateDirectory } from '../core/state.js'
+import { assessReadiness } from '../core/readiness.js'
+import { handleResetCommand } from '../core/reset-command.js'
+import { isReviewEligible, recordOfflineReview, selectReviewLesson } from '../core/review.js'
+import { loadState, passedAtMap, saveState, stateDirectory } from '../core/state.js'
 import {
-  completeTimer,
+  completeRecordedTimer,
   formatDuration,
+  hasRecordedTime,
   pauseTimer,
   resetTimer,
+  selectTimerLesson,
   startTimer,
   targetMinutes,
   timerApplies,
@@ -25,11 +30,13 @@ import { checkTypeScript } from '../verification/typescript-adapter.js'
 const root = process.cwd()
 
 async function main(): Promise<void> {
+  const command = process.argv[2] ?? 'status'
+  if (await handleResetCommand(root, command)) return
+
   const config = loadConfig()
   const lessons = await loadLessons(root)
   const state = await loadState(root, lessons)
   const provider = createCoachProvider(root, config)
-  const command = process.argv[2] ?? 'status'
 
   switch (command) {
     case 'status':
@@ -39,21 +46,16 @@ async function main(): Promise<void> {
       await startLesson(lessons, state, config)
       break
     case 'check':
-      await checkLesson(lessons, state, config, provider)
+      await checkLesson(lessons, state, provider)
       break
     case 'hint':
       await hint(lessons, state, provider)
       break
     case 'review':
-      await review(lessons, state, provider)
+      await review(lessons, state, provider, process.argv[3])
       break
     case 'solution':
       await reveal(lessons, state)
-      break
-    case 'reset':
-      await resetState(root)
-      console.log('Workshop progress, feedback, revealed references, and timers were cleared.')
-      console.log('Learner analysis and solution files were not changed.')
       break
     case 'timer':
       await manageTimer(lessons, state, config, process.argv[3] ?? 'status')
@@ -83,7 +85,7 @@ function showStatus(
   console.log('')
 
   if (!lesson) {
-    printReadiness(lessons, state, provider)
+    printReadiness(lessons, state, config)
     return
   }
 
@@ -92,7 +94,13 @@ function showStatus(
   console.log(`Instructions: ${relative(path.join(lesson.directory, 'instructions.md'))}`)
   console.log(`Analysis:     ${relative(path.join(lesson.directory, 'analysis.md'))}`)
   console.log(`Source:       ${relative(path.join(lesson.directory, lesson.source))}`)
-  console.log(`Attempts: ${progress.attempts}; hints: ${progress.hintsUsed}`)
+  console.log(
+    `Attempts: ${progress.attempts}; hints: ${progress.hintsUsed}; ` +
+      `adaptive diagnoses: ${progress.diagnosesReceived}`,
+  )
+  if (progress.verifiedAt && !progress.passedAt) {
+    console.log('Stage: implementation verified; complete Post-pass reflection to advance.')
+  }
   if (timerApplies(config, lesson)) {
     console.log(`Timer: ${timerSummary(progress.timer, targetMinutes(config, lesson))}`)
     if (!progress.timer.startedAt && progress.timer.accumulatedMs === 0) {
@@ -113,11 +121,17 @@ async function startLesson(
   console.log(`Open ${relative(path.join(lesson.directory, 'instructions.md'))}`)
   console.log(`Then edit ${relative(path.join(lesson.directory, 'analysis.md'))}`)
   console.log(`and ${relative(path.join(lesson.directory, lesson.source))}`)
+  const progress = state.lessons[lesson.id]!
+  if (progress.verifiedAt) {
+    console.log(
+      'Implementation is already verified; complete Post-pass reflection and run `just check`.',
+    )
+    return
+  }
   if (!timerApplies(config, lesson)) {
     console.log(`Timer not started: WORKSHOP_TIMER_MODE=${config.timerMode}.`)
     return
   }
-  const progress = state.lessons[lesson.id]!
   const result = startTimer(progress.timer)
   await saveState(root, state)
   console.log(
@@ -130,11 +144,11 @@ async function startLesson(
 async function checkLesson(
   lessons: LessonManifest[],
   state: WorkshopState,
-  config: ReturnType<typeof loadConfig>,
   provider: CoachProvider | null,
 ): Promise<void> {
   const lesson = requireCurrent(lessons, state)
   const progress = state.lessons[lesson.id]!
+  const firstVerification = progress.verifiedAt === null
   progress.attempts += 1
   console.log(`Checking ${lesson.id} — attempt ${progress.attempts}`)
 
@@ -157,6 +171,8 @@ async function checkLesson(
         const context = await coachContext(lesson, progress.attempts, progress.hintsUsed, failures)
         const diagnosis = await provider.diagnose(context)
         const target = await saveDiagnosis(root, lesson.id, progress.attempts, diagnosis)
+        progress.diagnosesReceived += 1
+        await saveState(root, state)
         printDiagnosis(diagnosis)
         console.log(`Saved: ${relative(target)}`)
       } catch (error) {
@@ -171,36 +187,49 @@ async function checkLesson(
     return
   }
 
-  progress.passedAt = new Date().toISOString()
-  progress.reviewRequired = progress.solutionRevealedAt !== null
-  if (
-    timerApplies(config, lesson) &&
-    (progress.timer.startedAt || progress.timer.accumulatedMs > 0)
-  ) {
-    const duration = completeTimer(progress.timer)
+  progress.verifiedAt ??= new Date().toISOString()
+  const duration = completeRecordedTimer(progress.timer)
+  if (duration !== null) {
     console.log(`Timer stopped at ${formatDuration(duration)}.`)
   }
   await saveState(root, state)
   console.log(
-    'PASS — deterministic analysis, type, correctness, contract, and complexity checks passed.',
+    "CODE VERIFIED — analysis evidence, types, and this lesson's registered correctness, contract, and complexity checks passed.",
   )
 
-  if (provider) {
-    console.log(`Requesting advisory ${provider.name} review of the passing solution…`)
+  if (provider && firstVerification) {
+    console.log(`Requesting advisory ${provider.name} review of the verified solution…`)
     try {
       const context = await coachContext(lesson, progress.attempts, progress.hintsUsed, [])
       const result = await provider.review(context)
       const target = await saveReview(root, lesson.id, result)
       progress.latestReviewPath = relative(target)
       progress.latestReviewScores = result.scores
+      progress.reviewRequired = false
       await saveState(root, state)
       printReview(result)
       console.log(`Saved: ${relative(target)}`)
     } catch (error) {
       console.log(`Advisory review unavailable: ${message(error)}`)
-      console.log('The deterministic pass is retained.')
+      console.log('The deterministic code verification is retained.')
     }
   }
+
+  const reflectionFailures = await validatePostPassReflection(lesson)
+  if (reflectionFailures.length > 0) {
+    await saveState(root, state)
+    console.log('\nProgression is waiting for the post-pass reflection.')
+    printFailures(reflectionFailures, 'INCOMPLETE')
+    console.log('Complete that section in analysis.md, then run `just check` again.')
+    process.exitCode = 1
+    return
+  }
+
+  const completedAt = new Date().toISOString()
+  progress.reflectionCompletedAt = completedAt
+  progress.passedAt = completedAt
+  await saveState(root, state)
+  console.log('PASS — implementation verification and post-pass reflection are complete.')
 
   const next = getCurrent(lessons, state)
   if (next) {
@@ -256,23 +285,36 @@ async function review(
   lessons: LessonManifest[],
   state: WorkshopState,
   provider: CoachProvider | null,
+  requestedId?: string,
 ): Promise<void> {
-  const reversed = [...lessons].reverse()
-  const lesson =
-    reversed.find(
-      (item) => state.lessons[item.id]!.passedAt && state.lessons[item.id]!.reviewRequired,
-    ) ?? reversed.find((item) => state.lessons[item.id]!.passedAt)
-  if (!lesson) throw new Error('Pass at least one lesson before requesting a review.')
+  const lesson = selectReviewLesson(lessons, state, requestedId)
+  if (!lesson) throw new Error('Verify at least one lesson before requesting a review.')
+  if (!isReviewEligible(lesson, state))
+    throw new Error(`${lesson.id} has not passed deterministic verification yet.`)
+  const progress = state.lessons[lesson.id]!
+
   if (!provider) {
-    console.log(
-      'No external coach is configured. Set COACH_PROVIDER=codex to request structured review.',
-    )
-    console.log(
-      `Use the post-pass reflection in ${relative(path.join(lesson.directory, 'analysis.md'))}.`,
-    )
+    if (!progress.reflectionCompletedAt) {
+      const failures = await validatePostPassReflection(lesson)
+      if (failures.length > 0) {
+        printFailures(failures, 'INCOMPLETE')
+        console.log(
+          `Complete ${relative(path.join(lesson.directory, 'analysis.md'))} and run \`just check\` before clearing review debt.`,
+        )
+        process.exitCode = 1
+        return
+      }
+      console.log('The reflection is complete; run `just check` once to finish lesson progression.')
+      process.exitCode = 1
+      return
+    }
+    recordOfflineReview(progress)
+    await saveState(root, state)
+    console.log(`Offline reflection review recorded for ${lesson.id}.`)
+    console.log('No external score was created; communication remains self-assessed.')
     return
   }
-  const progress = state.lessons[lesson.id]!
+
   console.log(`Reviewing ${lesson.id} with ${provider.name}…`)
   const result = await provider.review(
     await coachContext(lesson, progress.attempts, progress.hintsUsed, []),
@@ -304,9 +346,13 @@ async function manageTimer(
   config: ReturnType<typeof loadConfig>,
   action: string,
 ): Promise<void> {
-  const lesson = getCurrent(lessons, state) ?? lessons.at(-1)!
+  if (!['status', 'start', 'pause', 'resume', 'reset'].includes(action)) {
+    throw new Error('Timer action must be status, start, pause, resume, or reset.')
+  }
+  const lesson = selectTimerLesson(lessons, state, action)
   const progress = state.lessons[lesson.id]!
-  if (!timerApplies(config, lesson)) {
+  const historicalStatus = action === 'status' && hasRecordedTime(progress.timer)
+  if (!timerApplies(config, lesson) && !historicalStatus) {
     console.log(
       `Timing does not apply to ${lesson.id} while WORKSHOP_TIMER_MODE=${config.timerMode}.`,
     )
@@ -336,7 +382,12 @@ async function manageTimer(
       throw new Error('Timer action must be status, start, pause, resume, or reset.')
   }
   await saveState(root, state)
-  console.log(timerSummary(progress.timer, targetMinutes(config, lesson)))
+  console.log(
+    `Timer for ${lesson.id}: ${timerSummary(progress.timer, targetMinutes(config, lesson))}`,
+  )
+  if (!timerApplies(config, lesson)) {
+    console.log(`Stored timing is shown even though WORKSHOP_TIMER_MODE=${config.timerMode}.`)
+  }
 }
 
 async function coachContext(
@@ -382,8 +433,8 @@ function relative(target: string): string {
   return path.relative(root, target) || '.'
 }
 
-function printFailures(failures: CheckFailure[]): void {
-  console.log('FAIL')
+function printFailures(failures: CheckFailure[], label = 'FAIL'): void {
+  console.log(label)
   for (const failure of failures) {
     console.log(`\n[${failure.category}] ${failure.summary}`)
     console.log(failure.evidence)
@@ -410,41 +461,59 @@ function printReview(result: Awaited<ReturnType<CoachProvider['review']>>): void
 function printReadiness(
   lessons: LessonManifest[],
   state: WorkshopState,
-  provider: CoachProvider | null,
+  config: ReturnType<typeof loadConfig>,
 ): void {
-  const simulations = lessons.filter(
-    (lesson) => lesson.kind === 'checkpoint' || lesson.kind === 'final',
-  )
-  const independent = simulations.filter((lesson) => {
-    const progress = state.lessons[lesson.id]!
-    return progress.passedAt && !progress.solutionRevealedAt
-  })
-  const acceptableReviews = independent.filter((lesson) => {
-    const scores = state.lessons[lesson.id]!.latestReviewScores
-    return scores && Object.values(scores).every((score) => score >= 3)
-  })
-  const final = state.lessons[lessons.at(-1)!.id]!
-  const targetMet =
-    independent.length >= 2 &&
-    final.passedAt !== null &&
-    final.solutionRevealedAt === null &&
-    (provider ? acceptableReviews.length >= 2 : true)
+  const evidence = assessReadiness(lessons, state, config)
 
   console.log('Curriculum complete.')
-  console.log(`Independent mixed simulations: ${independent.length}/${simulations.length}`)
-  if (provider) {
-    console.log(`Independent simulations with all review scores >= 3: ${acceptableReviews.length}`)
-  } else {
+  console.log(
+    'Unassisted means zero hints, zero successful adaptive diagnoses, and no solution reveal.',
+  )
+  console.log('Mixed simulation evidence:')
+  for (const simulation of evidence.simulations) {
+    const assistance: string[] = []
+    if (simulation.hintsUsed > 0) assistance.push(`${simulation.hintsUsed} hint(s)`)
+    if (simulation.diagnosesReceived > 0) {
+      assistance.push(`${simulation.diagnosesReceived} diagnosis(es)`)
+    }
+    if (simulation.solutionRevealed) assistance.push('solution revealed')
+    const timer =
+      simulation.completedMs === null
+        ? 'timer not recorded'
+        : timerEvidence(simulation.completedMs, simulation.targetMinutes)
+    const review =
+      simulation.reviewScoresAcceptable === null
+        ? 'communication self-assessed'
+        : simulation.reviewScoresAcceptable
+          ? 'coach scores >= 3'
+          : 'coach score below 3'
     console.log(
-      'External review evidence: not configured; deterministic completion is still recorded.',
+      `- ${simulation.id} (${simulation.title}): ${simulation.unassisted ? 'unassisted' : assistance.join(', ') || 'assisted'}; ` +
+        `${simulation.attempts} attempt(s); ${timer}; ${review}; ` +
+        `reflection ${simulation.reflectionCompleted ? 'complete' : 'missing'}`,
     )
   }
-  console.log(`Readiness target: ${targetMet ? 'MET' : 'NOT YET MET'}`)
-  if (!targetMet) {
+  console.log(
+    `Unassisted mixed simulations: ${evidence.unassistedCount}/${evidence.simulations.length}`,
+  )
+  console.log(
+    `Unassisted simulations with all coach scores >= 3: ${evidence.acceptableReviewCount}`,
+  )
+  if (evidence.outstandingReviewIds.length > 0) {
+    console.log(`Outstanding revealed-solution review: ${evidence.outstandingReviewIds.join(', ')}`)
+  }
+  console.log(`Readiness target: ${evidence.targetMet ? 'MET' : 'NOT YET MET'}`)
+  if (!evidence.targetMet) {
     console.log(
-      'Revisit review-queue lessons and complete at least two mixed simulations without revealing solutions.',
+      'Complete the final and at least two mixed simulations without hints, diagnoses, or solution reveal, then clear any review debt.',
     )
   }
+}
+
+function timerEvidence(completedMs: number, target: number): string {
+  const targetMs = target * 60_000
+  const overtime = completedMs > targetMs ? ` (${formatDuration(completedMs - targetMs)} over)` : ''
+  return `${formatDuration(completedMs)} / ${target}m${overtime}`
 }
 
 function message(error: unknown): string {

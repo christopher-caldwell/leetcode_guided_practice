@@ -1,0 +1,1843 @@
+{
+  "version": 1,
+  "groups": [
+    {
+      "id": "two-pointers-windows",
+      "title": "Two pointers and sliding windows",
+      "summary": "Move ordered boundaries while preserving a relationship that makes discarded work unnecessary.",
+      "recognition_signals": [
+        "The input is sorted, or the answer is a contiguous region whose validity changes predictably at its boundaries.",
+        "A brute-force solution repeatedly rescans pairs or overlapping ranges that differ by only one item."
+      ],
+      "common_wrong_approaches": [
+        "Moving a boundary without stating the invariant can skip valid pairs or retain an invalid window.",
+        "Applying a shrinking window when negative values destroy monotonicity produces plausible but incorrect results."
+      ],
+      "problems": [
+        {
+          "id": "twoptr-01",
+          "origin": "TP1",
+          "title": "Closest Approved Spend",
+          "primary_concept": "opposing pointers on sorted input",
+          "secondary_concepts": ["greedy boundary movement", "tie breaking"],
+          "difficulty": "easy",
+          "statement": "Meal prices are sorted in ascending order. Choose two different meals with the greatest combined price that does not exceed a budget. Return their indices, breaking equal sums by smaller left index and then smaller right index, or null when no pair fits.",
+          "constraints": [
+            "0 <= prices.length <= 100000",
+            "Prices are nonnegative safe integers in sorted order",
+            "Do not mutate prices"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "indices",
+          "generator_parameters": {
+            "length": [0, 2, 100000],
+            "fit": ["none", "exact", "under"],
+            "duplicates": [true, false]
+          },
+          "edge_cases": [
+            "fewer than two meals",
+            "no affordable pair",
+            "duplicate prices",
+            "several pairs have the same sum"
+          ],
+          "examples": [{ "input": { "prices": [2, 4, 6, 9], "budget": 11 }, "output": [0, 3] }]
+        },
+        {
+          "id": "twoptr-02",
+          "origin": "TP2",
+          "title": "Three-Depot Balance",
+          "primary_concept": "sorted three-sum scan",
+          "secondary_concepts": ["deduplication", "two pointers"],
+          "difficulty": "medium",
+          "statement": "Regional depots report signed inventory adjustments. Return every unique sorted triple of adjustment values whose sum is zero. Order triples lexicographically and do not return duplicate value combinations.",
+          "constraints": [
+            "0 <= adjustments.length <= 3000",
+            "Adjustments are safe integers",
+            "Do not mutate the input"
+          ],
+          "expected_complexity": {
+            "time": "O(n^2)",
+            "space": "O(n) excluding output for a sorted copy"
+          },
+          "answer_type": "groups",
+          "generator_parameters": {
+            "length": [0, 3, 100, 3000],
+            "duplicates": ["none", "light", "heavy"],
+            "solutions": ["none", "one", "many"]
+          },
+          "edge_cases": [
+            "fewer than three values",
+            "all zeros",
+            "duplicate solutions",
+            "no balanced triple"
+          ],
+          "examples": [
+            {
+              "input": [-1, 0, 1, 2, -1, -4],
+              "output": [
+                [-1, -1, 2],
+                [-1, 0, 1]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "twoptr-03",
+          "origin": "TP3",
+          "title": "Shortest Throughput Burst",
+          "primary_concept": "variable sliding window",
+          "secondary_concepts": ["positive-sum monotonicity", "minimum window"],
+          "difficulty": "medium",
+          "statement": "A service records positive request counts for consecutive minutes. Return the minimum number of consecutive minutes whose total is at least a required throughput, or zero if no such period exists.",
+          "constraints": [
+            "0 <= requests.length <= 100000",
+            "Every request count is a positive safe integer",
+            "required is a positive safe integer"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "answer": [0, 1, "middle", "whole"],
+            "required": [1, 100, 1000000000]
+          },
+          "edge_cases": [
+            "empty input",
+            "one minute meets the target",
+            "only the whole input works",
+            "target is unreachable"
+          ],
+          "examples": [{ "input": { "requests": [2, 3, 1, 2, 4, 3], "required": 7 }, "output": 2 }]
+        },
+        {
+          "id": "twoptr-04",
+          "origin": "TP4",
+          "title": "Longest Reliable Run",
+          "primary_concept": "budgeted sliding window",
+          "secondary_concepts": ["violation counting", "window invariant"],
+          "difficulty": "medium",
+          "statement": "A binary monitoring stream uses 1 for success and 0 for failure. Return the longest contiguous run that could be made entirely successful by reclassifying at most k failures.",
+          "constraints": [
+            "0 <= outcomes.length <= 100000",
+            "Every outcome is 0 or 1",
+            "0 <= k <= outcomes.length"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "failure_rate": [0, 0.1, 1],
+            "budget": [0, 1, 100000]
+          },
+          "edge_cases": [
+            "empty stream",
+            "zero reclassifications",
+            "all failures",
+            "k exceeds the number of failures"
+          ],
+          "examples": [{ "input": { "outcomes": [1, 1, 0, 0, 1, 1, 1, 0], "k": 2 }, "output": 7 }]
+        },
+        {
+          "id": "twoptr-05",
+          "origin": "TP5",
+          "title": "Shared Audit Identifiers",
+          "primary_concept": "same-direction sorted pointers",
+          "secondary_concepts": ["set intersection", "stable deduplication"],
+          "difficulty": "easy",
+          "statement": "Two audit systems export sorted integer identifiers, possibly with duplicates. Return the distinct identifiers present in both exports in ascending order without using a hash set.",
+          "constraints": [
+            "0 <= first.length, second.length <= 100000",
+            "Both arrays are sorted ascending",
+            "Do not mutate either input"
+          ],
+          "expected_complexity": { "time": "O(n + m)", "space": "O(1) excluding output" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "sizes": [
+              [0, 0],
+              [10, 20],
+              [100000, 100000]
+            ],
+            "overlap": ["none", "partial", "complete"],
+            "duplicates": [true, false]
+          },
+          "edge_cases": [
+            "one export is empty",
+            "no shared IDs",
+            "heavy duplicates",
+            "all IDs shared"
+          ],
+          "examples": [
+            { "input": { "first": [1, 1, 3, 5, 8], "second": [1, 2, 3, 3, 9] }, "output": [1, 3] }
+          ]
+        },
+        {
+          "id": "twoptr-06",
+          "origin": "TP6",
+          "title": "Maximum Retaining Span",
+          "primary_concept": "greedy opposing pointers",
+          "secondary_concepts": ["proof by dominated choices", "area optimization"],
+          "difficulty": "medium",
+          "statement": "Vertical flood barriers have unit-spaced positions and nonnegative heights. Choose two barriers that retain the greatest rectangular water area, defined as distance times the shorter height, and return that area.",
+          "constraints": [
+            "0 <= heights.length <= 100000",
+            "Heights are nonnegative safe integers",
+            "The result fits in a safe integer"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 2, 100000],
+            "shape": ["increasing", "decreasing", "peaked", "random"]
+          },
+          "edge_cases": [
+            "fewer than two barriers",
+            "zero heights",
+            "equal heights",
+            "best pair is not adjacent"
+          ],
+          "examples": [{ "input": [1, 8, 6, 2, 5, 4, 8, 3, 7], "output": 49 }]
+        }
+      ]
+    },
+    {
+      "id": "stacks-monotonic",
+      "title": "Stacks and monotonic structures",
+      "summary": "Retain unresolved candidates in an order that lets one new value settle earlier decisions.",
+      "recognition_signals": [
+        "The answer for an earlier item becomes known when a later larger, smaller, or conflicting item arrives.",
+        "The prompt asks for nearest boundaries, nested structure, or a window extreme without rescanning every window."
+      ],
+      "common_wrong_approaches": [
+        "Scanning forward independently from every index repeats the same comparisons and becomes quadratic.",
+        "Storing values without their indices loses the distance or boundary information required for the result."
+      ],
+      "problems": [
+        {
+          "id": "stack-01",
+          "origin": "ST1",
+          "title": "Next Higher Sensor Reading",
+          "primary_concept": "monotonic decreasing stack",
+          "secondary_concepts": ["next greater element", "unresolved indices"],
+          "difficulty": "easy",
+          "statement": "For each sensor reading, return the first strictly higher reading to its right, or -1 when no later reading is higher.",
+          "constraints": [
+            "0 <= readings.length <= 100000",
+            "Readings are safe integers",
+            "Do not mutate readings"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "shape": ["increasing", "decreasing", "flat", "random"]
+          },
+          "edge_cases": [
+            "empty input",
+            "strictly decreasing readings",
+            "equal readings are not higher",
+            "last reading"
+          ],
+          "examples": [{ "input": [4, 2, 7, 5, 8], "output": [7, 7, 8, 8, -1] }]
+        },
+        {
+          "id": "stack-02",
+          "origin": "ST2",
+          "title": "Days Until a Higher Forecast",
+          "primary_concept": "monotonic index stack",
+          "secondary_concepts": ["distance to next greater value"],
+          "difficulty": "easy",
+          "statement": "Given daily forecast temperatures, return how many days each day must wait for a strictly warmer forecast. Return zero for days with no warmer future value.",
+          "constraints": [
+            "0 <= temperatures.length <= 100000",
+            "Temperatures are safe integers",
+            "Do not mutate input"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "shape": ["warming", "cooling", "plateaus", "mixed"]
+          },
+          "edge_cases": [
+            "empty forecast",
+            "all temperatures equal",
+            "strictly cooling",
+            "warmer day far away"
+          ],
+          "examples": [
+            { "input": [73, 74, 75, 71, 69, 72, 76, 73], "output": [1, 1, 4, 2, 1, 1, 0, 0] }
+          ]
+        },
+        {
+          "id": "stack-03",
+          "origin": "ST3",
+          "title": "Largest Uniform Rack Section",
+          "primary_concept": "monotonic boundary stack",
+          "secondary_concepts": ["histogram area", "nearest smaller boundaries"],
+          "difficulty": "hard",
+          "statement": "Adjacent warehouse columns have unit width and integer heights. Return the largest rectangular rack area that can fit under consecutive columns.",
+          "constraints": [
+            "0 <= heights.length <= 100000",
+            "Heights are nonnegative safe integers",
+            "The result fits in a safe integer"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "shape": ["increasing", "decreasing", "valley", "plateau"]
+          },
+          "edge_cases": [
+            "empty histogram",
+            "zero-height columns",
+            "all heights equal",
+            "best rectangle spans a valley"
+          ],
+          "examples": [{ "input": [2, 1, 5, 6, 2, 3], "output": 10 }]
+        },
+        {
+          "id": "stack-04",
+          "origin": "ST4",
+          "title": "Minimize the Shipment Code",
+          "primary_concept": "greedy monotonic stack",
+          "secondary_concepts": ["lexicographic minimization", "leading-zero normalization"],
+          "difficulty": "medium",
+          "statement": "A shipment code is a decimal digit string. Remove exactly k digits while preserving the remaining order so the resulting numeric value is as small as possible. Remove leading zeros and return \"0\" for an empty result.",
+          "constraints": [
+            "1 <= code.length <= 100000",
+            "Code contains only decimal digits",
+            "0 <= k <= code.length"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "value",
+          "generator_parameters": {
+            "length": [1, 10, 100000],
+            "digits": ["increasing", "decreasing", "repeated", "zeros"],
+            "remove": [0, 1, "all"]
+          },
+          "edge_cases": [
+            "remove no digits",
+            "remove every digit",
+            "leading zeros",
+            "already increasing code"
+          ],
+          "examples": [{ "input": { "code": "1432219", "k": 3 }, "output": "1219" }]
+        },
+        {
+          "id": "stack-05",
+          "origin": "ST5",
+          "title": "Peak Load in Every Window",
+          "primary_concept": "monotonic deque",
+          "secondary_concepts": ["fixed sliding window", "stale-index eviction"],
+          "difficulty": "hard",
+          "statement": "Given service-load readings and a positive window size, return the maximum reading in every contiguous window of that size.",
+          "constraints": [
+            "0 <= loads.length <= 100000",
+            "1 <= windowSize <= loads.length when loads is nonempty",
+            "Loads are safe integers"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(windowSize)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [1, 10, 100000],
+            "window_size": [1, 2, "n"],
+            "shape": ["increasing", "decreasing", "random"]
+          },
+          "edge_cases": [
+            "window size one",
+            "window spans the full input",
+            "duplicate maxima",
+            "negative loads"
+          ],
+          "examples": [
+            {
+              "input": { "loads": [1, 3, -1, -3, 5, 3, 6, 7], "windowSize": 3 },
+              "output": [3, 3, 5, 5, 6, 7]
+            }
+          ]
+        },
+        {
+          "id": "stack-06",
+          "origin": "ST6",
+          "title": "Drone Corridor Collisions",
+          "primary_concept": "stack-based collision simulation",
+          "secondary_concepts": ["directional interaction", "chain reactions"],
+          "difficulty": "medium",
+          "statement": "Drones occupy a corridor in listed left-to-right order. A positive size moves right and a negative size moves left. Opposing drones collide; the smaller absolute size is destroyed and equal sizes destroy both. Return surviving drones in order.",
+          "constraints": [
+            "0 <= drones.length <= 100000",
+            "Drone sizes are nonzero safe integers",
+            "All drones move at equal speed"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "collision_shape": ["none", "single", "chain", "mutual"]
+          },
+          "edge_cases": [
+            "empty corridor",
+            "no collisions",
+            "equal-size collision",
+            "one drone destroys several others"
+          ],
+          "examples": [{ "input": [5, 10, -5], "output": [5, 10] }]
+        }
+      ]
+    },
+    {
+      "id": "linked-list-pointers",
+      "title": "Linked-list pointer manipulation",
+      "summary": "Change or compare links while preserving the part of the structure that still must be traversed.",
+      "recognition_signals": [
+        "The input exposes nodes and next references rather than random-access indices or contiguous storage.",
+        "The contract requires constant auxiliary space, node reuse, or identity comparisons between shared nodes."
+      ],
+      "common_wrong_approaches": [
+        "Overwriting next before saving the remaining chain disconnects nodes that still need to be processed.",
+        "Comparing node values instead of node identity gives false intersections when different nodes share a value."
+      ],
+      "problems": [
+        {
+          "id": "linked-01",
+          "origin": "LL1",
+          "title": "Reverse the Escalation Chain",
+          "primary_concept": "iterative link reversal",
+          "secondary_concepts": ["pointer invariants", "in-place mutation"],
+          "difficulty": "easy",
+          "statement": "An incident escalation chain is a singly linked list. Reverse its links in place and return the new head without allocating replacement nodes.",
+          "constraints": [
+            "0 <= node count <= 100000",
+            "The input list is acyclic",
+            "Reuse every supplied node"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "object",
+          "generator_parameters": {
+            "length": [0, 1, 2, 100000],
+            "values": ["unique", "duplicate"]
+          },
+          "edge_cases": ["empty chain", "one node", "two nodes", "duplicate node values"],
+          "examples": [{ "input": [1, 2, 3], "output": [3, 2, 1] }]
+        },
+        {
+          "id": "linked-02",
+          "origin": "LL2",
+          "title": "Shared Escalation Point",
+          "primary_concept": "pointer alignment by length",
+          "secondary_concepts": ["node identity", "shared suffix"],
+          "difficulty": "easy",
+          "statement": "Two acyclic escalation chains may eventually share the same node objects and suffix. Return their first shared node by identity, or null when they never intersect, using constant auxiliary space.",
+          "constraints": [
+            "Combined distinct node count is at most 100000",
+            "Both chains are acyclic",
+            "Do not mutate either chain"
+          ],
+          "expected_complexity": { "time": "O(n + m)", "space": "O(1)" },
+          "answer_type": "object",
+          "generator_parameters": {
+            "lengths": [
+              [0, 0],
+              [3, 5],
+              [100000, 100000]
+            ],
+            "shared_suffix": [0, 1, "long"]
+          },
+          "edge_cases": [
+            "one empty chain",
+            "same head",
+            "equal values but no shared nodes",
+            "long unequal prefixes"
+          ],
+          "examples": [
+            {
+              "input": { "first": [4, 1, "shared:8", 4], "second": [5, 6, 1, "shared:8", 4] },
+              "output": "shared:8"
+            }
+          ]
+        },
+        {
+          "id": "linked-03",
+          "origin": "LL3",
+          "title": "Remove the Expiring Handoff",
+          "primary_concept": "fixed-gap linked-list pointers",
+          "secondary_concepts": ["sentinel node", "one-pass removal"],
+          "difficulty": "medium",
+          "statement": "Remove the kth node from the end of an acyclic handoff chain and return the head. k is valid, supplied nodes must be reused, and the chain should be traversed once.",
+          "constraints": [
+            "1 <= node count <= 100000",
+            "1 <= k <= node count",
+            "The input list is acyclic"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "object",
+          "generator_parameters": { "length": [1, 2, 100000], "k": [1, "middle", "n"] },
+          "edge_cases": [
+            "remove the head",
+            "remove the tail",
+            "one-node chain",
+            "k lies in the middle"
+          ],
+          "examples": [{ "input": { "chain": [1, 2, 3, 4, 5], "k": 2 }, "output": [1, 2, 3, 5] }]
+        },
+        {
+          "id": "linked-04",
+          "origin": "LL4",
+          "title": "Alternate the Support Queue",
+          "primary_concept": "split, reverse, and weave",
+          "secondary_concepts": ["middle detection", "in-place merge"],
+          "difficulty": "medium",
+          "statement": "Reorder a support-ticket chain from L0→L1→…→Ln into L0→Ln→L1→Ln-1→… in place. Reuse nodes and return the original head.",
+          "constraints": [
+            "0 <= node count <= 100000",
+            "The chain is acyclic",
+            "Do not change node values"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "object",
+          "generator_parameters": { "length": [0, 1, 2, 5, 100000], "parity": ["even", "odd"] },
+          "edge_cases": ["empty chain", "one node", "two nodes", "odd and even lengths"],
+          "examples": [{ "input": [1, 2, 3, 4, 5], "output": [1, 5, 2, 4, 3] }]
+        },
+        {
+          "id": "linked-05",
+          "origin": "LL5",
+          "title": "Symmetric Approval Chain",
+          "primary_concept": "half reversal with comparison",
+          "secondary_concepts": ["fast and slow pointers", "structure restoration"],
+          "difficulty": "medium",
+          "statement": "Determine whether values in an acyclic approval chain read the same forward and backward. Use constant auxiliary space and restore the chain to its original links before returning.",
+          "constraints": [
+            "0 <= node count <= 100000",
+            "Node values are safe integers",
+            "The chain must be restored"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "length": [0, 1, 2, 100000],
+            "palindrome": [true, false],
+            "parity": ["even", "odd"]
+          },
+          "edge_cases": [
+            "empty chain",
+            "one node",
+            "even palindrome",
+            "first mismatch near the center"
+          ],
+          "examples": [{ "input": [1, 2, 3, 2, 1], "output": true }]
+        },
+        {
+          "id": "linked-06",
+          "origin": "LL6",
+          "title": "Clone the Cross-Referenced Queue",
+          "primary_concept": "linked structure cloning",
+          "secondary_concepts": ["identity mapping", "random references"],
+          "difficulty": "hard",
+          "statement": "Each queue node has next and optional related references. Return a deep clone in which every cloned reference points only to cloned nodes and the original structure remains unchanged.",
+          "constraints": [
+            "0 <= node count <= 10000",
+            "related is null or points to a node in the same chain",
+            "Node values may repeat"
+          ],
+          "expected_complexity": {
+            "time": "O(n)",
+            "space": "O(n), or O(1) auxiliary with interleaving"
+          },
+          "answer_type": "object",
+          "generator_parameters": {
+            "length": [0, 1, 10000],
+            "related_shape": ["none", "self", "forward", "backward", "mixed"]
+          },
+          "edge_cases": [
+            "empty chain",
+            "self reference",
+            "several nodes reference one node",
+            "duplicate values"
+          ],
+          "examples": [
+            {
+              "input": [
+                { "value": 7, "related": null },
+                { "value": 13, "related": 0 }
+              ],
+              "output": [
+                { "value": 7, "related": null },
+                { "value": 13, "related": 0 }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "binary-search-variants",
+      "title": "Binary search and monotonic answer spaces",
+      "summary": "Discard half of an ordered search space by preserving the side that can still contain the answer.",
+      "recognition_signals": [
+        "The data or candidate answers have an order, and a predicate changes from false to true at a boundary.",
+        "The requested scale makes a linear scan too expensive while indexed access or feasibility testing is available."
+      ],
+      "common_wrong_approaches": [
+        "Using an inconsistent inclusive or half-open interval causes skipped candidates or nonterminating loops.",
+        "Returning immediately on equality is wrong when the contract asks for a first, last, minimum, or maximum boundary."
+      ],
+      "problems": [
+        {
+          "id": "binary-01",
+          "origin": "BS1",
+          "title": "Locate a Rotated Deployment Version",
+          "primary_concept": "binary search in a rotated array",
+          "secondary_concepts": ["sorted-half detection"],
+          "difficulty": "medium",
+          "statement": "A strictly increasing deployment-version array was rotated at an unknown pivot. Return the index of a target version or -1 when absent.",
+          "constraints": [
+            "0 <= versions.length <= 100000",
+            "Versions are distinct safe integers",
+            "Do not mutate versions"
+          ],
+          "expected_complexity": { "time": "O(log n)", "space": "O(1)" },
+          "answer_type": "index",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "pivot": [0, 1, "middle", "end"],
+            "target": ["present", "absent"]
+          },
+          "edge_cases": ["empty input", "not rotated", "one value", "target lies across the pivot"],
+          "examples": [
+            { "input": { "versions": [40, 50, 5, 10, 20, 30], "target": 10 }, "output": 3 }
+          ]
+        },
+        {
+          "id": "binary-02",
+          "origin": "BS2",
+          "title": "Activation Timestamp Range",
+          "primary_concept": "lower and upper bounds",
+          "secondary_concepts": ["duplicate boundaries", "binary search"],
+          "difficulty": "medium",
+          "statement": "Given sorted activation timestamps, return the first and last indices equal to a target timestamp, or [-1, -1] if it does not occur.",
+          "constraints": [
+            "0 <= timestamps.length <= 100000",
+            "Timestamps are sorted safe integers",
+            "Do not mutate input"
+          ],
+          "expected_complexity": { "time": "O(log n)", "space": "O(1)" },
+          "answer_type": "indices",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "multiplicity": [0, 1, 2, "many"],
+            "position": ["start", "middle", "end"]
+          },
+          "edge_cases": [
+            "empty input",
+            "target absent",
+            "all timestamps equal",
+            "match touches an array boundary"
+          ],
+          "examples": [
+            { "input": { "timestamps": [1, 2, 2, 2, 5], "target": 2 }, "output": [1, 3] }
+          ]
+        },
+        {
+          "id": "binary-03",
+          "origin": "BS3",
+          "title": "Minimum Dispatch Capacity",
+          "primary_concept": "binary search on feasible capacity",
+          "secondary_concepts": ["greedy feasibility", "minimum true boundary"],
+          "difficulty": "medium",
+          "statement": "Packages must ship in their listed order over at most d days. A day carries a contiguous prefix of remaining packages up to a fixed capacity. Return the minimum capacity that completes all shipments on time.",
+          "constraints": [
+            "1 <= weights.length <= 100000",
+            "Weights are positive safe integers",
+            "1 <= d <= weights.length"
+          ],
+          "expected_complexity": { "time": "O(n log S)", "space": "O(1)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [1, 10, 100000],
+            "days": [1, 2, "n"],
+            "weights": ["uniform", "skewed", "random"]
+          },
+          "edge_cases": [
+            "one shipping day",
+            "one package per day",
+            "one dominant package",
+            "capacity lower bound is the maximum weight"
+          ],
+          "examples": [{ "input": { "weights": [1, 2, 3, 1, 1], "days": 4 }, "output": 3 }]
+        },
+        {
+          "id": "binary-04",
+          "origin": "BS4",
+          "title": "Space the Access Points",
+          "primary_concept": "binary search on maximum feasible distance",
+          "secondary_concepts": ["greedy placement", "maximum true boundary"],
+          "difficulty": "medium",
+          "statement": "Install k wireless access points at distinct candidate coordinates. Return the largest possible minimum distance between any two installed points.",
+          "constraints": [
+            "2 <= coordinates.length <= 100000",
+            "2 <= k <= coordinates.length",
+            "Coordinates are distinct safe integers and may be unsorted"
+          ],
+          "expected_complexity": {
+            "time": "O(n log n + n log R)",
+            "space": "O(n) for a sorted copy"
+          },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [2, 10, 100000],
+            "k": [2, "middle", "n"],
+            "spacing": ["uniform", "clustered", "random"]
+          },
+          "edge_cases": [
+            "install at every coordinate",
+            "k equals two",
+            "negative coordinates",
+            "large coordinate gaps"
+          ],
+          "examples": [{ "input": { "coordinates": [1, 2, 8, 4, 9], "k": 3 }, "output": 3 }]
+        },
+        {
+          "id": "binary-05",
+          "origin": "BS5",
+          "title": "Search the Sharded Metric Matrix",
+          "primary_concept": "binary search over flattened coordinates",
+          "secondary_concepts": ["index mapping", "matrix ordering"],
+          "difficulty": "medium",
+          "statement": "Each matrix row is sorted, and the first value of a row is greater than the final value of the previous row. Return whether a target metric appears without flattening the matrix.",
+          "constraints": [
+            "0 <= rows, columns <= 1000",
+            "All rows have equal length",
+            "Matrix values are safe integers"
+          ],
+          "expected_complexity": { "time": "O(log(rows * columns))", "space": "O(1)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "dimensions": [
+              [0, 0],
+              [1, 10],
+              [1000, 1000]
+            ],
+            "target": ["first", "middle", "last", "absent"]
+          },
+          "edge_cases": ["empty matrix", "one row", "one column", "target lies between rows"],
+          "examples": [
+            {
+              "input": {
+                "matrix": [
+                  [1, 3, 5],
+                  [7, 9, 11]
+                ],
+                "target": 9
+              },
+              "output": true
+            }
+          ]
+        },
+        {
+          "id": "binary-06",
+          "origin": "BS6",
+          "title": "Median Across Two Telemetry Streams",
+          "primary_concept": "binary search partition",
+          "secondary_concepts": ["two-array order statistics", "partition invariants"],
+          "difficulty": "hard",
+          "statement": "Two telemetry arrays are individually sorted. Return the median of all values without fully merging them, in logarithmic time with respect to the shorter array.",
+          "constraints": [
+            "At least one array is nonempty",
+            "Combined length is at most 200000",
+            "Values are finite safe integers"
+          ],
+          "expected_complexity": { "time": "O(log(min(n, m)))", "space": "O(1)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "sizes": [
+              [0, 1],
+              [2, 3],
+              [100000, 100000]
+            ],
+            "parity": ["odd", "even"],
+            "overlap": ["none", "mixed"]
+          },
+          "edge_cases": [
+            "one array empty",
+            "combined even length",
+            "duplicate values",
+            "all values in one array precede the other"
+          ],
+          "examples": [{ "input": { "first": [1, 3], "second": [2] }, "output": 2 }]
+        }
+      ]
+    },
+    {
+      "id": "recursion-backtracking",
+      "title": "Recursion and backtracking",
+      "summary": "Explore a decision tree while restoring mutable choice state before trying the next branch.",
+      "recognition_signals": [
+        "The prompt asks for all valid constructions, combinations, permutations, or placements under constraints.",
+        "A partial choice can be extended recursively and rejected early when it can no longer lead to a solution."
+      ],
+      "common_wrong_approaches": [
+        "Forgetting to undo a choice leaks state between sibling branches and silently removes or corrupts results.",
+        "Copying large state at every branch can turn an already exponential search into avoidable extra overhead."
+      ],
+      "problems": [
+        {
+          "id": "recur-01",
+          "origin": "RB1",
+          "title": "Choose the On-Call Team",
+          "primary_concept": "combination backtracking",
+          "secondary_concepts": ["pruning", "decision trees"],
+          "difficulty": "easy",
+          "statement": "Given distinct engineer IDs and team size k, return every size-k team while preserving input order within each team. Order teams by the depth-first choice order induced by the input.",
+          "constraints": [
+            "0 <= engineers.length <= 20",
+            "0 <= k <= engineers.length",
+            "Engineer IDs are distinct"
+          ],
+          "expected_complexity": { "time": "O(C(n,k) * k)", "space": "O(k) excluding output" },
+          "answer_type": "groups",
+          "generator_parameters": { "length": [0, 1, 10, 20], "k": [0, 1, "middle", "n"] },
+          "edge_cases": ["k equals zero", "k equals n", "one engineer", "many combinations"],
+          "examples": [
+            {
+              "input": { "engineers": [1, 2, 3, 4], "k": 2 },
+              "output": [
+                [1, 2],
+                [1, 3],
+                [1, 4],
+                [2, 3],
+                [2, 4],
+                [3, 4]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "recur-02",
+          "origin": "RB2",
+          "title": "Feature Rollout Orders",
+          "primary_concept": "permutation backtracking",
+          "secondary_concepts": ["used-state tracking", "state restoration"],
+          "difficulty": "medium",
+          "statement": "Given distinct feature flags, return every possible rollout order. Each output must use every flag exactly once.",
+          "constraints": [
+            "0 <= flags.length <= 9",
+            "Flags are distinct strings",
+            "Do not mutate flags"
+          ],
+          "expected_complexity": { "time": "O(n! * n)", "space": "O(n) excluding output" },
+          "answer_type": "groups",
+          "generator_parameters": { "length": [0, 1, 5, 9], "names": ["short", "long"] },
+          "edge_cases": [
+            "empty input has one empty order",
+            "one flag",
+            "factorial output growth",
+            "input remains unchanged"
+          ],
+          "examples": [
+            {
+              "input": ["a", "b", "c"],
+              "output": [
+                ["a", "b", "c"],
+                ["a", "c", "b"],
+                ["b", "a", "c"],
+                ["b", "c", "a"],
+                ["c", "a", "b"],
+                ["c", "b", "a"]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "recur-03",
+          "origin": "RB3",
+          "title": "Support Keypad Messages",
+          "primary_concept": "cartesian-product backtracking",
+          "secondary_concepts": ["variable branching", "string construction"],
+          "difficulty": "easy",
+          "statement": "Digits 2 through 9 map to their standard telephone keypad letters. Return every possible letter message represented by an input digit string, or an empty array for an empty input.",
+          "constraints": [
+            "0 <= digits.length <= 10",
+            "Every digit is between 2 and 9",
+            "Order follows keypad letter order"
+          ],
+          "expected_complexity": { "time": "O(4^n * n)", "space": "O(n) excluding output" },
+          "answer_type": "values",
+          "generator_parameters": { "length": [0, 1, 5, 10], "branching": [3, 4, "mixed"] },
+          "edge_cases": [
+            "empty digits",
+            "one digit",
+            "digits seven and nine have four letters",
+            "maximum output size"
+          ],
+          "examples": [
+            { "input": "23", "output": ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"] }
+          ]
+        },
+        {
+          "id": "recur-04",
+          "origin": "RB4",
+          "title": "Trace a Command Through the Grid",
+          "primary_concept": "grid backtracking",
+          "secondary_concepts": ["temporary visited state", "path search"],
+          "difficulty": "medium",
+          "statement": "Determine whether a command string can be traced through orthogonally adjacent grid cells. A cell may be used at most once in one trace, and matching is case-sensitive.",
+          "constraints": [
+            "0 <= rows, columns <= 200",
+            "0 <= command.length <= 1000",
+            "Do not leave the grid mutated"
+          ],
+          "expected_complexity": { "time": "O(rows * columns * 3^L) worst case", "space": "O(L)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "dimensions": [
+              [0, 0],
+              [3, 4],
+              [200, 200]
+            ],
+            "path": ["present", "absent", "requires-reuse"]
+          },
+          "edge_cases": [
+            "empty command",
+            "empty grid",
+            "cell reuse would be required",
+            "repeated grid letters"
+          ],
+          "examples": [
+            {
+              "input": {
+                "grid": [
+                  ["A", "B", "C", "E"],
+                  ["S", "F", "C", "S"],
+                  ["A", "D", "E", "E"]
+                ],
+                "command": "ABCCED"
+              },
+              "output": true
+            }
+          ]
+        },
+        {
+          "id": "recur-05",
+          "origin": "RB5",
+          "title": "Place Noninterfering Replicas",
+          "primary_concept": "constraint backtracking",
+          "secondary_concepts": ["column and diagonal occupancy", "pruning"],
+          "difficulty": "hard",
+          "statement": "Place n service replicas on an n-by-n grid so no two share a row, column, or diagonal. Return the number of distinct placements.",
+          "constraints": [
+            "1 <= n <= 12",
+            "Each row contains exactly one replica",
+            "Reflections and rotations count as distinct placements"
+          ],
+          "expected_complexity": { "time": "O(n!) worst case with pruning", "space": "O(n)" },
+          "answer_type": "number",
+          "generator_parameters": { "size": [1, 2, 3, 4, 8, 12] },
+          "edge_cases": [
+            "n equals one",
+            "n equals two or three",
+            "diagonal conflicts",
+            "symmetries count separately"
+          ],
+          "examples": [{ "input": 4, "output": 2 }]
+        },
+        {
+          "id": "recur-06",
+          "origin": "RB6",
+          "title": "Restore Network Address Segments",
+          "primary_concept": "bounded partition backtracking",
+          "secondary_concepts": ["syntax validation", "early pruning"],
+          "difficulty": "medium",
+          "statement": "Insert three separators into a decimal digit string to form four address segments. Each segment must be 0 through 255 and may not contain a leading zero unless it is exactly \"0\". Return all valid addresses.",
+          "constraints": [
+            "0 <= digits.length <= 20",
+            "Input contains only decimal digits",
+            "Output addresses must preserve digit order"
+          ],
+          "expected_complexity": {
+            "time": "O(1) under four bounded segments",
+            "space": "O(1) excluding output"
+          },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 4, 12, 20],
+            "zeros": ["none", "leading", "many"],
+            "validity": ["none", "one", "many"]
+          },
+          "edge_cases": [
+            "too few or too many digits",
+            "leading zeros",
+            "segment above 255",
+            "several valid partitions"
+          ],
+          "examples": [{ "input": "25525511135", "output": ["255.255.11.135", "255.255.111.35"] }]
+        }
+      ]
+    },
+    {
+      "id": "tree-traversal",
+      "title": "Tree traversal and structural recursion",
+      "summary": "Combine answers from child subtrees or process nodes by depth while respecting tree invariants.",
+      "recognition_signals": [
+        "The input is hierarchical and each node naturally owns independent left and right subproblems.",
+        "The requested property depends on ancestor bounds, root-to-node paths, subtree summaries, or level order."
+      ],
+      "common_wrong_approaches": [
+        "Checking only a node against its immediate children misses violations inherited from more distant ancestors.",
+        "Recomputing subtree height or contents at every node turns a linear traversal into quadratic work on skewed trees."
+      ],
+      "problems": [
+        {
+          "id": "tree-01",
+          "origin": "TR1",
+          "title": "Validate the Routing Index Tree",
+          "primary_concept": "BST bound propagation",
+          "secondary_concepts": ["depth-first traversal", "ancestor constraints"],
+          "difficulty": "medium",
+          "statement": "Determine whether a binary routing tree is a valid strict binary-search tree: every value in a left subtree is smaller and every value in a right subtree is larger than its ancestor. Duplicate values are invalid.",
+          "constraints": [
+            "0 <= node count <= 100000",
+            "Node values are safe integers",
+            "Tree height is at most 1000"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(h)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "nodes": [0, 1, 100000],
+            "shape": ["balanced", "left-skewed", "right-skewed"],
+            "valid": [true, false]
+          },
+          "edge_cases": [
+            "empty tree",
+            "duplicate value",
+            "deep descendant violates an ancestor bound",
+            "safe-integer extremes"
+          ],
+          "examples": [{ "input": [5, 1, 7, null, null, 4, 8], "output": false }]
+        },
+        {
+          "id": "tree-02",
+          "origin": "TR2",
+          "title": "Closest Shared Manager",
+          "primary_concept": "lowest common ancestor",
+          "secondary_concepts": ["postorder recursion", "identity matching"],
+          "difficulty": "medium",
+          "statement": "Given a binary organization tree and two existing employee nodes, return their lowest shared manager. A node may be its own ancestor, and matching uses node identity.",
+          "constraints": [
+            "1 <= node count <= 100000",
+            "Both target nodes exist in the tree",
+            "The tree is not necessarily a search tree and height is at most 1000"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(h)" },
+          "answer_type": "object",
+          "generator_parameters": {
+            "nodes": [1, 10, 100000],
+            "relationship": ["siblings", "ancestor", "different-subtrees"],
+            "shape": ["balanced", "skewed"]
+          },
+          "edge_cases": [
+            "targets are the same node",
+            "one target is ancestor of the other",
+            "root is the answer",
+            "skewed tree"
+          ],
+          "examples": [
+            { "input": { "tree": [3, 5, 1, 6, 2, 0, 8], "first": 5, "second": 1 }, "output": 3 }
+          ]
+        },
+        {
+          "id": "tree-03",
+          "origin": "TR3",
+          "title": "Count Target-Cost Reporting Paths",
+          "primary_concept": "tree prefix-state DFS",
+          "secondary_concepts": ["backtracking counts", "path sums"],
+          "difficulty": "hard",
+          "statement": "Each hierarchy node has a signed cost. Count downward ancestor-to-descendant paths whose values sum to target. A path may start and end at any nodes but must follow parent-to-child links.",
+          "constraints": [
+            "0 <= node count <= 100000",
+            "Costs and target are safe integers",
+            "The answer fits in a safe integer and tree height is at most 1000"
+          ],
+          "expected_complexity": {
+            "time": "O(n)",
+            "space": "O(h) average map entries, O(n) worst case"
+          },
+          "answer_type": "number",
+          "generator_parameters": {
+            "nodes": [0, 1, 100000],
+            "costs": ["positive", "mixed", "zero-heavy"],
+            "shape": ["balanced", "skewed"]
+          },
+          "edge_cases": [
+            "empty tree",
+            "negative costs",
+            "paths starting below the root",
+            "overlapping valid paths"
+          ],
+          "examples": [
+            {
+              "input": { "tree": [10, 5, -3, 3, 2, null, 11, 3, -2, null, 1], "target": 8 },
+              "output": 3
+            }
+          ]
+        },
+        {
+          "id": "tree-04",
+          "origin": "TR4",
+          "title": "Rightmost Service by Tier",
+          "primary_concept": "level-order traversal",
+          "secondary_concepts": ["queue boundaries", "visible nodes"],
+          "difficulty": "easy",
+          "statement": "Return the rightmost service value at every depth of a binary hierarchy, from the root level downward.",
+          "constraints": [
+            "0 <= node count <= 100000",
+            "Node values are safe integers",
+            "Preserve the tree; tree height is at most 1000"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(w), where w is maximum width" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "nodes": [0, 1, 100000],
+            "shape": ["balanced", "left-skewed", "sparse"]
+          },
+          "edge_cases": ["empty tree", "one node", "left-only levels", "sparse final level"],
+          "examples": [{ "input": [1, 2, 3, null, 5, null, 4], "output": [1, 3, 4] }]
+        },
+        {
+          "id": "tree-05",
+          "origin": "TR5",
+          "title": "Longest Handoff Route",
+          "primary_concept": "tree diameter via subtree heights",
+          "secondary_concepts": ["postorder aggregation", "global optimum"],
+          "difficulty": "medium",
+          "statement": "Return the maximum number of edges on any path between two nodes in a binary handoff hierarchy. The path does not need to pass through the root.",
+          "constraints": [
+            "0 <= node count <= 100000",
+            "Tree height is at most 1000",
+            "Do not mutate the tree"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(h)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "nodes": [0, 1, 100000],
+            "shape": ["balanced", "skewed", "best-below-root"]
+          },
+          "edge_cases": [
+            "empty tree",
+            "one node has diameter zero",
+            "skewed tree",
+            "longest path excludes root"
+          ],
+          "examples": [{ "input": [1, 2, 3, 4, 5], "output": 3 }]
+        },
+        {
+          "id": "tree-06",
+          "origin": "TR6",
+          "title": "Rebuild the Deployment Hierarchy",
+          "primary_concept": "recursive tree reconstruction",
+          "secondary_concepts": ["preorder", "inorder", "index maps"],
+          "difficulty": "medium",
+          "statement": "Reconstruct and return a binary deployment tree from its preorder and inorder value sequences. All values are distinct and the sequences describe one valid tree.",
+          "constraints": [
+            "0 <= traversal length <= 100000",
+            "Preorder and inorder have equal length",
+            "All values are distinct safe integers and tree height is at most 1000"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "object",
+          "generator_parameters": {
+            "nodes": [0, 1, 100000],
+            "shape": ["balanced", "left-skewed", "right-skewed", "sparse"]
+          },
+          "edge_cases": [
+            "empty traversals",
+            "one node",
+            "skewed tree",
+            "root split at an inorder boundary"
+          ],
+          "examples": [
+            {
+              "input": { "preorder": [3, 9, 20, 15, 7], "inorder": [9, 3, 15, 20, 7] },
+              "output": [3, 9, 20, null, null, 15, 7]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "heaps-streaming",
+      "title": "Heaps and streaming selection",
+      "summary": "Retain the next most relevant candidate without fully ordering all available data.",
+      "recognition_signals": [
+        "The prompt repeatedly needs the smallest, largest, earliest, or kth item while data changes over time.",
+        "Only a bounded subset of candidates matters, or several already ordered streams must be merged incrementally."
+      ],
+      "common_wrong_approaches": [
+        "Sorting the complete collection after every update repeats work that a heap maintains incrementally.",
+        "Using the wrong heap direction retains the items that should be discarded and breaks bounded top-k logic."
+      ],
+      "problems": [
+        {
+          "id": "heap-01",
+          "origin": "HP1",
+          "title": "Running Median Latency",
+          "primary_concept": "two-heap median maintenance",
+          "secondary_concepts": ["streaming balance", "order statistics"],
+          "difficulty": "hard",
+          "statement": "Latency measurements arrive one at a time. Return the median after every insertion; for an even number of measurements, use the average of the two middle values.",
+          "constraints": [
+            "0 <= latencies.length <= 100000",
+            "Latencies are finite safe integers",
+            "Returned averages are exact halves when necessary"
+          ],
+          "expected_complexity": { "time": "O(n log n)", "space": "O(n)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "order": ["increasing", "decreasing", "random"],
+            "duplicates": [true, false]
+          },
+          "edge_cases": [
+            "empty stream",
+            "one measurement",
+            "even prefix length",
+            "duplicate medians"
+          ],
+          "examples": [{ "input": [5, 2, 10, 4], "output": [5, 3.5, 5, 4.5] }]
+        },
+        {
+          "id": "heap-02",
+          "origin": "HP2",
+          "title": "Merge Regional Telemetry Streams",
+          "primary_concept": "k-way heap merge",
+          "secondary_concepts": ["sorted streams", "frontier tracking"],
+          "difficulty": "medium",
+          "statement": "Several regions provide sorted telemetry arrays. Merge them into one sorted array while keeping at most one pending candidate from each region in a priority queue.",
+          "constraints": [
+            "0 <= stream count <= 10000",
+            "Total values are at most 200000",
+            "Each stream is sorted ascending"
+          ],
+          "expected_complexity": { "time": "O(N log k)", "space": "O(k) excluding output" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "stream_count": [0, 1, 10, 10000],
+            "total_values": [0, 10, 200000],
+            "empty_streams": [true, false]
+          },
+          "edge_cases": ["no streams", "empty streams", "duplicate values", "one very long stream"],
+          "examples": [
+            { "input": [[1, 4, 7], [2, 5], [], [3, 6, 8]], "output": [1, 2, 3, 4, 5, 6, 7, 8] }
+          ]
+        },
+        {
+          "id": "heap-03",
+          "origin": "HP3",
+          "title": "Assign Jobs to Available Workers",
+          "primary_concept": "dual-heap scheduling",
+          "secondary_concepts": ["resource availability", "deterministic ties"],
+          "difficulty": "hard",
+          "statement": "Workers have integer weights and process one job at a time. Jobs arrive at integer times equal to their indices and have durations. Assign each job to the available worker with smallest weight then index, or wait for the earliest worker to finish. Return assigned worker indices.",
+          "constraints": [
+            "1 <= workers.length <= 100000",
+            "1 <= jobs.length <= 100000",
+            "Weights and durations are positive safe integers"
+          ],
+          "expected_complexity": { "time": "O((w + j) log w)", "space": "O(w)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "workers": [1, 2, 100000],
+            "jobs": [1, 10, 100000],
+            "load": ["idle", "saturated", "bursty"]
+          },
+          "edge_cases": [
+            "one worker",
+            "several workers become free together",
+            "all workers busy",
+            "weight ties"
+          ],
+          "examples": [
+            {
+              "input": { "workers": [3, 3, 2], "jobs": [1, 2, 3, 2, 1, 2] },
+              "output": [2, 2, 0, 2, 1, 2]
+            }
+          ]
+        },
+        {
+          "id": "heap-04",
+          "origin": "HP4",
+          "title": "Nearest Service Depots",
+          "primary_concept": "bounded max-heap selection",
+          "secondary_concepts": ["top-k", "distance comparison"],
+          "difficulty": "medium",
+          "statement": "Given depot coordinates and k, return the k depots closest to the origin. Compare squared distance, then x, then y; return the selected depots in that order.",
+          "constraints": [
+            "0 <= depots.length <= 100000",
+            "0 <= k <= depots.length",
+            "Coordinates and squared distances are safe integers"
+          ],
+          "expected_complexity": { "time": "O(n log k + k log k)", "space": "O(k)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "k": [0, 1, 10, "n"],
+            "ties": [true, false]
+          },
+          "edge_cases": [
+            "k equals zero",
+            "k equals all depots",
+            "equal distances",
+            "negative coordinates"
+          ],
+          "examples": [
+            {
+              "input": {
+                "depots": [
+                  [1, 3],
+                  [-2, 2],
+                  [2, -2]
+                ],
+                "k": 2
+              },
+              "output": [
+                [-2, 2],
+                [2, -2]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "heap-05",
+          "origin": "HP5",
+          "title": "Online Kth-Highest Throughput",
+          "primary_concept": "bounded min-heap",
+          "secondary_concepts": ["online updates", "order statistics"],
+          "difficulty": "medium",
+          "statement": "Given k and a stream of throughput readings, return the kth-highest reading after each insertion once at least k readings have arrived; return null for earlier prefixes.",
+          "constraints": [
+            "1 <= k <= 100000",
+            "0 <= readings.length <= 100000",
+            "Readings are safe integers"
+          ],
+          "expected_complexity": { "time": "O(n log k)", "space": "O(k)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "k": [1, 2, 100000],
+            "order": ["increasing", "decreasing", "random"]
+          },
+          "edge_cases": [
+            "fewer than k readings",
+            "k equals one",
+            "duplicate readings",
+            "k equals total length"
+          ],
+          "examples": [
+            { "input": { "k": 3, "readings": [4, 5, 8, 2, 10] }, "output": [null, null, 4, 4, 5] }
+          ]
+        },
+        {
+          "id": "heap-06",
+          "origin": "HP6",
+          "title": "Separate Repeated Job Categories",
+          "primary_concept": "greedy max-heap construction",
+          "secondary_concepts": ["frequency maps", "cooldown of previous choice"],
+          "difficulty": "hard",
+          "statement": "Reorder job category strings so no equal categories are adjacent. Return the lexicographically smallest valid arrangement among choices available at each greedy step, or null if no arrangement exists.",
+          "constraints": [
+            "0 <= categories.length <= 100000",
+            "Categories are lowercase English strings",
+            "The input may contain duplicates"
+          ],
+          "expected_complexity": { "time": "O(n log u)", "space": "O(u)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "frequency_shape": ["feasible", "boundary", "impossible"],
+            "distinct": [1, 2, 1000]
+          },
+          "edge_cases": [
+            "empty input",
+            "one category",
+            "dominant category is impossible",
+            "several valid arrangements"
+          ],
+          "examples": [
+            { "input": ["a", "a", "a", "b", "b", "c"], "output": ["a", "b", "a", "b", "a", "c"] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "graph-search",
+      "title": "Graph search and connectivity",
+      "summary": "Model relationships explicitly, then choose traversal order and state according to the requested path or component property.",
+      "recognition_signals": [
+        "Entities have arbitrary many-to-many relationships, dependencies, routes, or grid neighbors rather than a hierarchy.",
+        "The prompt asks about reachability, ordering, connected groups, shortest paths, or merging transitively related records."
+      ],
+      "common_wrong_approaches": [
+        "Marking visited at the wrong time can enqueue a node repeatedly or block a cheaper weighted route discovered later.",
+        "Using depth-first discovery depth as a shortest-path distance is invalid when traversal order does not preserve distance."
+      ],
+      "problems": [
+        {
+          "id": "graph-01",
+          "origin": "GR1",
+          "title": "Deployment Dependency Order",
+          "primary_concept": "topological sorting",
+          "secondary_concepts": ["indegree counts", "cycle detection"],
+          "difficulty": "medium",
+          "statement": "Services are numbered 0 through n - 1. Each dependency [service, prerequisite] requires the prerequisite first. Return the lexicographically smallest valid deployment order, or an empty array when a cycle makes deployment impossible.",
+          "constraints": [
+            "0 <= serviceCount <= 100000",
+            "0 <= dependencies.length <= 200000",
+            "Dependencies contain valid service indices"
+          ],
+          "expected_complexity": {
+            "time": "O((V + E) log V) for lexical ordering",
+            "space": "O(V + E)"
+          },
+          "answer_type": "values",
+          "generator_parameters": {
+            "vertices": [0, 1, 100000],
+            "edges": [0, 1, 200000],
+            "shape": ["chain", "diamond", "cycle", "disconnected"]
+          },
+          "edge_cases": [
+            "no services",
+            "no dependencies",
+            "self dependency",
+            "several valid orders"
+          ],
+          "examples": [
+            {
+              "input": {
+                "serviceCount": 4,
+                "dependencies": [
+                  [1, 0],
+                  [2, 0],
+                  [3, 1],
+                  [3, 2]
+                ]
+              },
+              "output": [0, 1, 2, 3]
+            }
+          ]
+        },
+        {
+          "id": "graph-02",
+          "origin": "GR2",
+          "title": "Cheapest Route with Transfer Limit",
+          "primary_concept": "bounded-edge shortest path",
+          "secondary_concepts": ["Bellman-Ford layers", "stateful graph search"],
+          "difficulty": "hard",
+          "statement": "Directed routes have nonnegative prices. Return the cheapest price from source to destination using at most k intermediate transfers, or -1 when no such route exists.",
+          "constraints": [
+            "1 <= cityCount <= 1000",
+            "0 <= routes.length <= 20000",
+            "Prices are nonnegative safe integers"
+          ],
+          "expected_complexity": { "time": "O(kE)", "space": "O(V)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "vertices": [1, 10, 1000],
+            "edges": [0, 100, 20000],
+            "transfers": [0, 1, 10, 999]
+          },
+          "edge_cases": [
+            "source equals destination",
+            "zero transfers",
+            "cheapest unrestricted route exceeds the limit",
+            "unreachable destination"
+          ],
+          "examples": [
+            {
+              "input": {
+                "cityCount": 4,
+                "routes": [
+                  [0, 1, 100],
+                  [1, 2, 100],
+                  [2, 3, 100],
+                  [0, 3, 500]
+                ],
+                "source": 0,
+                "destination": 3,
+                "k": 1
+              },
+              "output": 500
+            }
+          ]
+        },
+        {
+          "id": "graph-03",
+          "origin": "GR3",
+          "title": "Incident Propagation Time",
+          "primary_concept": "multi-source breadth-first search",
+          "secondary_concepts": ["grid layers", "simultaneous sources"],
+          "difficulty": "medium",
+          "statement": "A grid contains blocked cells, healthy services, and initially failed services. Each minute, failures spread orthogonally to healthy neighbors. Return minutes until no healthy service remains, or -1 if some can never fail.",
+          "constraints": [
+            "0 <= rows, columns <= 500",
+            "Cells are blocked, healthy, or failed",
+            "Do not mutate the input grid"
+          ],
+          "expected_complexity": { "time": "O(rows * columns)", "space": "O(rows * columns)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "dimensions": [
+              [0, 0],
+              [3, 3],
+              [500, 500]
+            ],
+            "sources": [0, 1, "many"],
+            "reachability": ["complete", "blocked"]
+          },
+          "edge_cases": [
+            "empty grid",
+            "no healthy services",
+            "no initial failure",
+            "isolated healthy region"
+          ],
+          "examples": [
+            {
+              "input": [
+                [2, 1, 1],
+                [1, 1, 0],
+                [0, 1, 1]
+              ],
+              "output": 4
+            }
+          ]
+        },
+        {
+          "id": "graph-04",
+          "origin": "GR4",
+          "title": "Clone the Service Dependency Graph",
+          "primary_concept": "graph cloning traversal",
+          "secondary_concepts": ["identity mapping", "cycles"],
+          "difficulty": "medium",
+          "statement": "Given a node in a connected undirected service graph, return a deep clone. Cloned adjacency order must match the original, cloned edges must reference only clones, and the original graph must remain unchanged.",
+          "constraints": [
+            "0 <= node count <= 10000",
+            "Node values may repeat",
+            "The graph may contain cycles and self-edges"
+          ],
+          "expected_complexity": { "time": "O(V + E)", "space": "O(V)" },
+          "answer_type": "object",
+          "generator_parameters": {
+            "vertices": [0, 1, 10000],
+            "shape": ["chain", "cycle", "dense", "self-edge"],
+            "duplicate_values": [true, false]
+          },
+          "edge_cases": [
+            "null start node",
+            "one node",
+            "self-edge",
+            "duplicate node values require identity mapping"
+          ],
+          "examples": [
+            {
+              "input": [
+                [2, 4],
+                [1, 3],
+                [2, 4],
+                [1, 3]
+              ],
+              "output": [
+                [2, 4],
+                [1, 3],
+                [2, 4],
+                [1, 3]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "graph-05",
+          "origin": "GR5",
+          "title": "Merge Customer Identity Records",
+          "primary_concept": "disjoint-set union",
+          "secondary_concepts": ["transitive connectivity", "canonical output"],
+          "difficulty": "medium",
+          "statement": "Each customer record contains a display name followed by one or more email addresses. Records sharing any email belong to the same customer. Merge transitively connected records, sorting emails and ordering results by smallest original record index.",
+          "constraints": [
+            "0 <= record count <= 10000",
+            "Total emails are at most 100000",
+            "All records in one component use the same display name"
+          ],
+          "expected_complexity": { "time": "O(E α(E) + E log E)", "space": "O(E)" },
+          "answer_type": "groups",
+          "generator_parameters": {
+            "records": [0, 1, 10000],
+            "emails": [0, 1, 100000],
+            "overlap": ["none", "direct", "transitive"]
+          },
+          "edge_cases": [
+            "empty input",
+            "no shared emails",
+            "transitive three-record merge",
+            "duplicate emails within a record"
+          ],
+          "examples": [
+            {
+              "input": [
+                ["Ana", "a@x", "b@x"],
+                ["Ana", "b@x", "c@x"],
+                ["Bo", "z@x"]
+              ],
+              "output": [
+                ["Ana", "a@x", "b@x", "c@x"],
+                ["Bo", "z@x"]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "graph-06",
+          "origin": "GR6",
+          "title": "Lowest-Risk Grid Route",
+          "primary_concept": "Dijkstra shortest path",
+          "secondary_concepts": ["priority queue", "weighted grid graph"],
+          "difficulty": "hard",
+          "statement": "Each grid cell has a nonnegative entry risk. Starting at the top-left, move orthogonally to the bottom-right and return the minimum total risk of entered cells, including both endpoints.",
+          "constraints": [
+            "1 <= rows, columns <= 500",
+            "Risks are nonnegative safe integers",
+            "The result fits in a safe integer"
+          ],
+          "expected_complexity": {
+            "time": "O(rows * columns log(rows * columns))",
+            "space": "O(rows * columns)"
+          },
+          "answer_type": "number",
+          "generator_parameters": {
+            "dimensions": [
+              [1, 1],
+              [10, 10],
+              [500, 500]
+            ],
+            "weights": ["zero", "uniform", "varied"]
+          },
+          "edge_cases": [
+            "one cell",
+            "zero-risk cycles",
+            "cheapest route is not shortest by edges",
+            "large grid"
+          ],
+          "examples": [
+            {
+              "input": [
+                [1, 3, 1],
+                [1, 5, 1],
+                [4, 2, 1]
+              ],
+              "output": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dynamic-programming-greedy",
+      "title": "Dynamic programming and greedy decisions",
+      "summary": "Identify reusable subproblem state, or prove that one locally safe choice leaves an optimal remainder.",
+      "recognition_signals": [
+        "A brute-force decision tree revisits the same suffix, amount, position, or previous-choice state many times.",
+        "The answer is an optimum or count built from smaller prefixes, unless an exchange argument supports a greedy choice."
+      ],
+      "common_wrong_approaches": [
+        "Memoizing incomplete state combines subproblems that have different future options and returns incorrect optima.",
+        "Choosing the locally largest or smallest option without an exchange proof often fails on carefully spaced counterexamples."
+      ],
+      "problems": [
+        {
+          "id": "dp-01",
+          "origin": "DP1",
+          "title": "Minimum Tokens for an Exact Refund",
+          "primary_concept": "unbounded minimum-count dynamic programming",
+          "secondary_concepts": ["amount state", "impossible sentinel"],
+          "difficulty": "medium",
+          "statement": "Given positive token denominations and a refund amount, return the fewest tokens needed to total the amount exactly, or -1 when it is impossible. Each denomination may be used repeatedly.",
+          "constraints": [
+            "0 <= denominations.length <= 100",
+            "0 <= amount <= 100000",
+            "Denominations are distinct positive integers"
+          ],
+          "expected_complexity": {
+            "time": "O(amount * denominations.length)",
+            "space": "O(amount)"
+          },
+          "answer_type": "number",
+          "generator_parameters": {
+            "denominations": [0, 1, 10, 100],
+            "amount": [0, 1, 100000],
+            "reachable": [true, false]
+          },
+          "edge_cases": [
+            "zero amount",
+            "no denominations",
+            "greedy largest-first is suboptimal",
+            "unreachable amount"
+          ],
+          "examples": [{ "input": { "denominations": [1, 3, 4], "amount": 6 }, "output": 2 }]
+        },
+        {
+          "id": "dp-02",
+          "origin": "DP2",
+          "title": "Decode the Compact Badge Message",
+          "primary_concept": "prefix-count dynamic programming",
+          "secondary_concepts": ["one- and two-character transitions"],
+          "difficulty": "medium",
+          "statement": "Digits encode letters with 1 through 26 mapping to A through Z. Return the number of ways to decode a nonempty digit string; zero cannot be decoded alone.",
+          "constraints": [
+            "1 <= digits.length <= 100000",
+            "Input contains only decimal digits",
+            "The result fits in a safe integer"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [1, 2, 100000],
+            "zeros": ["none", "valid-pair", "invalid"],
+            "branching": ["low", "high"]
+          },
+          "edge_cases": [
+            "leading zero",
+            "zero after one or two",
+            "two-digit value above 26",
+            "long high-branching input"
+          ],
+          "examples": [{ "input": "226", "output": 3 }]
+        },
+        {
+          "id": "dp-03",
+          "origin": "DP3",
+          "title": "Longest Improving Performance Trend",
+          "primary_concept": "longest increasing subsequence",
+          "secondary_concepts": ["binary-search tails", "subsequence reasoning"],
+          "difficulty": "hard",
+          "statement": "Return the length of the longest strictly increasing subsequence of performance scores. Selected scores need not be contiguous, and equal scores do not increase the sequence.",
+          "constraints": [
+            "0 <= scores.length <= 100000",
+            "Scores are safe integers",
+            "Do not mutate scores"
+          ],
+          "expected_complexity": { "time": "O(n log n)", "space": "O(n)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "shape": ["increasing", "decreasing", "duplicates", "mixed"]
+          },
+          "edge_cases": [
+            "empty input",
+            "strictly decreasing scores",
+            "duplicate scores",
+            "best subsequence skips many values"
+          ],
+          "examples": [{ "input": [10, 9, 2, 5, 3, 7, 101, 18], "output": 4 }]
+        },
+        {
+          "id": "dp-04",
+          "origin": "DP4",
+          "title": "Segment the Service Alias",
+          "primary_concept": "boolean prefix dynamic programming",
+          "secondary_concepts": ["dictionary lookup", "string segmentation"],
+          "difficulty": "medium",
+          "statement": "Determine whether a service alias can be segmented into one or more dictionary tokens. Tokens may be reused, matching is case-sensitive, and the complete alias must be consumed.",
+          "constraints": [
+            "0 <= alias.length <= 10000",
+            "0 <= dictionary.length <= 10000",
+            "Total dictionary characters are at most 100000"
+          ],
+          "expected_complexity": {
+            "time": "O(nL) with bounded maximum token length L",
+            "space": "O(n + dictionary size)"
+          },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "length": [0, 1, 10000],
+            "dictionary": [0, 1, 10000],
+            "segmentable": [true, false],
+            "overlap": [true, false]
+          },
+          "edge_cases": [
+            "empty alias",
+            "empty dictionary",
+            "reused token",
+            "prefix choices that lead to dead ends"
+          ],
+          "examples": [
+            {
+              "input": { "alias": "craftcode", "dictionary": ["craft", "code", "raft"] },
+              "output": true
+            }
+          ]
+        },
+        {
+          "id": "dp-05",
+          "origin": "DP5",
+          "title": "Schedule the Most Maintenance Jobs",
+          "primary_concept": "greedy interval scheduling",
+          "secondary_concepts": ["earliest-finish exchange argument", "sorting"],
+          "difficulty": "medium",
+          "statement": "Maintenance jobs use half-open intervals [start, end). Select the maximum number of non-overlapping jobs one technician can complete. Return selected original indices in execution order, breaking equal end times by smaller original index.",
+          "constraints": [
+            "0 <= jobs.length <= 100000",
+            "Times are safe integers with start <= end",
+            "Zero-length jobs are allowed"
+          ],
+          "expected_complexity": { "time": "O(n log n)", "space": "O(n)" },
+          "answer_type": "indices",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "overlap": ["none", "nested", "heavy"],
+            "ties": [true, false]
+          },
+          "edge_cases": ["no jobs", "zero-length jobs", "all jobs overlap", "equal finish times"],
+          "examples": [
+            {
+              "input": [
+                [1, 4],
+                [3, 5],
+                [0, 6],
+                [5, 7],
+                [8, 9],
+                [5, 9]
+              ],
+              "output": [0, 3, 4]
+            }
+          ]
+        },
+        {
+          "id": "dp-06",
+          "origin": "DP6",
+          "title": "Minimum Cost Through Checkpoints",
+          "primary_concept": "rolling dynamic programming",
+          "secondary_concepts": ["local transitions", "space optimization"],
+          "difficulty": "easy",
+          "statement": "Each checkpoint has an entry cost. Starting before checkpoint 0, you may move one or two checkpoints at a time and pay the cost of each checkpoint landed on. Return the minimum cost to move beyond the final checkpoint.",
+          "constraints": [
+            "0 <= costs.length <= 100000",
+            "Costs are nonnegative safe integers",
+            "The result fits in a safe integer"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 2, 100000],
+            "costs": ["zero", "uniform", "alternating", "random"]
+          },
+          "edge_cases": [
+            "no checkpoints",
+            "one checkpoint can be skipped",
+            "zero costs",
+            "locally cheaper step leads to larger total"
+          ],
+          "examples": [{ "input": [10, 15, 20], "output": 15 }]
+        }
+      ]
+    }
+  ]
+}

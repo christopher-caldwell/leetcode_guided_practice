@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .workshop/
+practice/attempts/
 .env
 *.log
 .DS_Store

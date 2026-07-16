@@ -80,4 +80,4 @@ Passing code is necessary but not sufficient evidence of readiness. Codex review
 - Clarity: the implementation reflects the explanation and contract.
 - Communication: assumptions, baseline, optimization, and tradeoffs are concise and interview-usable.
 
-These scores are advisory because model assessment is nondeterministic. Deterministic analysis structure and executable checks control lesson progression.
+These scores are advisory because model assessment is nondeterministic. Deterministic analysis evidence, executable solution checks, and a completed post-pass reflection control lesson progression. The runner verifies required structure—questions, explicit Big-O notation, invariant language, and final-simulation coverage—but does not claim that a length or keyword rule proves communication quality. Without coach scores, communication remains explicitly self-assessed.

@@ -52,7 +52,9 @@ Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node o
 
 ## Automated pass condition
 
-All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without revealing private cases wholesale.
+All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without dumping internal case details wholesale.
+
+A focused TypeScript source policy rejects auxiliary collection construction inside `hasCycle`, and a contract case confirms that node values and links remain unchanged.
 
 ## Common traps
 
@@ -62,7 +64,7 @@ All required analysis sections must contain your reasoning. The TypeScript proje
 
 ## Post-pass reflection
 
-After passing, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Then consider this variation:
+After CODE VERIFIED, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Run `just check` again to advance, then consider this variation:
 
 > How could you find the node where the cycle begins after proving a cycle exists?
 

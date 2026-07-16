@@ -12,24 +12,24 @@ Keep this concise enough to communicate during an interview. Replace every TODO 
 
 ## Baseline approach
 
-<!-- TODO: Describe a correct first approach before optimizing it. -->
+<!-- TODO: Label Part A and Part B, then describe a correct first approach for each before optimizing. -->
 
 ## Cost analysis
 
-<!-- TODO: Define n (and any other variables), then derive baseline time and auxiliary space. -->
+<!-- TODO: For Part A and Part B, define variables and derive baseline time and auxiliary space. Include explicit Big-O bounds. -->
 
 ## Optimized approach
 
-<!-- TODO: Identify the expensive operation and explain the improved strategy without relying only on a pattern name. -->
+<!-- TODO: For Part A and Part B, identify the expensive operation and explain the improved strategy without relying only on a pattern name. -->
 
 ## Invariant and correctness
 
-<!-- TODO: State what remains true during execution and why the result follows at termination. -->
+<!-- TODO: State a Part A invariant and a Part B invariant, then explain why each result follows at termination. -->
 
 ## Final complexity
 
-<!-- TODO: State and justify final worst-case time and auxiliary-space complexity. -->
+<!-- TODO: State and justify final worst-case time and auxiliary-space complexity for Part A and Part B. -->
 
 ## Post-pass reflection
 
-<!-- Complete this after passing: what signal should help you recognize related problems later? -->
+<!-- Complete this after CODE VERIFIED and before advancing: what signal should help you recognize related problems later? -->

@@ -12,6 +12,7 @@ const verifiers: Record<string, (subject: Module) => void> = {
   '01-linear-scan': ({ findFirstIndex }) => {
     it('[correctness] handles duplicates, absence, negatives, and empty input', () => {
       expect(findFirstIndex([-3, 2, -3], -3)).toBe(0)
+      expect(findFirstIndex([9, 4, 7], 4)).toBe(1)
       expect(findFirstIndex([1, 2, 3], 9)).toBe(-1)
       expect(findFirstIndex([], 1)).toBe(-1)
     })
@@ -34,6 +35,7 @@ const verifiers: Record<string, (subject: Module) => void> = {
   '02-pair-sum-baseline': ({ pairSumBaseline }) => {
     it('[correctness] searches distinct pairs and reports impossibility', () => {
       expect(pairSumBaseline([-4, 8, 3], -1)).toEqual([0, 2])
+      expectValidPair(pairSumBaseline([99, 2, 7], 9), [99, 2, 7], 9)
       expect(pairSumBaseline([5], 10)).toBeNull()
       expect(pairSumBaseline([], 0)).toBeNull()
     })
@@ -93,6 +95,16 @@ const verifiers: Record<string, (subject: Module) => void> = {
       expect(compactSortedIds(ids)).toBe(3)
       expect(ids).toEqual([1, 2, 3])
     })
+    it('[complexity] compacts a large distinct input in one pass', () => {
+      let reads = 0
+      const ids = guardedArray(
+        Array.from({ length: 20_000 }, (_, index) => index),
+        () => reads++,
+        100_000,
+      )
+      expect(compactSortedIds(ids)).toBe(20_000)
+      expect(reads).toBeLessThan(100_000)
+    })
   },
   '06-checkpoint-nearby-events': ({ hasNearbyRepeat }) => {
     it('[correctness] evaluates index distance and latest repetitions', () => {
@@ -124,6 +136,16 @@ const verifiers: Record<string, (subject: Module) => void> = {
       const values = [3, 1, 2]
       maxWindowSum(values, 2)
       expect(values).toEqual([3, 1, 2])
+    })
+    it('[complexity] updates adjacent windows instead of rescanning them', () => {
+      let reads = 0
+      const values = guardedArray(
+        Array.from({ length: 8_000 }, (_, index) => (index % 17) - 8),
+        () => reads++,
+        40_000,
+      )
+      expect(maxWindowSum(values, 4_000)).toBeTypeOf('number')
+      expect(reads).toBeLessThan(40_000)
     })
   },
   '08-longest-unique-event-run': ({ longestUniqueRun }) => {
@@ -199,6 +221,29 @@ const verifiers: Record<string, (subject: Module) => void> = {
       expect(hasCycle(null)).toBe(false)
       expect(hasCycle(new ListNode(1, new ListNode(1)))).toBe(false)
     })
+    it('[contract] preserves node values and links', () => {
+      const one = new ListNode(1)
+      const two = new ListNode(2)
+      const three = new ListNode(3)
+      one.next = two
+      two.next = three
+      const before = [
+        [one.val, one.next],
+        [two.val, two.next],
+        [three.val, three.next],
+      ]
+      expect(hasCycle(one)).toBe(false)
+      expect([
+        [one.val, one.next],
+        [two.val, two.next],
+        [three.val, three.next],
+      ]).toEqual(before)
+    })
+    it('[complexity] traverses a long acyclic chain linearly', () => {
+      let head: any = null
+      for (let value = 0; value < 50_000; value += 1) head = new ListNode(value, head)
+      expect(hasCycle(head)).toBe(false)
+    })
   },
   '13-exact-sorted-lookup': ({ binarySearch }) => {
     it('[correctness] finds boundaries and reports absence', () => {
@@ -259,17 +304,28 @@ const verifiers: Record<string, (subject: Module) => void> = {
     it('[edge-case] handles large safe-integer workloads', () => {
       expect(minimumProcessingRate([1_000_000_000, 1_000_000_000], 3)).toBe(1_000_000_000)
     })
+    it('[complexity] searches the candidate rate logarithmically', () => {
+      let reads = 0
+      const jobs = guardedArray(
+        Array.from({ length: 32 }, () => 1_000_000_000),
+        () => reads++,
+        3_000,
+      )
+      expect(minimumProcessingRate(jobs, 32)).toBe(1_000_000_000)
+      expect(reads).toBeLessThan(3_000)
+    })
   },
   '17-hierarchy-depth': ({ maxDepth, TreeNode }) => {
     it('[correctness] chooses the longest child path', () => {
       const root = new TreeNode(1, new TreeNode(2, new TreeNode(3)), new TreeNode(4))
       expect(maxDepth(root)).toBe(3)
+      expect(maxDepth(new TreeNode(1, null, new TreeNode(2, null, new TreeNode(3))))).toBe(3)
     })
-    it('[edge-case] handles empty and moderately skewed trees', () => {
+    it('[edge-case] handles empty trees and the documented skew limit', () => {
       expect(maxDepth(null)).toBe(0)
       let root: any = null
-      for (let value = 0; value < 250; value += 1) root = new TreeNode(value, root)
-      expect(maxDepth(root)).toBe(250)
+      for (let value = 0; value < 1_000; value += 1) root = new TreeNode(value, root)
+      expect(maxDepth(root)).toBe(1_000)
     })
   },
   '18-hierarchy-by-level': ({ levelOrder, TreeNode }) => {
@@ -280,6 +336,16 @@ const verifiers: Record<string, (subject: Module) => void> = {
     it('[edge-case] handles empty and skewed trees', () => {
       expect(levelOrder(null)).toEqual([])
       expect(levelOrder(new TreeNode(1, new TreeNode(2, new TreeNode(3))))).toEqual([[1], [2], [3]])
+    })
+    it('[complexity] traverses a broad tree without front-removal copying', () => {
+      const nodes = Array.from({ length: 16_383 }, (_, value) => new TreeNode(value))
+      for (let index = 0; index < 8_191; index += 1) {
+        nodes[index]!.left = nodes[index * 2 + 1]!
+        nodes[index]!.right = nodes[index * 2 + 2]!
+      }
+      const levels = levelOrder(nodes[0]!)
+      expect(levels).toHaveLength(14)
+      expect(levels.at(-1)).toHaveLength(8_192)
     })
   },
   '19-highest-priority-items': ({ topKFrequent }) => {
@@ -294,6 +360,15 @@ const verifiers: Record<string, (subject: Module) => void> = {
       const values = [2, 2, 1]
       topKFrequent(values, 1)
       expect(values).toEqual([2, 2, 1])
+    })
+    it('[complexity] retains a small top-k from many distinct values', () => {
+      const values: number[] = []
+      for (let value = 1; value <= 500; value += 1) {
+        for (let count = 0; count < value; count += 1) values.push(value)
+      }
+      expect(topKFrequent(values, 5).sort((a: number, b: number) => a - b)).toEqual([
+        496, 497, 498, 499, 500,
+      ])
     })
   },
   '20-consolidate-schedule-windows': ({ mergeWindows }) => {
@@ -368,6 +443,13 @@ const verifiers: Record<string, (subject: Module) => void> = {
         [1, 3],
       ])
     })
+    it('[complexity] handles a large set of simultaneously active meetings', () => {
+      const meetings = Array.from(
+        { length: 20_000 },
+        (_, index) => [index, 100_000 + index] as [number, number],
+      )
+      expect(minimumConcurrentRooms(meetings)).toBe(20_000)
+    })
   },
   '22-disconnected-service-groups': ({ countServiceGroups }) => {
     it('[correctness] counts components with isolated services', () => {
@@ -412,6 +494,7 @@ const verifiers: Record<string, (subject: Module) => void> = {
   '24-final-interview-simulation': ({ smallestCoveringRange, shortestRoute }) => {
     it('[correctness] finds a minimum range with required multiplicity', () => {
       expect(smallestCoveringRange(['a', 'x', 'a', 'b', 'a'], ['a', 'a', 'b'])).toEqual([2, 4])
+      expect(smallestCoveringRange(['a', 'b', 'a', 'b'], ['a', 'b'])).toEqual([0, 1])
       expect(smallestCoveringRange(['a', 'b'], ['z'])).toBeNull()
       expect(smallestCoveringRange(['a'], [])).toBeNull()
     })
@@ -432,6 +515,20 @@ const verifiers: Record<string, (subject: Module) => void> = {
       ).toBe(2)
       expect(shortestRoute(4, [[0, 1]], 0, 3)).toBe(-1)
       expect(shortestRoute(2, [], 1, 1)).toBe(0)
+      expect(
+        shortestRoute(
+          5,
+          [
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [3, 4],
+            [0, 4],
+          ],
+          0,
+          4,
+        ),
+      ).toBe(1)
     })
     it('[contract] preserves both parts inputs', () => {
       const events = ['a', 'b']
@@ -443,15 +540,44 @@ const verifiers: Record<string, (subject: Module) => void> = {
       expect(required).toEqual(['b'])
       expect(edges).toEqual([[0, 1]])
     })
+    it('[complexity] scales both final parts to interview-sized structures', () => {
+      let reads = 0
+      const events = guardedArray(
+        [...Array.from({ length: 19_999 }, () => 'noise'), 'target'],
+        () => reads++,
+        200_000,
+      )
+      expect(smallestCoveringRange(events, ['target'])).toEqual([19_999, 19_999])
+      expect(reads).toBeLessThan(200_000)
+
+      const edges: Array<[number, number]> = []
+      for (let service = 1; service < 20_000; service += 1) {
+        edges.push([service - 1, service])
+      }
+      expect(shortestRoute(20_000, edges, 0, 19_999)).toBe(19_999)
+    })
   },
 }
 
-function countedArray(values: number[], onRead: () => void): number[] {
+function countedArray<T>(values: T[], onRead: () => void): T[] {
   return new Proxy(values, {
     get(target, property, receiver) {
       if (typeof property === 'string' && /^\d+$/.test(property)) onRead()
       return Reflect.get(target, property, receiver)
     },
+  })
+}
+
+function guardedArray<T>(values: T[], onRead: () => void, maximumReads: number): T[] {
+  let reads = 0
+  return countedArray(values, () => {
+    reads += 1
+    onRead()
+    if (reads >= maximumReads) {
+      throw new Error(
+        `Indexed-read budget exceeded (${maximumReads}); expected a scalable approach.`,
+      )
+    }
   })
 }
 

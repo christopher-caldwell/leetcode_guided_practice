@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import type { LessonManifest, TimerState } from '../src/core/models.js'
+import { WorkshopStateSchema, type LessonManifest, type TimerState } from '../src/core/models.js'
 import {
   completeTimer,
+  completeRecordedTimer,
   elapsedMs,
   pauseTimer,
   resetTimer,
+  selectTimerLesson,
   startTimer,
   targetMinutes,
   timerApplies,
@@ -61,6 +63,14 @@ describe('persisted timer transitions', () => {
     expect(timer).toEqual(fresh())
   })
 
+  it('completes recorded time regardless of the current configuration mode', () => {
+    const timer = fresh()
+    startTimer(timer, new Date('2026-01-01T00:00:00.000Z'))
+    expect(completeRecordedTimer(timer, new Date('2026-01-01T00:03:00.000Z'))).toBe(180_000)
+    expect(timer.completedMs).toBe(180_000)
+    expect(completeRecordedTimer(timer, new Date('2026-01-01T00:04:00.000Z'))).toBeNull()
+  })
+
   it('applies modes and override targets predictably', () => {
     expect(timerApplies({ timerMode: 'off' }, lesson)).toBe(false)
     expect(timerApplies({ timerMode: 'all' }, lesson)).toBe(true)
@@ -68,5 +78,21 @@ describe('persisted timer transitions', () => {
     expect(timerApplies({ timerMode: 'checkpoints' }, { ...lesson, kind: 'checkpoint' })).toBe(true)
     expect(targetMinutes({ timerMode: 'all' }, lesson)).toBe(30)
     expect(targetMinutes({ timerMode: 'all', timerMinutes: 45 }, lesson)).toBe(45)
+  })
+
+  it('shows the most recently recorded lesson after progression advances', () => {
+    const next = { ...lesson, id: '02-example', order: 2 }
+    const state = WorkshopStateSchema.parse({
+      version: 1,
+      lessons: {
+        [lesson.id]: {
+          passedAt: '2026-01-01T00:30:00.000Z',
+          timer: { accumulatedMs: 1_800_000, completedMs: 1_800_000 },
+        },
+        [next.id]: {},
+      },
+    })
+    expect(selectTimerLesson([lesson, next], state, 'status').id).toBe(lesson.id)
+    expect(selectTimerLesson([lesson, next], state, 'start').id).toBe(next.id)
   })
 })

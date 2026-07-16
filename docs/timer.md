@@ -13,7 +13,7 @@ The stopwatch measures elapsed wall-clock time across explicitly started segment
 - Coding
 - Testing and correcting the attempt
 
-Whether hint time should count is your choice: leave the stopwatch running for an honest coached-session duration, or pause before requesting a learning hint when measuring only independent work. The readiness report can separately see that hints or reference revelation occurred.
+Whether hint time should count is your choice: leave the stopwatch running for an honest coached-session duration, or pause before requesting a learning hint when measuring only independent work. The readiness report separately shows hints, successful adaptive diagnoses, reference revelation, attempts, and completed timing.
 
 ## What timing does not do
 
@@ -63,7 +63,7 @@ Leave the value empty to retain lesson-specific targets:
 WORKSHOP_TIMER_MINUTES=
 ```
 
-Configuration is validated when every workshop command begins. Values such as `sometimes`, `0`, `-1`, or `forty` fail with a clear error.
+Configuration is validated when workshop commands begin. `just reset` intentionally bypasses configuration and state parsing so it remains a recovery path for malformed generated data. Values such as `sometimes`, `0`, `-1`, or `forty` fail with a clear error for normal commands.
 
 ## Stopwatch lifecycle
 
@@ -72,7 +72,7 @@ The timer for a lesson contains:
 - Accumulated milliseconds from completed segments
 - An optional wall-clock timestamp for a running segment
 - The number of segments started
-- The completed duration after a passing check
+- The completed duration after successful code verification
 
 It is stored in `.workshop/progress.json` and is therefore preserved between commands and terminal sessions.
 
@@ -106,6 +106,8 @@ stored completed segments + (current time - running segment start)
 
 It does not pause, resume, or reset anything.
 
+For `start`, `pause`, `resume`, and `reset`, timer commands always address the current lesson. For `status`, the runner shows the current lesson when it has recorded time; otherwise it shows the most recently recorded lesson. This keeps a just-completed checkpoint visible after progression advances. The selected lesson id is printed with the duration.
+
 ### Pause
 
 ```bash
@@ -130,9 +132,11 @@ Resume starts a new segment while preserving accumulated time. `resume` and `sta
 
 You may explicitly pause after a failure when switching from a timed attempt to untimed study.
 
-### Passing checks
+### Successful code verification
 
-A passing `just check` automatically stops a timer that has recorded any time. The completed duration remains visible in progress. External coaching review occurs after deterministic success and after the timer has stopped, so model latency is not counted.
+A `just check` whose code and pre-pass analysis evidence verify automatically stops any timer that has recorded time. This is independent of the current timer mode, so changing `.env` mid-attempt cannot strand a running stopwatch. The completed duration remains visible while you write the required post-pass reflection. External coaching review occurs after deterministic success and after the timer has stopped, so model latency is not counted.
+
+The lesson advances only after the reflection is complete and a subsequent `just check` records it. Reflection time is intentionally outside the interview-attempt stopwatch.
 
 ### Reset only the current stopwatch
 
@@ -148,7 +152,7 @@ This clears accumulated time, the running timestamp, segment count, and complete
 - Coaching reports
 - Analysis and source files
 
-If all lessons are complete, timer commands address the final lesson.
+If all lessons are complete, mutating timer commands address the final lesson. Status still prefers the most recently recorded timer.
 
 ### Reset all generated workshop state
 
@@ -174,7 +178,7 @@ If you want to keep earlier segments but exclude only part of an accidental inte
 
 The current target is derived from the current `.env` each time status is displayed. Changing `WORKSHOP_TIMER_MINUTES` changes the comparison target, not elapsed time.
 
-Changing mode to `off` hides active timing operations but does not delete stored time. Restore the previous mode to see it again, or use `just reset` if you intend to clear everything. Prefer pausing before changing mode.
+Changing mode to `off` disables new active timing operations but does not delete stored time. `just timer status` still displays the most recently recorded duration and notes that the current mode is off. Prefer pausing before changing mode; successful code verification will stop a recorded timer even if the mode changed.
 
 ## Example: recommended checkpoint flow
 
@@ -185,8 +189,10 @@ just start
 just check
 # If it fails, the clock continues.
 just check
-# A pass stops the clock automatically.
+# CODE VERIFIED stops the clock automatically.
 just timer status
+# Complete Post-pass reflection, then record progression.
+just check
 ```
 
 ## Example: interrupted attempt

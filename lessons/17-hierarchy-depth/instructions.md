@@ -20,7 +20,7 @@ Return the number of nodes on the longest path from a binary tree root to a leaf
 ### Constraints
 
 - 0 <= node count <= 100,000
-- The tree may be highly skewed.
+- Maximum tree height is 1,000. The tree may be highly skewed within that bound.
 - Do not mutate nodes.
 
 ## Clarifying questions to consider
@@ -52,17 +52,17 @@ Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node o
 
 ## Automated pass condition
 
-All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without revealing private cases wholesale.
+All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without dumping internal case details wholesale.
 
 ## Common traps
 
 - Combining child depths by addition instead of selecting a path.
 - Returning 1 for an empty tree.
-- Ignoring call-stack space in complexity analysis.
+- Ignoring O(h) call-stack space and the finite recursion depth of the Node.js runtime.
 
 ## Post-pass reflection
 
-After passing, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Then consider this variation:
+After CODE VERIFIED, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Run `just check` again to advance, then consider this variation:
 
 > How would you return whether the tree is height-balanced while avoiding repeated depth calculations?
 

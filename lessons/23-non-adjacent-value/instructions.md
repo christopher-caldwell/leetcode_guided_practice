@@ -22,6 +22,7 @@ Select values from an array to maximize their sum without selecting adjacent ind
 - 0 <= values.length <= 100,000
 - Values may be negative.
 - Do not mutate input.
+- Use O(1) auxiliary state beyond the input and return value.
 
 ## Clarifying questions to consider
 
@@ -52,7 +53,9 @@ Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node o
 
 ## Automated pass condition
 
-All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without revealing private cases wholesale.
+All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without dumping internal case details wholesale.
+
+A focused TypeScript source policy enforces scalar O(1) auxiliary state instead of a full dynamic-programming table.
 
 ## Common traps
 
@@ -62,7 +65,7 @@ All required analysis sections must contain your reasoning. The TypeScript proje
 
 ## Post-pass reflection
 
-After passing, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Then consider this variation:
+After CODE VERIFIED, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Run `just check` again to advance, then consider this variation:
 
 > How would the transition change if the first and last indices were also considered adjacent?
 

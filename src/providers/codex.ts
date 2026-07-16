@@ -1,7 +1,7 @@
-import { spawn } from 'node:child_process'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { z, type ZodType } from 'zod'
+import { runProcess } from '../core/process.js'
 import { stateDirectory } from '../core/state.js'
 import {
   DiagnosisResponseSchema,
@@ -70,10 +70,12 @@ export class CodexCoachProvider implements CoachProvider {
     const nonce = `${context.lesson.id}-${Date.now()}`
     const schemaPath = path.join(generated, `${nonce}.schema.json`)
     const outputPath = path.join(generated, `${nonce}.output.json`)
+    const sandboxPath = path.join(stateDirectory(this.root), 'generated', 'coach-sandbox')
+    await mkdir(sandboxPath, { recursive: true })
     await writeFile(schemaPath, `${JSON.stringify(z.toJSONSchema(schema), null, 2)}\n`, 'utf8')
 
     const prompt = buildPrompt(context, instruction)
-    await runCodex(this.root, this.executable, schemaPath, outputPath, prompt)
+    await runCodex(sandboxPath, this.executable, schemaPath, outputPath, prompt)
     return parseCoachResponse(schema, await readFile(outputPath, 'utf8'))
   }
 }
@@ -126,7 +128,7 @@ ${context.source}
 }
 
 async function runCodex(
-  root: string,
+  sandboxPath: string,
   executable: string,
   schemaPath: string,
   outputPath: string,
@@ -143,40 +145,59 @@ async function runCodex(
     '--output-last-message',
     outputPath,
     '--cd',
-    root,
+    sandboxPath,
     '-',
   ]
 
-  await new Promise<void>((resolve, reject) => {
-    const child = spawn(executable, args, {
-      cwd: root,
-      stdio: ['pipe', 'ignore', 'pipe'],
-      env: process.env,
-    })
-    let stderr = ''
-    const timeout = setTimeout(() => child.kill('SIGTERM'), 120_000)
-    child.stderr.setEncoding('utf8')
-    child.stderr.on('data', (chunk: string) => {
-      stderr += chunk
-      if (stderr.length > 8_000) stderr = stderr.slice(-8_000)
-    })
-    child.on('error', (error) => {
-      clearTimeout(timeout)
-      reject(error)
-    })
-    child.on('close', (code, signal) => {
-      clearTimeout(timeout)
-      if (code === 0) resolve()
-      else {
-        reject(
-          new Error(
-            signal
-              ? `Codex coaching was interrupted (${signal}).`
-              : `Codex coaching exited with code ${code}. ${stderr.trim()}`,
-          ),
-        )
-      }
-    })
-    child.stdin.end(prompt)
+  const result = await runProcess(executable, args, {
+    cwd: sandboxPath,
+    environment: coachEnvironment(process.env),
+    input: prompt,
+    timeoutMs: 120_000,
+    killGraceMs: 2_000,
+    outputLimit: 8_000,
   })
+  if (result.timedOut) throw new Error('Codex coaching timed out after 120 seconds.')
+  if (result.exitCode === 0) return
+  throw new Error(
+    result.signal
+      ? `Codex coaching was interrupted (${result.signal}).`
+      : `Codex coaching exited with code ${result.exitCode}. ${result.stderr.trim()}`,
+  )
+}
+
+const COACH_ENVIRONMENT_KEYS = [
+  'PATH',
+  'HOME',
+  'CODEX_HOME',
+  'XDG_CONFIG_HOME',
+  'XDG_DATA_HOME',
+  'XDG_CACHE_HOME',
+  'TMPDIR',
+  'TMP',
+  'TEMP',
+  'USER',
+  'LOGNAME',
+  'SHELL',
+  'LANG',
+  'LC_ALL',
+  'LC_CTYPE',
+  'TERM',
+  'COLORTERM',
+  'NO_COLOR',
+  'HTTPS_PROXY',
+  'HTTP_PROXY',
+  'ALL_PROXY',
+  'NO_PROXY',
+  'SSL_CERT_FILE',
+  'SSL_CERT_DIR',
+] as const
+
+export function coachEnvironment(environment: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  const allowed: NodeJS.ProcessEnv = {}
+  for (const key of COACH_ENVIRONMENT_KEYS) {
+    const value = environment[key]
+    if (value !== undefined) allowed[key] = value
+  }
+  return allowed
 }

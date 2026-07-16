@@ -32,4 +32,4 @@ Keep this concise enough to communicate during an interview. Replace every TODO 
 
 ## Post-pass reflection
 
-<!-- Complete this after passing: what signal should help you recognize related problems later? -->
+<!-- Complete this after CODE VERIFIED and before advancing: what signal should help you recognize related problems later? -->

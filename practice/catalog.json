@@ -1,0 +1,1536 @@
+{
+  "version": 1,
+  "groups": [
+    {
+      "id": "set-membership",
+      "title": "Set membership and deduplication",
+      "summary": "Choose a set or last-seen map when repeated membership checks dominate the cost.",
+      "recognition_signals": [
+        "The prompt repeatedly asks whether a value has appeared before or belongs to another collection.",
+        "The required output depends on uniqueness, duplication, intersection, or the first repeated event."
+      ],
+      "common_wrong_approaches": [
+        "Scanning an earlier prefix or another collection for every item creates an avoidable quadratic cost.",
+        "Using a set when the contract needs multiplicity or last position discards information required later."
+      ],
+      "problems": [
+        {
+          "id": "set-01",
+          "origin": "A1",
+          "title": "First Badge Seen Twice",
+          "primary_concept": "set membership",
+          "secondary_concepts": ["stream processing", "early return"],
+          "difficulty": "easy",
+          "statement": "Employees scan integer badge IDs in chronological order. Return the badge whose second scan occurs first. Return -1 when no badge is scanned more than once.",
+          "constraints": [
+            "0 <= scans.length <= 100000",
+            "Badge IDs are safe integers",
+            "Do not mutate scans"
+          ],
+          "expected_complexity": {
+            "time": "O(n)",
+            "space": "O(u), where u is the number of distinct badges"
+          },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 10, 100000],
+            "duplicate_pattern": ["none", "early", "late", "heavy"]
+          },
+          "edge_cases": [
+            "empty input",
+            "all badges distinct",
+            "the first two scans match",
+            "several values repeat"
+          ],
+          "examples": [{ "input": [7, 3, 8, 3, 7], "output": 3 }],
+          "related_lessons": []
+        },
+        {
+          "id": "set-02",
+          "origin": "A3",
+          "title": "Final Mention Feed",
+          "primary_concept": "reverse traversal with a set",
+          "secondary_concepts": ["stable deduplication", "output reversal"],
+          "difficulty": "easy",
+          "statement": "A feed lists usernames in chronological order. Keep only the final occurrence of each username and preserve the relative chronological order of the entries that remain.",
+          "constraints": [
+            "0 <= usernames.length <= 100000",
+            "Usernames are case-sensitive",
+            "Do not mutate usernames"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(u)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 20, 100000],
+            "duplicate_pattern": ["none", "adjacent", "interleaved", "uniform"]
+          },
+          "edge_cases": ["empty feed", "one username", "all entries equal", "no duplicates"],
+          "examples": [{ "input": ["a", "b", "a", "c", "b"], "output": ["a", "c", "b"] }],
+          "related_lessons": []
+        },
+        {
+          "id": "set-03",
+          "origin": "A4",
+          "title": "Shared Ingredients",
+          "primary_concept": "set intersection",
+          "secondary_concepts": ["stable output order", "deduplication"],
+          "difficulty": "easy",
+          "statement": "Given one or more recipes, each represented by a list of ingredient names, return each distinct ingredient present in every recipe. Order results by first appearance in the first recipe.",
+          "constraints": [
+            "1 <= recipes.length <= 1000",
+            "The total number of ingredient entries is at most 100000",
+            "Ingredient matching is case-sensitive"
+          ],
+          "expected_complexity": { "time": "O(t)", "space": "O(u), where t is total input size" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "recipe_count": [1, 2, 10, 1000],
+            "overlap": ["none", "partial", "complete"]
+          },
+          "edge_cases": [
+            "one recipe with duplicates",
+            "no common ingredients",
+            "duplicate ingredients within recipes"
+          ],
+          "examples": [
+            {
+              "input": [
+                ["salt", "oil", "salt", "rice"],
+                ["rice", "salt"],
+                ["salt", "rice", "beans"]
+              ],
+              "output": ["salt", "rice"]
+            }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "set-04",
+          "origin": "A5",
+          "title": "Longest Serial Block",
+          "primary_concept": "consecutive-sequence boundary lookup",
+          "secondary_concepts": ["set membership", "amortized analysis"],
+          "difficulty": "medium",
+          "statement": "Given unsorted integer serial numbers, return the length of the longest run of consecutive values. Duplicate serial numbers do not extend a run, and sorting is not allowed.",
+          "constraints": [
+            "0 <= serials.length <= 100000",
+            "Serials are safe integers",
+            "Expected linear time is required"
+          ],
+          "expected_complexity": { "time": "O(n) expected", "space": "O(u)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 100, 100000],
+            "layout": ["random", "one-long-run", "duplicates", "gapped"]
+          },
+          "edge_cases": [
+            "empty input",
+            "duplicates inside the best run",
+            "negative serials",
+            "several equal-length runs"
+          ],
+          "examples": [
+            {
+              "input": [40, 12, 10, 11, 80, 13, 11],
+              "output": 4,
+              "explanation": "The longest run is 10, 11, 12, 13."
+            }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "set-05",
+          "origin": "A6",
+          "title": "Novelty Checkpoints",
+          "primary_concept": "incremental distinct counting",
+          "secondary_concepts": ["set membership", "online output"],
+          "difficulty": "easy",
+          "statement": "Given visitor IDs in arrival order, return an array whose value at each index is the number of distinct visitors observed up to and including that arrival.",
+          "constraints": [
+            "0 <= visitors.length <= 100000",
+            "Visitor IDs are safe integers",
+            "Produce one output per input event"
+          ],
+          "expected_complexity": { "time": "O(n) expected", "space": "O(u)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 20, 100000],
+            "cardinality": [1, 2, 10, 100000]
+          },
+          "edge_cases": ["empty stream", "all IDs equal", "all IDs distinct", "negative IDs"],
+          "examples": [{ "input": [4, 4, 7, 4, 9], "output": [1, 1, 2, 2, 3] }],
+          "related_lessons": []
+        },
+        {
+          "id": "set-06",
+          "origin": "A8",
+          "title": "First Completely New Window",
+          "primary_concept": "fixed sliding-window frequencies",
+          "secondary_concepts": ["set membership", "duplicate counting"],
+          "difficulty": "medium",
+          "statement": "Given an array of event codes and a positive window size, return the starting index of the first fixed-size window in which every value is distinct. Return -1 if no such window exists.",
+          "constraints": [
+            "0 <= events.length <= 100000",
+            "1 <= windowSize <= 100000",
+            "A window larger than the input has no answer"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(min(n, windowSize))" },
+          "answer_type": "index",
+          "generator_parameters": {
+            "window_size": [1, 2, 10, 100000],
+            "first_valid_position": ["start", "middle", "end", "none"]
+          },
+          "edge_cases": [
+            "window size one",
+            "window larger than input",
+            "all values equal",
+            "first valid window at the final position"
+          ],
+          "examples": [{ "input": { "events": [2, 2, 3, 4, 3], "windowSize": 3 }, "output": 1 }],
+          "related_lessons": [
+            {
+              "id": "08-longest-unique-event-run",
+              "relationship": "variant",
+              "distinction": "This asks for the first valid fixed-size window rather than the longest variable-size unique run."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frequency-maps",
+      "title": "Frequency maps and multisets",
+      "summary": "Track multiplicity when existence alone cannot prove the result.",
+      "recognition_signals": [
+        "The contract distinguishes one copy from several copies or asks whether resources can be consumed.",
+        "The answer depends on how often each value occurs rather than only whether it occurs."
+      ],
+      "common_wrong_approaches": [
+        "Replacing counts with a set loses multiplicity and usually passes only all-distinct examples.",
+        "Sorting can obscure stable output requirements and costs more than direct counting when keys are hashable."
+      ],
+      "problems": [
+        {
+          "id": "freq-01",
+          "origin": "B1",
+          "title": "Scrap-Letter Printer",
+          "primary_concept": "frequency consumption",
+          "secondary_concepts": ["multisets", "early rejection"],
+          "difficulty": "easy",
+          "statement": "A printer owns reusable character tiles. Determine whether it can print a target message when each tile may be used at most once. Matching is case-sensitive and spaces are ordinary characters.",
+          "constraints": [
+            "0 <= tiles.length, message.length <= 100000",
+            "Inputs contain UTF-16 code units in the ASCII range",
+            "Do not mutate either input"
+          ],
+          "expected_complexity": {
+            "time": "O(t + m)",
+            "space": "O(a), where a is the observed alphabet"
+          },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "alphabet_size": [1, 4, 26, 95],
+            "availability": ["enough", "one-short", "missing-symbol"]
+          },
+          "edge_cases": [
+            "empty message",
+            "empty tiles",
+            "repeated target letters",
+            "case differences"
+          ],
+          "examples": [{ "input": { "tiles": "algorithm", "message": "math" }, "output": true }],
+          "related_lessons": [
+            {
+              "id": "04-inventory-reconciliation",
+              "relationship": "variant",
+              "distinction": "This checks whether one multiset contains another, not whether two complete inventories are equal."
+            }
+          ]
+        },
+        {
+          "id": "freq-02",
+          "origin": "B2",
+          "title": "First Unrepeated Alarm",
+          "primary_concept": "frequency map plus stable scan",
+          "secondary_concepts": ["two-pass processing"],
+          "difficulty": "easy",
+          "statement": "Given alarm codes in chronological order, return the first code that occurs exactly once in the complete sequence. Return null when every code repeats.",
+          "constraints": [
+            "0 <= alarms.length <= 100000",
+            "Alarm codes are case-sensitive strings",
+            "Do not reorder the input"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(u)" },
+          "answer_type": "value",
+          "generator_parameters": {
+            "length": [0, 1, 100, 100000],
+            "unique_position": ["first", "middle", "last", "none"]
+          },
+          "edge_cases": [
+            "empty input",
+            "one alarm",
+            "all alarms repeated",
+            "several unique alarms"
+          ],
+          "examples": [{ "input": ["cpu", "disk", "cpu", "memory"], "output": "disk" }],
+          "related_lessons": []
+        },
+        {
+          "id": "freq-03",
+          "origin": "B5",
+          "title": "Missing Shipment Items",
+          "primary_concept": "multiset subtraction",
+          "secondary_concepts": ["stable output order", "frequency maps"],
+          "difficulty": "easy",
+          "statement": "Expected and actual shipments are arrays of item IDs. Return the missing items in expected-shipment order, preserving multiplicity. Extra actual items do not appear in the result.",
+          "constraints": [
+            "0 <= expected.length, actual.length <= 100000",
+            "Item IDs are safe integers",
+            "Do not mutate either shipment"
+          ],
+          "expected_complexity": { "time": "O(e + a)", "space": "O(u)" },
+          "answer_type": "values",
+          "generator_parameters": { "expected_size": [0, 1, 100000], "missing_rate": [0, 0.1, 1] },
+          "edge_cases": [
+            "nothing missing",
+            "everything missing",
+            "duplicate expected items",
+            "unexpected extra actual items"
+          ],
+          "examples": [
+            { "input": { "expected": [3, 3, 4, 7], "actual": [3, 7] }, "output": [3, 4] }
+          ],
+          "related_lessons": [
+            {
+              "id": "04-inventory-reconciliation",
+              "relationship": "variant",
+              "distinction": "This computes an ordered multiset difference instead of returning whole-inventory equality."
+            }
+          ]
+        },
+        {
+          "id": "freq-04",
+          "origin": "B6",
+          "title": "Unique Popularity Counts",
+          "primary_concept": "frequency-of-frequencies uniqueness",
+          "secondary_concepts": ["sets", "frequency maps"],
+          "difficulty": "easy",
+          "statement": "Return true when every distinct integer in an array occurs a different number of times. Empty and single-distinct-value arrays satisfy the condition.",
+          "constraints": [
+            "0 <= values.length <= 100000",
+            "Values are safe integers",
+            "Do not mutate values"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(u)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "frequency_shape": ["all-unique", "collision", "staircase"]
+          },
+          "edge_cases": [
+            "empty array",
+            "one distinct value",
+            "two values with equal counts",
+            "all values distinct"
+          ],
+          "examples": [{ "input": [1, 1, 1, 2, 2, 3], "output": true }],
+          "related_lessons": []
+        },
+        {
+          "id": "freq-05",
+          "origin": "B8",
+          "title": "Shortest Representative Log",
+          "primary_concept": "frequency with first and last positions",
+          "secondary_concepts": ["array degree", "tie handling"],
+          "difficulty": "medium",
+          "statement": "The degree of an array is its greatest value frequency. Return the inclusive boundaries of the shortest contiguous subarray having the same degree as the complete array. Break equal lengths by earlier start.",
+          "constraints": [
+            "1 <= events.length <= 100000",
+            "Event IDs are safe integers",
+            "Return a pair of inclusive indices"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(u)" },
+          "answer_type": "indices",
+          "generator_parameters": {
+            "length": [1, 10, 100000],
+            "degree_ties": ["none", "same-span", "different-span"]
+          },
+          "edge_cases": [
+            "one event",
+            "all events equal",
+            "all events distinct",
+            "multiple values share the degree"
+          ],
+          "examples": [{ "input": [1, 2, 2, 3, 1, 4, 2], "output": [1, 6] }],
+          "related_lessons": []
+        },
+        {
+          "id": "freq-06",
+          "origin": "B10",
+          "title": "Equal-Frequency Removal",
+          "primary_concept": "frequency-map case analysis",
+          "secondary_concepts": ["frequency of frequencies"],
+          "difficulty": "medium",
+          "statement": "Determine whether deleting exactly one array element can make every remaining distinct value occur the same positive number of times. The empty remainder is valid.",
+          "constraints": [
+            "1 <= values.length <= 100000",
+            "Values are safe integers",
+            "Exactly one element must be deleted"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(u)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "length": [1, 2, 100000],
+            "repairable": [true, false],
+            "distinct_values": [1, 2, 1000]
+          },
+          "edge_cases": [
+            "one element",
+            "one distinct value",
+            "removing an entire singleton class",
+            "frequencies differ by one"
+          ],
+          "examples": [
+            { "input": [1, 1, 2, 2, 3], "output": true, "explanation": "Delete the only 3." }
+          ],
+          "related_lessons": []
+        }
+      ]
+    },
+    {
+      "id": "complement-lookup",
+      "title": "Complement lookup and pair counting",
+      "summary": "Compute the value or remainder needed to complete a relation, then count earlier matches.",
+      "recognition_signals": [
+        "For each current value, the relationship determines one or a small number of needed partner values.",
+        "The prompt asks for pairs or tuples satisfying a fixed sum, difference, XOR, product, or remainder relation."
+      ],
+      "common_wrong_approaches": [
+        "Enumerating every pair ignores that a partner can be derived directly from the current value.",
+        "Inserting the current item before counting partners can accidentally pair an index with itself."
+      ],
+      "problems": [
+        {
+          "id": "comp-01",
+          "origin": "C2",
+          "title": "Firmware Version Gap",
+          "primary_concept": "difference complements",
+          "secondary_concepts": ["pair counting", "duplicate handling"],
+          "difficulty": "medium",
+          "statement": "Given integer version numbers and a nonnegative gap d, count unordered index pairs (i, j), i < j, for which the absolute value difference is exactly d.",
+          "constraints": [
+            "0 <= versions.length <= 100000",
+            "0 <= d <= 1000000000",
+            "The answer fits in a safe integer"
+          ],
+          "expected_complexity": { "time": "O(n) expected", "space": "O(u)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "gap": [0, 1, 1000000000],
+            "duplicate_pattern": ["none", "pairs", "heavy"]
+          },
+          "edge_cases": [
+            "d equals zero",
+            "duplicate versions",
+            "no valid pairs",
+            "negative version numbers"
+          ],
+          "examples": [{ "input": { "versions": [1, 3, 1, 5], "d": 2 }, "output": 3 }],
+          "related_lessons": [
+            {
+              "id": "03-pair-sum-at-scale",
+              "relationship": "variant",
+              "distinction": "This counts every absolute-difference index pair and must treat a zero gap separately."
+            }
+          ]
+        },
+        {
+          "id": "comp-02",
+          "origin": "C3",
+          "title": "Closest-in-Time Target Pair",
+          "primary_concept": "complement lookup with nearest prior index",
+          "secondary_concepts": ["tie breaking", "online processing"],
+          "difficulty": "medium",
+          "statement": "Among all distinct event pairs whose numeric values sum to target, return the pair of indices with minimum distance. Break ties by smaller second index, then smaller first index. Return null if none exists.",
+          "constraints": [
+            "0 <= values.length <= 100000",
+            "Values and target are safe integers",
+            "Return indices in increasing order"
+          ],
+          "expected_complexity": { "time": "O(n) expected", "space": "O(u)" },
+          "answer_type": "indices",
+          "generator_parameters": {
+            "length": [0, 2, 100000],
+            "tie_shape": ["none", "second-index", "first-index"]
+          },
+          "edge_cases": [
+            "duplicate complement values",
+            "self-complement requiring two indices",
+            "several optimal pairs",
+            "no pair"
+          ],
+          "examples": [{ "input": { "values": [4, 1, 5, 2, 4], "target": 6 }, "output": [1, 2] }],
+          "related_lessons": [
+            {
+              "id": "03-pair-sum-at-scale",
+              "relationship": "variant",
+              "distinction": "The workshop lesson accepts any valid pair; this variant optimizes index distance with explicit ties."
+            }
+          ]
+        },
+        {
+          "id": "comp-03",
+          "origin": "C4",
+          "title": "XOR Access Keys",
+          "primary_concept": "XOR complement lookup",
+          "secondary_concepts": ["pair counting", "bitwise reasoning"],
+          "difficulty": "medium",
+          "statement": "Given nonnegative integer access keys and a target bitmask, count unordered index pairs whose bitwise XOR equals the target bitmask.",
+          "constraints": [
+            "0 <= keys.length <= 100000",
+            "0 <= keys[i], target < 2^31",
+            "The answer fits in a safe integer"
+          ],
+          "expected_complexity": { "time": "O(n) expected", "space": "O(u)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "target": [0, 1, 2147483647],
+            "duplicate_pattern": ["none", "light", "heavy"]
+          },
+          "edge_cases": ["target zero", "duplicate keys", "zero keys", "no matching complement"],
+          "examples": [{ "input": { "keys": [1, 2, 3, 2], "target": 3 }, "output": 2 }],
+          "related_lessons": [
+            {
+              "id": "03-pair-sum-at-scale",
+              "relationship": "variant",
+              "distinction": "The complement is derived with XOR and every index pair is counted rather than one pair returned."
+            }
+          ]
+        },
+        {
+          "id": "comp-04",
+          "origin": "C5",
+          "title": "Full-Cycle Song Pairs",
+          "primary_concept": "complementary remainder classes",
+          "secondary_concepts": ["modular arithmetic", "pair counting"],
+          "difficulty": "medium",
+          "statement": "Given song durations and a positive cycle length m, count unordered index pairs whose combined duration is divisible by m. Durations may be negative offsets.",
+          "constraints": [
+            "0 <= durations.length <= 100000",
+            "1 <= m <= 100000",
+            "The answer fits in a safe integer"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(min(n, m))" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "modulus": [1, 2, 60, 100000],
+            "remainder_distribution": ["uniform", "complement-heavy", "none"]
+          },
+          "edge_cases": [
+            "m equals one",
+            "remainder zero pairs",
+            "m/2 remainder when m is even",
+            "negative durations"
+          ],
+          "examples": [{ "input": { "durations": [20, 40, 50, 10], "m": 60 }, "output": 2 }],
+          "related_lessons": []
+        },
+        {
+          "id": "comp-05",
+          "origin": "C7",
+          "title": "Four-Ledger Reconciliation",
+          "primary_concept": "meet-in-the-middle pair sums",
+          "secondary_concepts": ["frequency maps", "tuple counting"],
+          "difficulty": "hard",
+          "statement": "Given four equally sized integer ledgers A, B, C, and D, count index tuples (i, j, k, l) for which A[i] + B[j] + C[k] + D[l] equals zero.",
+          "constraints": [
+            "0 <= each array length <= 500",
+            "Values are between -10^9 and 10^9",
+            "The answer fits in a safe integer"
+          ],
+          "expected_complexity": { "time": "O(n^2)", "space": "O(n^2)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 50, 500],
+            "sum_distribution": ["random", "zero-heavy", "no-match"]
+          },
+          "edge_cases": ["empty arrays", "all zeros", "many equal pair sums", "negative values"],
+          "examples": [
+            { "input": { "A": [1, 2], "B": [-2, -1], "C": [-1, 2], "D": [0, 2] }, "output": 2 }
+          ],
+          "related_lessons": [
+            {
+              "id": "03-pair-sum-at-scale",
+              "relationship": "variant",
+              "distinction": "This extends complement lookup to four arrays with pair-sum multiplicities and meet-in-the-middle."
+            }
+          ]
+        },
+        {
+          "id": "comp-06",
+          "origin": "C8",
+          "title": "Product Partner",
+          "primary_concept": "product complement case analysis",
+          "secondary_concepts": ["set membership", "zero handling", "divisibility"],
+          "difficulty": "medium",
+          "statement": "Determine whether two distinct indices contain integers whose product equals target. Avoid multiplication overflow by deriving a partner only when division is exact; handle zero explicitly.",
+          "constraints": [
+            "0 <= values.length <= 100000",
+            "Values and target are safe integers",
+            "Intermediate multiplication may exceed the safe-integer range"
+          ],
+          "expected_complexity": { "time": "O(n) expected", "space": "O(u)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "target": [0, 1, -1, 1000000000],
+            "values": ["positive", "signed", "zero-heavy"]
+          },
+          "edge_cases": [
+            "zero target",
+            "two zeros",
+            "negative factor pairs",
+            "target not divisible by current value"
+          ],
+          "examples": [{ "input": { "values": [-3, 4, 2, -8], "target": 24 }, "output": true }],
+          "related_lessons": [
+            {
+              "id": "03-pair-sum-at-scale",
+              "relationship": "variant",
+              "distinction": "The relation is multiplication, so zero, sign, exact division, and overflow change complement derivation."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "canonical-representation",
+      "title": "Canonical representation and grouping",
+      "summary": "Normalize equivalent objects to one stable key before deduplicating or grouping them.",
+      "recognition_signals": [
+        "Objects may look different syntactically but the contract defines transformations that preserve equivalence.",
+        "The task asks to group or deduplicate values under rotation, translation, scaling, or normalization rules."
+      ],
+      "common_wrong_approaches": [
+        "Comparing every pair of objects repeats expensive equivalence work and tends toward quadratic time.",
+        "An incomplete sign, order, or zero convention creates multiple keys for the same logical value."
+      ],
+      "problems": [
+        {
+          "id": "canon-01",
+          "origin": "D1",
+          "title": "Anagram Filing System",
+          "primary_concept": "canonical frequency signature",
+          "secondary_concepts": ["grouping", "stable output"],
+          "difficulty": "medium",
+          "statement": "Group lowercase words that contain the same letters with the same multiplicities. Preserve word order inside each group and order groups by the first word assigned to them.",
+          "constraints": [
+            "0 <= words.length <= 10000",
+            "Words contain only lowercase English letters",
+            "Total character count is at most 100000"
+          ],
+          "expected_complexity": { "time": "O(c)", "space": "O(c), where c is total characters" },
+          "answer_type": "groups",
+          "generator_parameters": {
+            "word_count": [0, 1, 10000],
+            "alphabet_size": [1, 4, 26],
+            "group_shape": ["singletons", "balanced", "one-large"]
+          },
+          "edge_cases": [
+            "empty input",
+            "empty strings",
+            "duplicate words",
+            "many singleton groups"
+          ],
+          "examples": [
+            {
+              "input": ["eat", "tea", "tan", "ate", "nat", "bat"],
+              "output": [["eat", "tea", "ate"], ["tan", "nat"], ["bat"]]
+            }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "canon-02",
+          "origin": "D2",
+          "title": "Shift-Equivalent Labels",
+          "primary_concept": "relative-offset canonicalization",
+          "secondary_concepts": ["modular arithmetic", "grouping"],
+          "difficulty": "medium",
+          "statement": "Group nonempty lowercase labels when every character of one can be shifted by the same cyclic alphabet offset to form the other. Preserve input order within and across groups.",
+          "constraints": [
+            "0 <= labels.length <= 10000",
+            "Each label contains lowercase English letters",
+            "Total character count is at most 100000"
+          ],
+          "expected_complexity": { "time": "O(c)", "space": "O(c)" },
+          "answer_type": "groups",
+          "generator_parameters": {
+            "label_length": [1, 2, 20],
+            "wraparound": [true, false],
+            "group_count": [1, 5, 1000]
+          },
+          "edge_cases": [
+            "single-character labels all match",
+            "alphabet wraparound",
+            "duplicate labels",
+            "different lengths"
+          ],
+          "examples": [
+            {
+              "input": ["abc", "mno", "az", "ba", "abd"],
+              "output": [["abc", "mno"], ["az", "ba"], ["abd"]]
+            }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "canon-03",
+          "origin": "D4",
+          "title": "Direction Families",
+          "primary_concept": "GCD vector normalization",
+          "secondary_concepts": ["sign conventions", "grouping"],
+          "difficulty": "medium",
+          "statement": "Group nonzero integer vectors that point along the same directed ray. Vectors with opposite signs belong to different groups. Preserve the first-seen order of groups and vectors.",
+          "constraints": [
+            "0 <= vectors.length <= 100000",
+            "Each component is a safe integer",
+            "The zero vector is not allowed"
+          ],
+          "expected_complexity": { "time": "O(n log M)", "space": "O(n)" },
+          "answer_type": "groups",
+          "generator_parameters": {
+            "magnitude": [1, 10, 1000000000],
+            "axis_vectors": [true, false],
+            "opposites": [true, false]
+          },
+          "edge_cases": [
+            "horizontal vectors",
+            "vertical vectors",
+            "negative components",
+            "opposite directions"
+          ],
+          "examples": [
+            {
+              "input": [
+                [2, 4],
+                [1, 2],
+                [-3, -6],
+                [0, 5]
+              ],
+              "output": [
+                [
+                  [2, 4],
+                  [1, 2]
+                ],
+                [[-3, -6]],
+                [[0, 5]]
+              ]
+            }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "canon-04",
+          "origin": "D5",
+          "title": "Translated Island Shapes",
+          "primary_concept": "translation-invariant component signatures",
+          "secondary_concepts": ["grid traversal", "connected components"],
+          "difficulty": "medium",
+          "statement": "A binary grid contains 4-directionally connected islands. Return the number of distinct island shapes when translation is allowed but rotation and reflection are not.",
+          "constraints": [
+            "0 <= rows, columns <= 500",
+            "The grid contains only 0 and 1",
+            "Do not mutate the grid"
+          ],
+          "expected_complexity": { "time": "O(rows * columns)", "space": "O(rows * columns)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "grid_size": [
+              [0, 0],
+              [1, 1],
+              [20, 20],
+              [500, 500]
+            ],
+            "shape_repeats": ["none", "translated", "rotated-only"]
+          },
+          "edge_cases": [
+            "empty grid",
+            "no islands",
+            "single-cell islands",
+            "rotated shapes are different"
+          ],
+          "examples": [
+            {
+              "input": [
+                [1, 1, 0, 1, 1],
+                [1, 0, 0, 1, 0]
+              ],
+              "output": 1
+            }
+          ],
+          "related_lessons": [
+            {
+              "id": "22-disconnected-service-groups",
+              "relationship": "variant",
+              "distinction": "This traverses components and additionally canonicalizes each component's geometry under translation."
+            }
+          ]
+        },
+        {
+          "id": "canon-05",
+          "origin": "D7",
+          "title": "Necklace Families",
+          "primary_concept": "canonical cyclic rotation",
+          "secondary_concepts": ["string algorithms", "grouping"],
+          "difficulty": "hard",
+          "statement": "Group equal-length strings when one is a cyclic rotation of the other. Reversal is not allowed. Preserve input order inside groups and first-seen group order.",
+          "constraints": [
+            "0 <= necklaces.length <= 10000",
+            "Total character count is at most 200000",
+            "Strings may contain arbitrary ASCII characters"
+          ],
+          "expected_complexity": {
+            "time": "O(c) with a linear minimum-rotation algorithm",
+            "space": "O(c)"
+          },
+          "answer_type": "groups",
+          "generator_parameters": {
+            "length": [1, 2, 1000],
+            "periodicity": ["aperiodic", "periodic", "uniform"],
+            "reversed_decoys": [true, false]
+          },
+          "edge_cases": [
+            "one-character strings",
+            "repeated periodic strings",
+            "reversal-only matches",
+            "different lengths"
+          ],
+          "examples": [
+            {
+              "input": ["abcde", "cdeab", "eabcd", "edcba"],
+              "output": [["abcde", "cdeab", "eabcd"], ["edcba"]]
+            }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "canon-06",
+          "origin": "D9",
+          "title": "Rational Number Deduplication",
+          "primary_concept": "reduced-fraction canonicalization",
+          "secondary_concepts": ["GCD", "sign normalization", "sets"],
+          "difficulty": "medium",
+          "statement": "Given integer numerator-denominator pairs, return the number of distinct numeric values. Reduce by greatest common divisor, keep denominators positive, and represent every zero identically.",
+          "constraints": [
+            "0 <= fractions.length <= 100000",
+            "Denominators are nonzero",
+            "Numerators and denominators are safe integers"
+          ],
+          "expected_complexity": { "time": "O(n log M)", "space": "O(u)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "magnitude": [1, 1000, 1000000000],
+            "equivalent_forms": ["none", "scaled", "sign-flipped", "zeros"]
+          },
+          "edge_cases": [
+            "zero numerators",
+            "negative denominators",
+            "both parts negative",
+            "already reduced fractions"
+          ],
+          "examples": [
+            {
+              "input": [
+                [2, 4],
+                [-3, -6],
+                [1, 2],
+                [0, -9]
+              ],
+              "output": 2
+            }
+          ],
+          "related_lessons": []
+        }
+      ]
+    },
+    {
+      "id": "prefix-state",
+      "title": "Prefix sums and prefix-state hashing",
+      "summary": "Describe a range by subtracting or comparing cumulative state at two boundaries.",
+      "recognition_signals": [
+        "The prompt asks about many contiguous ranges, or negative values prevent a monotonic sliding window.",
+        "A valid range can be recognized by a relationship between state before the range and state after it."
+      ],
+      "common_wrong_approaches": [
+        "Recomputing each range aggregate repeats work and often produces quadratic or query-times-length cost.",
+        "Forgetting the empty prefix loses ranges that begin at index zero and causes off-by-one errors."
+      ],
+      "problems": [
+        {
+          "id": "prefix-01",
+          "origin": "E1",
+          "title": "Historical Balance Queries",
+          "primary_concept": "prefix sums",
+          "secondary_concepts": ["offline preprocessing", "range queries"],
+          "difficulty": "easy",
+          "statement": "Given daily account changes and many inclusive [left, right] queries, return the total change for each query. Preprocess once rather than scanning each queried range.",
+          "constraints": [
+            "0 <= changes.length <= 100000",
+            "0 <= queries.length <= 100000",
+            "Every query indexes a valid nonempty range"
+          ],
+          "expected_complexity": { "time": "O(n + q)", "space": "O(n) excluding output" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "query_count": [0, 1, 100000],
+            "query_shape": ["points", "full-range", "overlapping"]
+          },
+          "edge_cases": [
+            "no queries",
+            "single-day queries",
+            "negative changes",
+            "full-array query"
+          ],
+          "examples": [
+            {
+              "input": {
+                "changes": [5, -2, 7, -4],
+                "queries": [
+                  [0, 1],
+                  [1, 3]
+                ]
+              },
+              "output": [3, 1]
+            }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "prefix-02",
+          "origin": "E2",
+          "title": "Target-Sum Periods",
+          "primary_concept": "prefix-sum frequency lookup",
+          "secondary_concepts": ["subarray counting", "hash maps"],
+          "difficulty": "medium",
+          "statement": "Count contiguous nonempty periods whose values sum exactly to k. Values may be positive, negative, or zero, so window sums are not monotonic.",
+          "constraints": [
+            "0 <= values.length <= 100000",
+            "Values and k are safe integers",
+            "The answer fits in a safe integer"
+          ],
+          "expected_complexity": { "time": "O(n) expected", "space": "O(n)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "sign_mix": ["positive", "negative", "mixed", "zero-heavy"],
+            "target": [0, 1, -10]
+          },
+          "edge_cases": ["empty array", "k equals zero", "overlapping periods", "negative values"],
+          "examples": [{ "input": { "values": [1, 2, 1, -1, 1], "k": 3 }, "output": 4 }],
+          "related_lessons": []
+        },
+        {
+          "id": "prefix-03",
+          "origin": "E3",
+          "title": "Longest Balanced Signal",
+          "primary_concept": "first occurrence of prefix difference",
+          "secondary_concepts": ["binary encoding", "longest subarray"],
+          "difficulty": "medium",
+          "statement": "Given a binary signal, return the length of the longest contiguous segment containing an equal number of zeros and ones.",
+          "constraints": [
+            "0 <= signal.length <= 100000",
+            "Every value is 0 or 1",
+            "Do not mutate the signal"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "balance": ["alternating", "blocked", "biased", "uniform"]
+          },
+          "edge_cases": ["empty signal", "all zeros", "all ones", "whole signal balanced"],
+          "examples": [{ "input": [0, 1, 1, 0, 1, 1, 0], "output": 4 }],
+          "related_lessons": []
+        },
+        {
+          "id": "prefix-04",
+          "origin": "E4",
+          "title": "Divisible Expense Periods",
+          "primary_concept": "prefix-remainder frequencies",
+          "secondary_concepts": ["modular normalization", "subarray counting"],
+          "difficulty": "medium",
+          "statement": "Count contiguous nonempty expense periods whose total is divisible by positive integer m. Expense adjustments may be negative; normalize remainders into 0 through m - 1.",
+          "constraints": [
+            "0 <= expenses.length <= 100000",
+            "1 <= m <= 100000",
+            "The answer fits in a safe integer"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(min(n, m))" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "modulus": [1, 2, 100000],
+            "sign_mix": ["positive", "mixed", "negative"]
+          },
+          "edge_cases": ["m equals one", "negative prefix sums", "zero values", "empty array"],
+          "examples": [{ "input": { "expenses": [4, 5, 0, -2, -3, 1], "m": 5 }, "output": 7 }],
+          "related_lessons": []
+        },
+        {
+          "id": "prefix-05",
+          "origin": "E5",
+          "title": "Equal Red, Green, and Blue Segment",
+          "primary_concept": "multidimensional prefix differences",
+          "secondary_concepts": ["canonical state", "longest substring"],
+          "difficulty": "hard",
+          "statement": "A signal contains only R, G, and B. Return the inclusive boundaries of the longest contiguous segment with equal counts of all three symbols. Break ties by earliest start; return null if none exists.",
+          "constraints": [
+            "0 <= signal.length <= 100000",
+            "The alphabet is exactly R, G, and B",
+            "A valid segment must be nonempty"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "indices",
+          "generator_parameters": {
+            "length": [0, 3, 100000],
+            "distribution": ["balanced", "biased", "missing-color"]
+          },
+          "edge_cases": [
+            "fewer than three symbols",
+            "one color absent",
+            "whole input balanced",
+            "equal-length best segments"
+          ],
+          "examples": [{ "input": "RRGBGBR", "output": [1, 6] }],
+          "related_lessons": []
+        },
+        {
+          "id": "prefix-06",
+          "origin": "E11",
+          "title": "Odd-Parity Character Window",
+          "primary_concept": "prefix parity bitmask",
+          "secondary_concepts": ["Hamming-neighbor lookup", "longest substring"],
+          "difficulty": "hard",
+          "statement": "Given a string over letters a through j, return the length of the longest substring in which at most one distinct character has an odd frequency.",
+          "constraints": [
+            "0 <= text.length <= 100000",
+            "Text contains only letters a through j",
+            "Substrings are contiguous"
+          ],
+          "expected_complexity": { "time": "O(10n)", "space": "O(2^10)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "alphabet_size": [1, 2, 10],
+            "parity_shape": ["even", "one-odd", "many-odd"]
+          },
+          "edge_cases": ["empty string", "one character", "all counts even", "only one odd count"],
+          "examples": [
+            {
+              "input": "aabaa",
+              "output": 5,
+              "explanation": "The complete string has only b with odd frequency."
+            }
+          ],
+          "related_lessons": []
+        }
+      ]
+    },
+    {
+      "id": "difference-and-sweeps",
+      "title": "Difference arrays and event sweeps",
+      "summary": "Apply range effects at boundaries, then reconstruct state in sorted order.",
+      "recognition_signals": [
+        "Many operations affect complete ranges while only their start and end boundaries change the active state.",
+        "Coordinates may be sparse or huge, but the answer changes only at a limited set of event positions."
+      ],
+      "common_wrong_approaches": [
+        "Updating every point in every interval makes runtime depend on total covered length rather than event count.",
+        "Failing to define inclusive versus half-open endpoints produces incorrect ordering for simultaneous events."
+      ],
+      "problems": [
+        {
+          "id": "sweep-01",
+          "origin": "F1",
+          "title": "Batch Temperature Adjustments",
+          "primary_concept": "difference array",
+          "secondary_concepts": ["range updates", "prefix reconstruction"],
+          "difficulty": "easy",
+          "statement": "Start with an integer array of n zeros. Each operation [left, right, delta] adds delta to every inclusive index in the range. Return the final array after all operations.",
+          "constraints": [
+            "0 <= n, operations.length <= 100000",
+            "Every operation is within 0 through n - 1",
+            "Final values are safe integers"
+          ],
+          "expected_complexity": { "time": "O(n + q)", "space": "O(n)" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "operation_count": [0, 1, 100000],
+            "overlap": ["none", "nested", "heavy"]
+          },
+          "edge_cases": [
+            "no operations",
+            "single-index ranges",
+            "negative deltas",
+            "full-array updates"
+          ],
+          "examples": [
+            {
+              "input": {
+                "n": 5,
+                "operations": [
+                  [1, 3, 2],
+                  [2, 4, -1]
+                ]
+              },
+              "output": [0, 2, 1, 1, -1]
+            }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "sweep-02",
+          "origin": "F3",
+          "title": "Shuttle Capacity Audit",
+          "primary_concept": "ordered boundary events",
+          "secondary_concepts": ["difference maps", "endpoint semantics"],
+          "difficulty": "medium",
+          "statement": "Each trip [passengers, pickup, dropoff] boards passengers at pickup and removes them before boarding at dropoff. Return whether shuttle occupancy ever exceeds capacity.",
+          "constraints": [
+            "0 <= trips.length <= 100000",
+            "0 <= pickup < dropoff <= 10^9",
+            "Passengers and capacity are nonnegative safe integers"
+          ],
+          "expected_complexity": { "time": "O(n log n)", "space": "O(n)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "trip_count": [0, 1, 100000],
+            "coordinate_scale": [10, 1000000000],
+            "load": ["under", "exact", "over"]
+          },
+          "edge_cases": [
+            "no trips",
+            "dropoff and pickup at same stop",
+            "exactly full",
+            "multiple events at one stop"
+          ],
+          "examples": [
+            {
+              "input": {
+                "trips": [
+                  [2, 1, 5],
+                  [3, 5, 7]
+                ],
+                "capacity": 3
+              },
+              "output": true
+            }
+          ],
+          "related_lessons": [
+            {
+              "id": "21-checkpoint-concurrent-rooms",
+              "relationship": "variant",
+              "distinction": "Events carry passenger weights and dropoffs occur before pickups, rather than counting uniform rooms."
+            }
+          ]
+        },
+        {
+          "id": "sweep-03",
+          "origin": "F4",
+          "title": "Streetlight Brightness",
+          "primary_concept": "discrete interval sweep",
+          "secondary_concepts": ["coordinate bounds", "coverage thresholds"],
+          "difficulty": "medium",
+          "statement": "Each streetlight illuminates every integer position in an inclusive interval [left, right]. Return the number of integer positions covered by at least k lights.",
+          "constraints": [
+            "0 <= lights.length <= 100000",
+            "1 <= k <= 100000",
+            "-10^9 <= left <= right <= 10^9"
+          ],
+          "expected_complexity": { "time": "O(n log n)", "space": "O(n)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "light_count": [0, 1, 100000],
+            "threshold": [1, 2, 100000],
+            "coordinates": ["small", "sparse", "negative"]
+          },
+          "edge_cases": [
+            "no lights",
+            "k exceeds light count",
+            "single-point intervals",
+            "negative positions"
+          ],
+          "examples": [
+            {
+              "input": {
+                "lights": [
+                  [1, 3],
+                  [2, 4],
+                  [4, 4]
+                ],
+                "k": 2
+              },
+              "output": 3
+            }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "sweep-04",
+          "origin": "F5",
+          "title": "Peak Session Intervals",
+          "primary_concept": "event sweep with interval reconstruction",
+          "secondary_concepts": ["endpoint semantics", "maximum tracking"],
+          "difficulty": "medium",
+          "statement": "Sessions use half-open intervals [login, logout). Return the maximum concurrent session count and every maximal half-open interval over which that maximum is maintained. Ignore zero-length intervals.",
+          "constraints": [
+            "0 <= sessions.length <= 100000",
+            "Times are safe integers",
+            "Each login time is at most its logout time"
+          ],
+          "expected_complexity": { "time": "O(n log n)", "space": "O(n)" },
+          "answer_type": "object",
+          "generator_parameters": {
+            "session_count": [0, 1, 100000],
+            "ties": ["none", "touching", "disjoint-peaks"],
+            "zero_length": [true, false]
+          },
+          "edge_cases": [
+            "no sessions",
+            "zero-length sessions",
+            "logout and login at same time",
+            "multiple disjoint peak intervals"
+          ],
+          "examples": [
+            {
+              "input": [
+                [1, 5],
+                [2, 4],
+                [6, 8],
+                [6, 7]
+              ],
+              "output": {
+                "maximum": 2,
+                "intervals": [
+                  [2, 4],
+                  [6, 7]
+                ]
+              }
+            }
+          ],
+          "related_lessons": [
+            {
+              "id": "21-checkpoint-concurrent-rooms",
+              "relationship": "variant",
+              "distinction": "This returns all maximal peak intervals with explicit half-open semantics, not only a room count."
+            }
+          ]
+        },
+        {
+          "id": "sweep-05",
+          "origin": "F7",
+          "title": "Earliest Overloaded Time",
+          "primary_concept": "weighted event sweep",
+          "secondary_concepts": ["early detection", "sparse coordinates"],
+          "difficulty": "medium",
+          "statement": "Workloads are half-open intervals [start, end) with positive amounts. Return the earliest coordinate at which active workload strictly exceeds the system limit, or null if it never does.",
+          "constraints": [
+            "0 <= workloads.length <= 100000",
+            "0 <= start < end <= 10^18",
+            "Use bigint coordinates and workload totals"
+          ],
+          "expected_complexity": { "time": "O(n log n)", "space": "O(n)" },
+          "answer_type": "value",
+          "generator_parameters": {
+            "workload_count": [0, 1, 100000],
+            "coordinate_scale": [1000, "10^18"],
+            "overload": ["never", "at-start", "later"]
+          },
+          "edge_cases": [
+            "no workloads",
+            "exactly at limit",
+            "events sharing a coordinate",
+            "coordinates beyond safe integers"
+          ],
+          "examples": [
+            {
+              "input": {
+                "workloads": [
+                  ["1", "5", "4"],
+                  ["3", "7", "3"]
+                ],
+                "limit": "6"
+              },
+              "output": "3"
+            }
+          ],
+          "related_lessons": [
+            {
+              "id": "21-checkpoint-concurrent-rooms",
+              "relationship": "variant",
+              "distinction": "This uses weighted sparse events, strict overload detection, and coordinates requiring bigint arithmetic."
+            }
+          ]
+        },
+        {
+          "id": "sweep-06",
+          "origin": "F8",
+          "title": "Covered-Length Report",
+          "primary_concept": "continuous interval union sweep",
+          "secondary_concepts": ["sorting", "coverage counts"],
+          "difficulty": "medium",
+          "statement": "Given half-open real-coordinate intervals [start, end), return the total length covered by at least one interval. Zero-length intervals contribute nothing.",
+          "constraints": [
+            "0 <= intervals.length <= 100000",
+            "Endpoints are finite safe integers",
+            "Each start is at most its end"
+          ],
+          "expected_complexity": {
+            "time": "O(n log n)",
+            "space": "O(n) because the input is preserved"
+          },
+          "answer_type": "number",
+          "generator_parameters": {
+            "interval_count": [0, 1, 100000],
+            "overlap": ["none", "touching", "nested", "heavy"]
+          },
+          "edge_cases": [
+            "empty input",
+            "zero-length intervals",
+            "touching intervals",
+            "fully nested intervals"
+          ],
+          "examples": [
+            {
+              "input": [
+                [1, 4],
+                [3, 7],
+                [10, 12]
+              ],
+              "output": 8
+            }
+          ],
+          "related_lessons": [
+            {
+              "id": "20-consolidate-schedule-windows",
+              "relationship": "variant",
+              "distinction": "This computes continuous union length under half-open semantics rather than returning merged intervals."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "index-placement",
+      "title": "Values used as indices and permutation cycles",
+      "summary": "Exploit a constrained value range as implicit storage or as a pointer graph.",
+      "recognition_signals": [
+        "Array values are restricted to an index-sized range such as zero through n or one through n.",
+        "The contract requires linear time with constant auxiliary space or describes a permutation and its cycles."
+      ],
+      "common_wrong_approaches": [
+        "Using a general set ignores information encoded by the constrained value range and violates space limits.",
+        "Swapping without checking whether a value is already correctly placed can create an infinite duplicate loop."
+      ],
+      "problems": [
+        {
+          "id": "index-01",
+          "origin": "G1",
+          "title": "Missing Shelf Labels",
+          "primary_concept": "in-place index marking",
+          "secondary_concepts": ["value-range invariants", "sign encoding"],
+          "difficulty": "easy",
+          "statement": "An array of length n contains integers from 1 through n with repetition allowed. Return all values in that range that do not appear, using constant auxiliary space besides the result.",
+          "constraints": [
+            "0 <= values.length <= 100000",
+            "Every value is between 1 and n",
+            "The input may be modified"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1) excluding output" },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "missing_rate": [0, 0.1, 1],
+            "duplicates": ["light", "heavy"]
+          },
+          "edge_cases": [
+            "empty array",
+            "nothing missing",
+            "many repeated values",
+            "all entries equal"
+          ],
+          "examples": [{ "input": [4, 3, 2, 7, 8, 2, 3, 1], "output": [5, 6] }],
+          "related_lessons": [
+            {
+              "id": "05-compact-sorted-identifiers",
+              "relationship": "variant",
+              "distinction": "Both permit mutation, but this encodes presence through value-index correspondence rather than two pointers."
+            }
+          ]
+        },
+        {
+          "id": "index-02",
+          "origin": "G3",
+          "title": "Corrupted Permutation",
+          "primary_concept": "in-place permutation marking",
+          "secondary_concepts": ["missing and duplicate detection"],
+          "difficulty": "medium",
+          "statement": "An intended permutation of 1 through n contains one duplicated value and one missing value. Return an object containing both, using constant auxiliary space.",
+          "constraints": [
+            "2 <= values.length <= 100000",
+            "Every value is between 1 and n",
+            "The input may be modified"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "object",
+          "generator_parameters": {
+            "length": [2, 10, 100000],
+            "duplicate_position": ["start", "middle", "end"],
+            "missing_value": [1, "middle", "n"]
+          },
+          "edge_cases": [
+            "missing one",
+            "missing n",
+            "adjacent duplicate values",
+            "duplicate appears before missing position"
+          ],
+          "examples": [{ "input": [1, 2, 2, 4], "output": { "duplicate": 2, "missing": 3 } }],
+          "related_lessons": []
+        },
+        {
+          "id": "index-03",
+          "origin": "G4",
+          "title": "First Missing Positive Identifier",
+          "primary_concept": "cyclic index placement",
+          "secondary_concepts": ["in-place partitioning", "value-range reasoning"],
+          "difficulty": "hard",
+          "statement": "Given an unsorted integer array containing negatives, zeros, and positives, return the smallest positive integer that does not appear. Use linear time and constant auxiliary space.",
+          "constraints": [
+            "0 <= values.length <= 100000",
+            "Values are safe integers",
+            "The input may be modified"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "value_mix": ["negative", "dense-positive", "sparse", "duplicates"]
+          },
+          "edge_cases": [
+            "empty array",
+            "one missing",
+            "all nonpositive",
+            "duplicates",
+            "answer is n + 1"
+          ],
+          "examples": [{ "input": [3, 4, -1, 1], "output": 2 }],
+          "related_lessons": []
+        },
+        {
+          "id": "index-04",
+          "origin": "G5",
+          "title": "Restore Seat Assignments",
+          "primary_concept": "permutation cycle decomposition",
+          "secondary_concepts": ["minimum swaps", "visited-state encoding"],
+          "difficulty": "medium",
+          "statement": "Array seatOfStudent is a permutation where index is a student and value is the seat currently occupied. Return the minimum swaps of any two students needed so every student i occupies seat i.",
+          "constraints": [
+            "0 <= seatOfStudent.length <= 100000",
+            "Values form a permutation of 0 through n - 1",
+            "Do not mutate the input"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "cycle_shape": ["identity", "one-cycle", "many-cycles", "transpositions"]
+          },
+          "edge_cases": [
+            "empty permutation",
+            "already correct",
+            "one long cycle",
+            "several disjoint cycles"
+          ],
+          "examples": [{ "input": [1, 0, 3, 2], "output": 2 }],
+          "related_lessons": []
+        },
+        {
+          "id": "index-05",
+          "origin": "G6",
+          "title": "Read-Only Duplicate Search",
+          "primary_concept": "Floyd cycle entry",
+          "secondary_concepts": ["implicit pointer graph", "constant-space reasoning"],
+          "difficulty": "hard",
+          "statement": "An array of length n + 1 contains values from 1 through n and exactly one distinct value is duplicated one or more times. Return that value without modifying the array and with constant auxiliary space.",
+          "constraints": [
+            "1 <= n <= 100000",
+            "Every value is between 1 and n",
+            "Run in O(n) time and do not mutate input"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [2, 10, 100001],
+            "duplicate_multiplicity": [2, 3, "many"],
+            "cycle_entry": ["early", "middle", "late"]
+          },
+          "edge_cases": [
+            "n equals one",
+            "duplicate appears many times",
+            "self-loop cycle entry",
+            "long tail before cycle"
+          ],
+          "examples": [{ "input": [1, 3, 4, 2, 2], "output": 2 }],
+          "related_lessons": [
+            {
+              "id": "12-cyclic-dependency-chain",
+              "relationship": "variant",
+              "distinction": "This models array values as pointers and must locate the cycle entry, not merely detect a linked-list cycle."
+            }
+          ]
+        },
+        {
+          "id": "index-06",
+          "origin": "G8",
+          "title": "Broken Circular Routing Table",
+          "primary_concept": "cycle metrics in a functional graph",
+          "secondary_concepts": ["Floyd cycle detection", "cycle entry", "cycle length"],
+          "difficulty": "medium",
+          "statement": "Each routing-table entry stores the index of the next entry. Starting from entry 0, return whether a cycle exists, its first entry, its length, and the number of entries before it. A route that exits with -1 is acyclic.",
+          "constraints": [
+            "0 <= next.length <= 100000",
+            "Each value is -1 or a valid index",
+            "Do not mutate the routing table"
+          ],
+          "expected_complexity": { "time": "O(r), where r is reachable entries", "space": "O(1)" },
+          "answer_type": "object",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "shape": ["acyclic", "self-loop", "tail-and-cycle", "cycle-at-zero"]
+          },
+          "edge_cases": [
+            "empty table",
+            "immediate exit",
+            "self-loop",
+            "cycle begins at zero",
+            "unreachable entries"
+          ],
+          "examples": [
+            {
+              "input": [1, 2, 3, 1],
+              "output": { "hasCycle": true, "first": 1, "length": 3, "prefixLength": 1 }
+            }
+          ],
+          "related_lessons": [
+            {
+              "id": "12-cyclic-dependency-chain",
+              "relationship": "variant",
+              "distinction": "This returns entry, cycle length, and tail length for an index graph and also supports an acyclic sentinel."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

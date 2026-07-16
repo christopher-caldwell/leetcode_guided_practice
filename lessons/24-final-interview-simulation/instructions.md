@@ -10,7 +10,7 @@ Lessons 1–23. Relevant patterns are intentionally not announced.
 
 ## Problem statement
 
-Complete both parts. Part A returns the inclusive boundaries of the shortest contiguous event range containing every required identifier with multiplicity, or null when the requirement is empty or impossible. Part B returns the fewest undirected edges between two services, or -1 when unreachable.
+Complete both parts. Part A returns the inclusive boundaries of the shortest contiguous event range containing every required identifier with multiplicity, or null when the requirement is empty or impossible. If multiple minimum ranges have equal length, return the one with the earliest start. Part B returns the fewest undirected edges between two services, or -1 when unreachable.
 
 ### Examples
 
@@ -30,7 +30,7 @@ Complete both parts. Part A returns the inclusive boundaries of the shortest con
 - Does required multiplicity matter?
 - Does a route from a service to itself use zero edges?
 
-Write your actual assumptions and answers in `lessons/24-final-interview-simulation/analysis.md` before coding.
+Write your actual assumptions and answers in `lessons/24-final-interview-simulation/analysis.md` before coding. In the Baseline, Cost, Optimized, Invariant, and Final Complexity sections, label and address both `Part A` and `Part B` explicitly.
 
 ## Expected workflow
 
@@ -53,7 +53,9 @@ Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node o
 
 ## Automated pass condition
 
-All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without revealing private cases wholesale.
+All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without dumping internal case details wholesale.
+
+The final verifier includes an adjacency-order counterexample for DFS discovery depth, a guarded 20,000-event covering-range case, and a 20,000-service route.
 
 ## Common traps
 
@@ -63,7 +65,7 @@ All required analysis sections must contain your reasoning. The TypeScript proje
 
 ## Post-pass reflection
 
-After passing, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Then consider this variation:
+After CODE VERIFIED, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Run `just check` again to advance, then consider this variation:
 
 > How would Part B change if connections had nonnegative travel times?
 

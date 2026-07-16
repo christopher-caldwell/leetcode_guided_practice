@@ -1,13 +1,18 @@
-import { spawn } from 'node:child_process'
 import { mkdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { CheckFailure, CheckResult, FailureCategory, LessonManifest } from '../core/models.js'
+import { runProcess } from '../core/process.js'
 import { stateDirectory } from '../core/state.js'
+import { validateSourcePolicies } from './source-policies.js'
 
-interface ProcessResult {
-  exitCode: number
-  stdout: string
-  stderr: string
+const TYPECHECK_TIMEOUT_MS = 30_000
+const VERIFIER_TIMEOUT_MS = 30_000
+
+export interface TypeScriptCheckOptions {
+  solutionPath?: string
+  publicTestPath?: string
+  skipTypecheck?: boolean
+  verificationOutputDirectory?: string
 }
 
 interface VitestAssertion {
@@ -25,29 +30,52 @@ interface VitestJsonResult {
   testResults?: VitestTestResult[]
 }
 
-export async function checkTypeScript(root: string, lesson: LessonManifest): Promise<CheckResult> {
-  const typecheck = await run(root, 'pnpm', ['exec', 'tsc', '--noEmit'])
-  if (typecheck.exitCode !== 0) {
-    return {
-      passed: false,
-      failures: [
-        {
-          category: 'typecheck',
-          summary: 'The TypeScript project does not type-check.',
-          evidence: trimEvidence(`${typecheck.stdout}\n${typecheck.stderr}`),
-        },
-      ],
-      output: `${typecheck.stdout}\n${typecheck.stderr}`,
+export async function checkTypeScript(
+  root: string,
+  lesson: LessonManifest,
+  options: TypeScriptCheckOptions = {},
+): Promise<CheckResult> {
+  if (!options.skipTypecheck) {
+    const typecheck = await runProcess('pnpm', ['exec', 'tsc', '--noEmit'], {
+      cwd: root,
+      environment: process.env,
+      timeoutMs: TYPECHECK_TIMEOUT_MS,
+    })
+    if (typecheck.timedOut) {
+      return timeoutFailure('TypeScript type-check', TYPECHECK_TIMEOUT_MS, typecheck)
+    }
+    if (typecheck.exitCode !== 0) {
+      return {
+        passed: false,
+        failures: [
+          {
+            category: 'typecheck',
+            summary: 'The TypeScript project does not type-check.',
+            evidence: trimEvidence(`${typecheck.stdout}\n${typecheck.stderr}`),
+          },
+        ],
+        output: `${typecheck.stdout}\n${typecheck.stderr}`,
+      }
     }
   }
 
-  const generated = path.join(stateDirectory(root), 'generated', 'verification')
+  const solutionPath = options.solutionPath ?? path.join(lesson.directory, lesson.source)
+  const sourceFailures = await validateSourcePolicies(lesson, solutionPath)
+  if (sourceFailures.length > 0) {
+    return { passed: false, failures: sourceFailures, output: '' }
+  }
+
+  const generated =
+    options.verificationOutputDirectory ??
+    path.join(stateDirectory(root), 'generated', 'verification')
   await mkdir(generated, { recursive: true })
   const outputFile = path.join(generated, `${lesson.id}-${Date.now()}.json`)
-  const publicTest = path.relative(root, path.join(lesson.directory, lesson.publicTest))
-  const internalTest = 'src/verification/lesson-verifier.test.ts'
-  const vitest = await run(
+  const publicTest = path.relative(
     root,
+    options.publicTestPath ?? path.join(lesson.directory, lesson.publicTest),
+  )
+  const internalTest = 'src/verification/lesson-verifier.test.ts'
+  const vitest = await runProcess(
     'pnpm',
     [
       'exec',
@@ -58,8 +86,20 @@ export async function checkTypeScript(root: string, lesson: LessonManifest): Pro
       '--reporter=json',
       `--outputFile=${outputFile}`,
     ],
-    { WORKSHOP_LESSON_ID: lesson.id },
+    {
+      cwd: root,
+      environment: {
+        ...process.env,
+        WORKSHOP_LESSON_ID: lesson.id,
+        WORKSHOP_SOLUTION_PATH: solutionPath,
+      },
+      timeoutMs: VERIFIER_TIMEOUT_MS,
+    },
   )
+
+  if (vitest.timedOut) {
+    return timeoutFailure('Lesson verifier', VERIFIER_TIMEOUT_MS, vitest)
+  }
 
   if (vitest.exitCode === 0) {
     return { passed: true, failures: [], output: vitest.stdout }
@@ -85,6 +125,26 @@ export async function checkTypeScript(root: string, lesson: LessonManifest): Pro
     passed: false,
     failures: failures.slice(0, 4),
     output: `${vitest.stdout}\n${vitest.stderr}`,
+  }
+}
+
+function timeoutFailure(
+  label: string,
+  timeoutMs: number,
+  result: { stdout: string; stderr: string },
+): CheckResult {
+  const details = trimEvidence(`${result.stdout}\n${result.stderr}`)
+  const evidence = `${label} exceeded ${Math.round(timeoutMs / 1_000)} seconds and was terminated.`
+  return {
+    passed: false,
+    failures: [
+      {
+        category: 'runtime',
+        summary: `${label} timed out.`,
+        evidence: details ? `${evidence}\n${details}` : evidence,
+      },
+    ],
+    output: `${result.stdout}\n${result.stderr}`,
   }
 }
 
@@ -119,27 +179,4 @@ function trimEvidence(value: string): string {
     .replace(/\n{3,}/g, '\n\n')
     .trim()
   return cleaned.length > 900 ? `${cleaned.slice(0, 900)}\n…` : cleaned
-}
-
-async function run(
-  root: string,
-  executable: string,
-  args: string[],
-  extraEnvironment: Record<string, string> = {},
-): Promise<ProcessResult> {
-  return new Promise((resolve, reject) => {
-    const child = spawn(executable, args, {
-      cwd: root,
-      env: { ...process.env, ...extraEnvironment },
-      stdio: ['ignore', 'pipe', 'pipe'],
-    })
-    let stdout = ''
-    let stderr = ''
-    child.stdout.setEncoding('utf8')
-    child.stderr.setEncoding('utf8')
-    child.stdout.on('data', (chunk: string) => (stdout += chunk))
-    child.stderr.on('data', (chunk: string) => (stderr += chunk))
-    child.on('error', reject)
-    child.on('close', (code) => resolve({ exitCode: code ?? 1, stdout, stderr }))
-  })
 }

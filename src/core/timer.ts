@@ -1,4 +1,4 @@
-import type { LessonManifest, TimerState } from './models.js'
+import type { LessonManifest, TimerState, WorkshopState } from './models.js'
 import type { WorkshopConfig } from './config.js'
 
 export function timerApplies(config: WorkshopConfig, lesson: LessonManifest): boolean {
@@ -37,6 +37,11 @@ export function completeTimer(timer: TimerState, now = new Date()): number {
   return timer.accumulatedMs
 }
 
+export function completeRecordedTimer(timer: TimerState, now = new Date()): number | null {
+  if (!timer.startedAt && (timer.accumulatedMs === 0 || timer.completedMs !== null)) return null
+  return completeTimer(timer, now)
+}
+
 export function resetTimer(timer: TimerState): void {
   timer.accumulatedMs = 0
   timer.startedAt = null
@@ -59,4 +64,23 @@ export function timerSummary(timer: TimerState, target: number, now = Date.now()
   const state = timer.startedAt ? 'running' : timer.completedMs !== null ? 'completed' : 'stopped'
   const overtime = elapsed > targetMs ? ` — ${formatDuration(elapsed - targetMs)} over target` : ''
   return `${state}: ${formatDuration(elapsed)} / ${target}m${overtime}`
+}
+
+export function hasRecordedTime(timer: TimerState): boolean {
+  return timer.startedAt !== null || timer.accumulatedMs > 0 || timer.completedMs !== null
+}
+
+export function selectTimerLesson(
+  lessons: LessonManifest[],
+  state: WorkshopState,
+  action: string,
+): LessonManifest {
+  const current = lessons.find((lesson) => !state.lessons[lesson.id]!.passedAt)
+  if (action !== 'status') return current ?? lessons.at(-1)!
+  if (current && hasRecordedTime(state.lessons[current.id]!.timer)) return current
+  return (
+    [...lessons].reverse().find((lesson) => hasRecordedTime(state.lessons[lesson.id]!.timer)) ??
+    current ??
+    lessons.at(-1)!
+  )
 }

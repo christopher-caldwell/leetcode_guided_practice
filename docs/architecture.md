@@ -44,8 +44,9 @@ The runner itself is TypeScript because Node is already required for the initial
 
 - Manifest validation
 - Progress serialization
-- Analysis-section validation
+- Analysis-evidence and post-pass-reflection validation
 - Stopwatch transitions
+- Readiness evidence calculation
 - Feedback persistence
 
 It does not decide whether an algorithm is correct.
@@ -58,13 +59,15 @@ It does not decide whether an algorithm is correct.
 2. The lesson's public Vitest file
 3. The parameterized internal verifier
 
-Internal test names carry categories such as `[edge-case]` and `[complexity]`. The adapter converts Vitest's JSON report into normalized `CheckFailure` values for the CLI and coach.
+Internal test names carry categories such as `[edge-case]` and `[complexity]`. The adapter converts Vitest's JSON report into normalized `CheckFailure` values for the CLI and coach. A small set of lesson-specific TypeScript AST policies covers contracts that black-box output tests cannot establish reliably, such as O(1) auxiliary state or required priority-queue use. Every verifier child has a parent-side deadline and forced-termination fallback.
+
+“Internal” means separate from the visible example file, not secret from a repository owner. Local tests cannot be cryptographically hidden; deterministic generated/scaling cases and known-wrong regression fixtures provide the useful boundary.
 
 A future language implementation should add its own verifier adapter and solution-folder convention while reusing lesson manifests, analysis validation, progress, timers, and coaching requests. The initial release intentionally implements only TypeScript.
 
 ## Coaching boundary
 
-`src/providers/coach.ts` defines the provider-neutral port and normalized schemas. `src/providers/codex.ts` is one external-process adapter. Provider selection occurs in `src/providers/factory.ts`.
+`src/providers/coach.ts` defines the provider-neutral port and normalized schemas. `src/providers/codex.ts` is one external-process adapter. Provider selection occurs in `src/providers/factory.ts`. The Codex process starts from an empty generated directory with an allowlisted environment rather than inheriting unrelated shell credentials.
 
 This boundary is independent of solution language: a future Rust verifier could still send source, reasoning, and normalized failures through the same coach port.
 
@@ -73,6 +76,8 @@ This boundary is independent of solution language: a future Rust verifier could 
 Readable complete solutions are absent from lesson directories and runner source. `assets/reference-solutions.json` contains base64-packaged content with SHA-256 integrity hashes. Encoding is not claimed as encryption; its purpose is to keep solutions out of the ordinary browsing path, not defeat deliberate reverse engineering.
 
 `just solution` validates and materializes only the current lesson under `.workshop/revealed/`. It also copies supplied support code when necessary and marks the lesson for review.
+
+Maintainer reference validation uses the same verifier with an explicit generated source path. It decodes references into a disposable `.workshop/generated/reference-validation-*` tree and never replaces canonical learner files.
 
 ## State boundary
 

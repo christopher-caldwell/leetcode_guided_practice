@@ -43,10 +43,14 @@ export type TimerState = z.infer<typeof TimerStateSchema>
 export const LessonProgressSchema = z.object({
   attempts: z.number().int().nonnegative().default(0),
   hintsUsed: z.number().int().nonnegative().default(0),
+  diagnosesReceived: z.number().int().nonnegative().default(0),
+  verifiedAt: z.string().datetime().nullable().default(null),
+  reflectionCompletedAt: z.string().datetime().nullable().default(null),
   passedAt: z.string().datetime().nullable().default(null),
   solutionRevealedAt: z.string().datetime().nullable().default(null),
   reviewRequired: z.boolean().default(false),
   latestReviewPath: z.string().nullable().default(null),
+  offlineReviewCompletedAt: z.string().datetime().nullable().default(null),
   latestReviewScores: z
     .object({
       correctness: z.number().int().min(1).max(4),

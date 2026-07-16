@@ -10,7 +10,7 @@ Lesson 2 and basic TypeScript Map usage.
 
 ## Problem statement
 
-Solve the same distinct-index pair-sum contract, but inputs may contain 100,000 values. The verifier rejects work proportional to every possible pair.
+Solve the same distinct-index pair-sum contract, but inputs may contain 100,000 values. Use a `Map` to retain the information needed for constant-average-time complement lookup; the verifier rejects work proportional to every possible pair.
 
 ### Examples
 
@@ -52,7 +52,9 @@ Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node o
 
 ## Automated pass condition
 
-All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without revealing private cases wholesale.
+All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without dumping internal case details wholesale.
+
+The verifier also confirms that `pairSumAtScale` constructs the required `Map`; small output examples alone cannot distinguish it from a copied quadratic scan.
 
 ## Common traps
 
@@ -62,7 +64,7 @@ All required analysis sections must contain your reasoning. The TypeScript proje
 
 ## Post-pass reflection
 
-After passing, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Then consider this variation:
+After CODE VERIFIED, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Run `just check` again to advance, then consider this variation:
 
 > How would you adapt the approach if the input were already sorted but original indices were unnecessary?
 

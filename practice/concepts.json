@@ -1,0 +1,242 @@
+{
+  "set-membership": {
+    "blurb": "A set answers whether a value has already been seen without rescanning earlier input. The central interview decision is how much history to retain: existence alone, the latest position, or a richer count. Use this family to practice replacing repeated linear membership checks with explicit state.",
+    "recommended_after_lesson": 6,
+    "resource": {
+      "title": "Hash Usage",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/26",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Identify the exact membership question asked each time a new value arrives; do not choose the data structure yet.",
+      "Ask whether existence is sufficient or whether the earliest, latest, or total number of occurrences must be retained.",
+      "Scan once while maintaining a Set or Map whose contents state precisely what is true about the processed prefix."
+    ]
+  },
+  "frequency-maps": {
+    "blurb": "Frequency maps treat an input as a multiset rather than a collection of merely present values. They are useful when copies can be consumed, compared, repaired, or ranked. The important invariant is that each stored count has an unambiguous meaning for the portion of input already processed.",
+    "recommended_after_lesson": 4,
+    "resource": {
+      "title": "Hash Usage",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/26",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Write down an example where replacing every count with true or false would produce the wrong answer.",
+      "Decide whether counts should describe the complete input, the remaining inventory, or only the active prefix or window.",
+      "Build or update one Map entry per observed item, then make a separate stable pass if output order matters."
+    ]
+  },
+  "complement-lookup": {
+    "blurb": "Complement lookup turns a relationship between two values into a direct question about the partner needed by the current value. Two Sum is the simplest form, but the same reasoning applies to differences, XOR, products, and modular remainder classes. Counting variants must retain multiplicity, not just existence.",
+    "recommended_after_lesson": 3,
+    "resource": {
+      "title": "Hash Usage",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/26",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "For one current value, express the required partner algebraically before thinking about loops or containers.",
+      "Determine whether you need one partner index, the nearest partner, or the number of earlier copies of that partner.",
+      "Scan in a direction that makes distinct-index handling natural: query earlier state first, then insert the current item."
+    ]
+  },
+  "canonical-representation": {
+    "blurb": "Canonicalization converts every member of an equivalence class into the same stable key. Instead of repeatedly comparing complex objects pairwise, normalize each object once and group by that representation. Correctness depends on covering every allowed transformation without collapsing objects that are not equivalent.",
+    "recommended_after_lesson": 4,
+    "resource": {
+      "title": "Hash Usage",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/26",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "List exactly which transformations preserve identity and which superficially similar transformations do not.",
+      "Design a deterministic representation with explicit ordering, sign, duplicate, and zero conventions.",
+      "Normalize each object once, serialize the normalized form unambiguously, and use that value as a Map key."
+    ]
+  },
+  "prefix-state": {
+    "blurb": "A prefix state summarizes everything before a boundary. A contiguous range can then be described by subtracting two prefix sums or comparing two equal state signatures. Hashing earlier prefix states is especially powerful when negative values make ordinary sliding windows invalid.",
+    "recommended_after_lesson": 7,
+    "resource": {
+      "title": "Prefix Sums",
+      "url": "https://neetcode.io/courses/advanced-algorithms/4",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Define what cumulative state would let you describe any range using only its two boundaries.",
+      "Write the equation relating the current prefix, the desired range property, and the earlier prefix you need.",
+      "Seed the empty prefix, then scan while querying or counting earlier states before recording the current boundary."
+    ]
+  },
+  "difference-and-sweeps": {
+    "blurb": "Difference arrays and sweep lines record only where a range effect starts and stops. Sorting those boundary events lets you reconstruct the active state without touching every covered coordinate. Endpoint semantics are part of the algorithm: simultaneous starts, ends, and queries need a defined order.",
+    "recommended_after_lesson": 20,
+    "resource": {
+      "title": "Car Pooling: Difference Array and Line Sweep",
+      "url": "https://neetcode.io/solutions/car-pooling",
+      "format": "worked-example",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Mark the exact coordinates where the answer can change instead of imagining every point inside every range.",
+      "Translate each interval into signed boundary events and specify what happens when several events share a coordinate.",
+      "Process ordered events while maintaining the active total; emit or evaluate the span before the next boundary."
+    ]
+  },
+  "index-placement": {
+    "blurb": "When values are restricted to an index-sized range, the array itself can encode presence, placement, or next pointers. That often removes the need for an auxiliary set. The same value-as-pointer view also exposes permutation cycles and enables constant-space cycle detection.",
+    "recommended_after_lesson": 12,
+    "resource": {
+      "title": "Fast and Slow Pointers",
+      "url": "https://neetcode.io/courses/advanced-algorithms/5",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Compare the legal value range with the legal index range and identify the direct correspondence between them.",
+      "Decide whether positions can encode presence through sign, whether values should be swapped home, or whether values form pointers.",
+      "Maintain a placement or cycle invariant and explicitly guard duplicates before performing another swap or pointer step."
+    ]
+  },
+  "two-pointers-windows": {
+    "blurb": "Two-pointer algorithms avoid reconsidering dominated pairs or overlapping ranges. Opposing pointers exploit sorted order, same-direction pointers compact or merge, and sliding windows maintain state about a contiguous region. The proof must explain why moving one boundary cannot discard a better answer.",
+    "recommended_after_lesson": 5,
+    "resource": {
+      "title": "Two Pointers",
+      "url": "https://neetcode.io/courses/advanced-algorithms/3",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Identify whether the content between the pointers matters; if it does, state the window property being maintained.",
+      "For each comparison or constraint violation, prove which boundary can move without losing a still-possible answer.",
+      "Move each pointer only forward, updating outgoing and incoming state exactly once so total work remains linear."
+    ]
+  },
+  "stacks-monotonic": {
+    "blurb": "A stack retains unresolved earlier work in last-in-first-out order. A monotonic stack adds an ordering invariant so a new value can settle several earlier candidates at once, while a monotonic deque also evicts stale values from the opposite end for window problems.",
+    "recommended_after_lesson": 9,
+    "resource": {
+      "title": "Daily Temperatures: Monotonic Stack",
+      "url": "https://neetcode.io/solutions/daily-temperatures",
+      "format": "worked-example",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Describe what an item on the stack is still waiting to learn from future input.",
+      "Choose increasing or decreasing stack order so the current value resolves candidates from the top only.",
+      "Push and pop each index at most once; store indices whenever distance, width, or expiration matters."
+    ]
+  },
+  "linked-list-pointers": {
+    "blurb": "Linked lists trade random access for cheap local rewiring. Most interview problems rely on preserving the next node before mutation, aligning or spacing traversals, and comparing node identity rather than values. Draw a three-node example before changing links in code.",
+    "recommended_after_lesson": 10,
+    "resource": {
+      "title": "Singly Linked Lists",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/5",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Draw the smallest nontrivial chain and label every pointer that must survive the next mutation.",
+      "Ask whether a sentinel, a fixed pointer gap, or fast and slow traversal removes a special case.",
+      "State a link invariant before the loop and save next before any assignment that could disconnect the unprocessed suffix."
+    ]
+  },
+  "binary-search-variants": {
+    "blurb": "Binary search applies whenever an ordered candidate space can be cut in half. Exact lookup is only the beginning: many interview problems search for the first or last true value of a monotonic feasibility predicate. Pick one interval convention and preserve it mechanically.",
+    "recommended_after_lesson": 14,
+    "resource": {
+      "title": "Binary Search: Search Array",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/14",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Write the ordered search space and the monotonic statement that becomes permanently true or false across it.",
+      "Decide whether equality is the answer or only evidence that a better boundary may still exist on one side.",
+      "Use one documented interval convention, compute the midpoint without overflow, and prove every update shrinks the interval."
+    ]
+  },
+  "recursion-backtracking": {
+    "blurb": "Backtracking performs a depth-first search over decisions. A partial candidate is extended, rejected when impossible, and restored before exploring its sibling branch. The key skills are defining the decision at one level and distinguishing path-local state from globally visited state.",
+    "recommended_after_lesson": 15,
+    "resource": {
+      "title": "Tree Maze: Backtracking",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/22",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Define what one recursion level chooses and what condition means a complete result has been built.",
+      "Identify the earliest safe pruning rule and list exactly which mutable state belongs only to the current path.",
+      "Implement choose, recurse, and undo symmetrically; copy only when recording a completed result."
+    ]
+  },
+  "tree-traversal": {
+    "blurb": "Tree problems become manageable when each call or queue entry has a precise meaning. Depth-first traversal combines child summaries and carries ancestor context; breadth-first traversal preserves level order. Many bugs come from checking only local parent-child relationships when the rule is inherited globally.",
+    "recommended_after_lesson": 18,
+    "resource": {
+      "title": "Tree Depth-First Search",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/19",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "State what information a subtree call returns or what each queued item knows before choosing DFS or BFS.",
+      "Separate context inherited from ancestors from the summary computed from children and returned upward.",
+      "Visit each node once, combining child results locally; avoid recomputing height, membership, or paths from scratch."
+    ]
+  },
+  "heaps-streaming": {
+    "blurb": "A heap maintains the next most relevant candidate without sorting everything. Min-heaps expose the smallest retained value, max-heaps expose the largest, and two heaps can maintain a moving partition. The subtle choice is which items to keep and which heap direction makes the discard boundary visible.",
+    "recommended_after_lesson": 19,
+    "resource": {
+      "title": "Heap Properties",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/23",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Name the single candidate that must be available next and whether the complete collection really needs ordering.",
+      "For bounded top-k work, choose the heap whose root is the retained item you would discard when a better value arrives.",
+      "Define the heap ordering including all tie breakers, then ensure every insertion and removal preserves the intended frontier."
+    ]
+  },
+  "graph-search": {
+    "blurb": "Graphs model arbitrary relationships rather than a single hierarchy. Start by defining vertices, edges, direction, and weights. Traversal order then follows the contract: DFS or BFS for reachability, BFS for unweighted distance, topological order for prerequisites, and a priority queue for nonnegative weighted paths.",
+    "recommended_after_lesson": 22,
+    "resource": {
+      "title": "Introduction to Graphs",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/28",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Explicitly identify vertices, directed or undirected edges, edge weights, and the complete state needed to distinguish routes.",
+      "Choose traversal order from the guarantee required: reachability, fewest edges, prerequisite order, or lowest accumulated weight.",
+      "Mark or settle states at the correct time for that traversal; weighted searches may need to revisit a vertex with a cheaper distance."
+    ]
+  },
+  "dynamic-programming-greedy": {
+    "blurb": "Dynamic programming stores answers to overlapping subproblems so an exponential decision tree becomes a table or rolling state. Greedy algorithms instead commit to one locally safe choice and need an exchange argument proving that commitment cannot hurt the optimum. Do not label an approach greedy without that proof.",
+    "recommended_after_lesson": 23,
+    "resource": {
+      "title": "One-Dimensional Dynamic Programming",
+      "url": "https://neetcode.io/courses/dsa-for-beginners/32",
+      "format": "video-lesson",
+      "source": "NeetCode"
+    },
+    "hint_ladder": [
+      "Write a brute-force recurrence and identify which arguments completely determine the future subproblem.",
+      "Check whether different decision paths revisit the same state; if not, test whether an exchange argument supports a greedy choice.",
+      "Choose memoization or tabulation, define base cases explicitly, then compress space only after the full transition is correct."
+    ]
+  }
+}

@@ -55,7 +55,7 @@ This produces dense help early without invoking a model on every repeated check.
 
 ### Review
 
-After a deterministic pass, Codex reviews the solution and analysis. It scores four dimensions from 1 through 4:
+After deterministic code verification, Codex reviews the solution and analysis. It scores four dimensions from 1 through 4:
 
 - Correctness reasoning
 - Complexity reasoning
@@ -64,7 +64,7 @@ After a deterministic pass, Codex reviews the solution and analysis. It scores f
 
 It can suggest improvements even for passing code. Scores are advisory and contribute evidence for readiness reflection; they never relock a deterministic pass.
 
-`just review` repeats this process for the most recently passed lesson. It also clears that lesson's review-required marker after explicit solution revelation.
+`just review` repeats this process for queued work or the most recently verified lesson. `just review <lesson-id>` selects a specific verified lesson. A successful provider review clears that lesson's review-required marker after explicit solution revelation. Without a provider, a completed post-pass reflection supplies an explicit offline self-review path; no synthetic model score is created.
 
 ## Execution safety
 
@@ -74,11 +74,13 @@ The Codex provider uses non-interactive `codex exec` with:
 - `--sandbox read-only`, preventing repository edits
 - `--output-schema`, constraining the final response shape
 - `--output-last-message`, producing one machine-readable result file
-- A 120-second process timeout
+- An empty generated working directory rather than the repository root
+- An allowlist of runtime/authentication environment variables rather than the complete parent environment
+- A 120-second process timeout followed by forced termination when necessary
 
 The output is parsed as JSON and validated again with Zod. Malformed output, process errors, missing authentication, timeouts, or missing executables are handled as coaching unavailability. Deterministic checks and progress remain intact.
 
-Learner source and analysis are treated as untrusted data in the coaching prompt. The provider is explicitly told not to follow instructions embedded within them or inspect other repository files.
+Learner source and analysis are treated as untrusted data in the coaching prompt. The provider is explicitly told not to follow instructions embedded within them or inspect other repository files. The selected source and analysis are embedded in the prompt; the isolated working directory contains neither file. Cloud/database credentials and other unrelated parent variables are not forwarded.
 
 ## Generated feedback
 

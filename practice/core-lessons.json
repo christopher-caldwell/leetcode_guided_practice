@@ -1,0 +1,749 @@
+{
+  "set-01": [
+    {
+      "lesson_id": "01-linear-scan",
+      "relationship": "reinforces",
+      "connection": "Preserves the early-return scan from lesson 1 while adding remembered history."
+    },
+    {
+      "lesson_id": "06-checkpoint-nearby-events",
+      "relationship": "reinforces",
+      "connection": "Uses the same repeated-event recognition without the distance constraint."
+    }
+  ],
+  "set-02": [
+    {
+      "lesson_id": "06-checkpoint-nearby-events",
+      "relationship": "extends",
+      "connection": "Reuses seen-value state but traverses backward to preserve final occurrences."
+    }
+  ],
+  "set-03": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Moves from comparing two multisets to stable intersection across many collections."
+    }
+  ],
+  "set-04": [
+    {
+      "lesson_id": "06-checkpoint-nearby-events",
+      "relationship": "extends",
+      "connection": "Uses constant-time membership to grow only from consecutive-run boundaries."
+    }
+  ],
+  "set-05": [
+    {
+      "lesson_id": "06-checkpoint-nearby-events",
+      "relationship": "reinforces",
+      "connection": "Turns repeated-event membership into an incremental distinct-count output."
+    }
+  ],
+  "set-06": [
+    {
+      "lesson_id": "07-best-reporting-period",
+      "relationship": "combines",
+      "connection": "Retains lesson 7's fixed window while replacing its aggregate with duplicate state."
+    },
+    {
+      "lesson_id": "08-longest-unique-event-run",
+      "relationship": "reinforces",
+      "connection": "Practices the uniqueness invariant with a first-fixed-window result."
+    }
+  ],
+  "freq-01": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "reinforces",
+      "connection": "Consumes one frequency map as a target multiset rather than comparing equality."
+    }
+  ],
+  "freq-02": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "reinforces",
+      "connection": "Builds complete frequencies before a stable scan for the earliest singleton."
+    }
+  ],
+  "freq-03": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Computes an ordered multiset subtraction instead of returning a boolean."
+    }
+  ],
+  "freq-04": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Adds a second uniqueness check over the frequencies produced by lesson 4's pattern."
+    }
+  ],
+  "freq-05": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Stores first and last positions alongside counts to optimize a representative range."
+    }
+  ],
+  "freq-06": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Requires reasoning about how deleting one item changes the frequency distribution."
+    }
+  ],
+  "comp-01": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Derives difference partners and counts all index pairs, including the zero-gap case."
+    }
+  ],
+  "comp-02": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Keeps complement lookup but optimizes pair distance with deterministic ties."
+    }
+  ],
+  "comp-03": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Changes additive complements to XOR complements and counts every valid pair."
+    }
+  ],
+  "comp-04": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Looks up complementary remainder classes rather than an exact numeric complement."
+    }
+  ],
+  "comp-05": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Generalizes pair-sum lookup to four arrays through meet-in-the-middle frequencies."
+    }
+  ],
+  "comp-06": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Preserves partner lookup while adding divisibility, sign, zero, and overflow cases."
+    }
+  ],
+  "canon-01": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Uses a complete character-frequency profile as a stable grouping key."
+    }
+  ],
+  "canon-02": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Replaces exact value keys with normalized relative-offset signatures."
+    }
+  ],
+  "canon-03": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Builds hashable keys by reducing vector components and normalizing signs."
+    }
+  ],
+  "canon-04": [
+    {
+      "lesson_id": "22-disconnected-service-groups",
+      "relationship": "combines",
+      "connection": "Traverses connected components and then canonicalizes each component's geometry."
+    },
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Groups components by structural signatures rather than raw scalar frequencies."
+    }
+  ],
+  "canon-05": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Canonicalizes all cyclic rotations before grouping equivalent strings."
+    }
+  ],
+  "canon-06": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "extends",
+      "connection": "Normalizes signs and common factors before set-based numeric deduplication."
+    }
+  ],
+  "prefix-01": [
+    {
+      "lesson_id": "07-best-reporting-period",
+      "relationship": "extends",
+      "connection": "Generalizes incremental range aggregation from adjacent windows to arbitrary queries."
+    }
+  ],
+  "prefix-02": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Looks up a needed earlier prefix instead of a needed earlier array value."
+    }
+  ],
+  "prefix-03": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Stores the earliest equal prefix-difference state to maximize a range."
+    }
+  ],
+  "prefix-04": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Counts equal normalized prefix remainders through a frequency map."
+    }
+  ],
+  "prefix-05": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Uses a two-dimensional count-difference state as the hash-map key."
+    }
+  ],
+  "prefix-06": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Encodes prefix parity as a bitmask and looks up nearby valid states."
+    }
+  ],
+  "sweep-01": [
+    {
+      "lesson_id": "07-best-reporting-period",
+      "relationship": "extends",
+      "connection": "Moves incremental aggregation from adjacent windows to many range-update boundaries."
+    }
+  ],
+  "sweep-02": [
+    {
+      "lesson_id": "21-checkpoint-concurrent-rooms",
+      "relationship": "extends",
+      "connection": "Uses weighted pickup and drop-off events with explicit same-stop ordering."
+    }
+  ],
+  "sweep-03": [
+    {
+      "lesson_id": "21-checkpoint-concurrent-rooms",
+      "relationship": "extends",
+      "connection": "Counts threshold coverage over sparse integer intervals rather than peak rooms."
+    }
+  ],
+  "sweep-04": [
+    {
+      "lesson_id": "21-checkpoint-concurrent-rooms",
+      "relationship": "extends",
+      "connection": "Returns every peak interval instead of only the maximum concurrent count."
+    }
+  ],
+  "sweep-05": [
+    {
+      "lesson_id": "21-checkpoint-concurrent-rooms",
+      "relationship": "extends",
+      "connection": "Adds workload weights, bigint coordinates, and earliest strict overload detection."
+    }
+  ],
+  "sweep-06": [
+    {
+      "lesson_id": "20-consolidate-schedule-windows",
+      "relationship": "extends",
+      "connection": "Computes union length under half-open semantics rather than returning merged windows."
+    }
+  ],
+  "index-01": [
+    {
+      "lesson_id": "05-compact-sorted-identifiers",
+      "relationship": "extends",
+      "connection": "Reuses in-place mutation but encodes presence through value-index correspondence."
+    }
+  ],
+  "index-02": [
+    {
+      "lesson_id": "05-compact-sorted-identifiers",
+      "relationship": "extends",
+      "connection": "Uses the array itself to identify one duplicate and one missing permutation value."
+    }
+  ],
+  "index-03": [
+    {
+      "lesson_id": "05-compact-sorted-identifiers",
+      "relationship": "extends",
+      "connection": "Generalizes in-place placement to arbitrary signed input under constant-space limits."
+    }
+  ],
+  "index-04": [
+    {
+      "lesson_id": "12-cyclic-dependency-chain",
+      "relationship": "extends",
+      "connection": "Treats permutation assignments as disjoint cycles whose sizes determine swap count."
+    }
+  ],
+  "index-05": [
+    {
+      "lesson_id": "12-cyclic-dependency-chain",
+      "relationship": "extends",
+      "connection": "Uses array values as next pointers and locates the cycle entry to find a duplicate."
+    }
+  ],
+  "index-06": [
+    {
+      "lesson_id": "12-cyclic-dependency-chain",
+      "relationship": "extends",
+      "connection": "Adds cycle entry, length, prefix length, and an acyclic exit sentinel."
+    }
+  ],
+  "twoptr-01": [
+    {
+      "lesson_id": "05-compact-sorted-identifiers",
+      "relationship": "reinforces",
+      "connection": "Uses opposing pointers on sorted data rather than a read and write boundary."
+    }
+  ],
+  "twoptr-02": [
+    {
+      "lesson_id": "02-pair-sum-baseline",
+      "relationship": "combines",
+      "connection": "Starts from nested tuple enumeration and reduces one dimension after sorting."
+    },
+    {
+      "lesson_id": "05-compact-sorted-identifiers",
+      "relationship": "extends",
+      "connection": "Uses two-pointer movement plus duplicate skipping for unique triples."
+    }
+  ],
+  "twoptr-03": [
+    {
+      "lesson_id": "11-checkpoint-stable-segment",
+      "relationship": "reinforces",
+      "connection": "Maintains a variable window whose positive sum makes boundary movement monotonic."
+    }
+  ],
+  "twoptr-04": [
+    {
+      "lesson_id": "11-checkpoint-stable-segment",
+      "relationship": "reinforces",
+      "connection": "Changes the window budget from distinct kinds to a count of tolerated failures."
+    }
+  ],
+  "twoptr-05": [
+    {
+      "lesson_id": "10-merge-sorted-streams",
+      "relationship": "reinforces",
+      "connection": "Coordinates two ordered inputs while advancing only the side that cannot match."
+    },
+    {
+      "lesson_id": "05-compact-sorted-identifiers",
+      "relationship": "reinforces",
+      "connection": "Adds stable deduplication to a same-direction two-pointer scan."
+    }
+  ],
+  "twoptr-06": [
+    {
+      "lesson_id": "05-compact-sorted-identifiers",
+      "relationship": "extends",
+      "connection": "Uses a dominance proof to decide which opposing pointer can safely move."
+    }
+  ],
+  "stack-01": [
+    {
+      "lesson_id": "09-balanced-delimiters",
+      "relationship": "extends",
+      "connection": "Uses stack order to retain unresolved indices rather than unmatched delimiters."
+    }
+  ],
+  "stack-02": [
+    {
+      "lesson_id": "09-balanced-delimiters",
+      "relationship": "extends",
+      "connection": "Stores unresolved indices so one warmer value can settle multiple earlier days."
+    }
+  ],
+  "stack-03": [
+    {
+      "lesson_id": "09-balanced-delimiters",
+      "relationship": "extends",
+      "connection": "Uses monotonic stack boundaries to finalize candidate rectangle widths."
+    }
+  ],
+  "stack-04": [
+    {
+      "lesson_id": "09-balanced-delimiters",
+      "relationship": "extends",
+      "connection": "Turns stack discipline into a greedy lexicographic construction."
+    }
+  ],
+  "stack-05": [
+    {
+      "lesson_id": "07-best-reporting-period",
+      "relationship": "combines",
+      "connection": "Keeps lesson 7's fixed windows but maintains their maxima incrementally."
+    },
+    {
+      "lesson_id": "09-balanced-delimiters",
+      "relationship": "extends",
+      "connection": "Generalizes LIFO storage to a monotonic double-ended queue."
+    }
+  ],
+  "stack-06": [
+    {
+      "lesson_id": "09-balanced-delimiters",
+      "relationship": "extends",
+      "connection": "Uses the stack as the only frontier where new directional conflicts can occur."
+    }
+  ],
+  "linked-01": [
+    {
+      "lesson_id": "10-merge-sorted-streams",
+      "relationship": "reinforces",
+      "connection": "Practices preserving next references while rewiring supplied linked-list nodes."
+    }
+  ],
+  "linked-02": [
+    {
+      "lesson_id": "10-merge-sorted-streams",
+      "relationship": "extends",
+      "connection": "Coordinates two list traversals but compares node identity instead of sorted values."
+    }
+  ],
+  "linked-03": [
+    {
+      "lesson_id": "10-merge-sorted-streams",
+      "relationship": "extends",
+      "connection": "Uses a sentinel and a fixed pointer gap for one-pass structural removal."
+    }
+  ],
+  "linked-04": [
+    {
+      "lesson_id": "10-merge-sorted-streams",
+      "relationship": "extends",
+      "connection": "Combines middle detection, reversal, and in-place weaving of one chain."
+    }
+  ],
+  "linked-05": [
+    {
+      "lesson_id": "12-cyclic-dependency-chain",
+      "relationship": "combines",
+      "connection": "Uses fast and slow pointers before reversing and restoring half of the chain."
+    },
+    {
+      "lesson_id": "10-merge-sorted-streams",
+      "relationship": "reinforces",
+      "connection": "Requires careful node reuse and restoration of the original structure."
+    }
+  ],
+  "linked-06": [
+    {
+      "lesson_id": "10-merge-sorted-streams",
+      "relationship": "extends",
+      "connection": "Moves from reusing supplied nodes to cloning a linked structure with extra references."
+    }
+  ],
+  "binary-01": [
+    {
+      "lesson_id": "13-exact-sorted-lookup",
+      "relationship": "extends",
+      "connection": "Preserves logarithmic lookup while determining which rotated half remains sorted."
+    }
+  ],
+  "binary-02": [
+    {
+      "lesson_id": "14-first-eligible-record",
+      "relationship": "reinforces",
+      "connection": "Runs boundary search twice to locate the complete duplicate range."
+    }
+  ],
+  "binary-03": [
+    {
+      "lesson_id": "16-checkpoint-processing-rate",
+      "relationship": "reinforces",
+      "connection": "Searches the minimum feasible capacity using a monotonic simulation predicate."
+    }
+  ],
+  "binary-04": [
+    {
+      "lesson_id": "16-checkpoint-processing-rate",
+      "relationship": "extends",
+      "connection": "Changes minimum-true search into maximum-true search over feasible spacing."
+    }
+  ],
+  "binary-05": [
+    {
+      "lesson_id": "13-exact-sorted-lookup",
+      "relationship": "extends",
+      "connection": "Maps one logarithmic search interval onto row and column coordinates."
+    }
+  ],
+  "binary-06": [
+    {
+      "lesson_id": "14-first-eligible-record",
+      "relationship": "extends",
+      "connection": "Searches for a valid partition boundary across two ordered arrays."
+    }
+  ],
+  "recur-01": [
+    {
+      "lesson_id": "15-generate-flag-selections",
+      "relationship": "reinforces",
+      "connection": "Prunes the subset decision tree to branches that choose exactly k items."
+    }
+  ],
+  "recur-02": [
+    {
+      "lesson_id": "15-generate-flag-selections",
+      "relationship": "extends",
+      "connection": "Changes include-or-skip branches into choosing each unused item for the next position."
+    }
+  ],
+  "recur-03": [
+    {
+      "lesson_id": "15-generate-flag-selections",
+      "relationship": "extends",
+      "connection": "Explores a variable-width cartesian-product decision tree."
+    }
+  ],
+  "recur-04": [
+    {
+      "lesson_id": "15-generate-flag-selections",
+      "relationship": "reinforces",
+      "connection": "Requires choose, recurse, and restore behavior for temporary grid visits."
+    },
+    {
+      "lesson_id": "22-disconnected-service-groups",
+      "relationship": "combines",
+      "connection": "Uses grid-neighbor traversal but with path-local rather than global visited state."
+    }
+  ],
+  "recur-05": [
+    {
+      "lesson_id": "15-generate-flag-selections",
+      "relationship": "extends",
+      "connection": "Adds aggressive constraint pruning to a row-by-row placement tree."
+    }
+  ],
+  "recur-06": [
+    {
+      "lesson_id": "15-generate-flag-selections",
+      "relationship": "extends",
+      "connection": "Backtracks over bounded partition lengths with syntax-based pruning."
+    }
+  ],
+  "tree-01": [
+    {
+      "lesson_id": "17-hierarchy-depth",
+      "relationship": "extends",
+      "connection": "Carries ancestor value bounds through the same recursive tree structure."
+    }
+  ],
+  "tree-02": [
+    {
+      "lesson_id": "17-hierarchy-depth",
+      "relationship": "extends",
+      "connection": "Uses postorder returns to combine evidence from two child subtrees."
+    }
+  ],
+  "tree-03": [
+    {
+      "lesson_id": "17-hierarchy-depth",
+      "relationship": "combines",
+      "connection": "Backtracks path state during a depth-first hierarchy traversal."
+    },
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "extends",
+      "connection": "Looks up complementary prefix sums along the active ancestor path."
+    }
+  ],
+  "tree-04": [
+    {
+      "lesson_id": "18-hierarchy-by-level",
+      "relationship": "reinforces",
+      "connection": "Selects one deterministic value from each breadth-first level."
+    }
+  ],
+  "tree-05": [
+    {
+      "lesson_id": "17-hierarchy-depth",
+      "relationship": "extends",
+      "connection": "Computes subtree heights while updating a path optimum that may exclude the root."
+    }
+  ],
+  "tree-06": [
+    {
+      "lesson_id": "17-hierarchy-depth",
+      "relationship": "extends",
+      "connection": "Builds recursive left and right subproblems from traversal boundaries."
+    }
+  ],
+  "heap-01": [
+    {
+      "lesson_id": "19-highest-priority-items",
+      "relationship": "extends",
+      "connection": "Balances two priority queues to maintain a changing middle order statistic."
+    }
+  ],
+  "heap-02": [
+    {
+      "lesson_id": "19-highest-priority-items",
+      "relationship": "reinforces",
+      "connection": "Keeps only the next candidate from each stream in a priority queue."
+    },
+    {
+      "lesson_id": "10-merge-sorted-streams",
+      "relationship": "extends",
+      "connection": "Generalizes two sorted inputs to k ordered streams."
+    }
+  ],
+  "heap-03": [
+    {
+      "lesson_id": "19-highest-priority-items",
+      "relationship": "extends",
+      "connection": "Maintains separate priority orders for available and busy workers."
+    },
+    {
+      "lesson_id": "21-checkpoint-concurrent-rooms",
+      "relationship": "combines",
+      "connection": "Tracks resource lifetimes while selecting a deterministic reusable worker."
+    }
+  ],
+  "heap-04": [
+    {
+      "lesson_id": "19-highest-priority-items",
+      "relationship": "reinforces",
+      "connection": "Retains a bounded top-k set using the opposite heap direction."
+    }
+  ],
+  "heap-05": [
+    {
+      "lesson_id": "19-highest-priority-items",
+      "relationship": "reinforces",
+      "connection": "Maintains the kth-highest boundary incrementally for every stream prefix."
+    }
+  ],
+  "heap-06": [
+    {
+      "lesson_id": "19-highest-priority-items",
+      "relationship": "extends",
+      "connection": "Uses frequency priority repeatedly to construct, rather than merely select, output."
+    },
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "combines",
+      "connection": "Begins with the same frequency-map representation before scheduling categories."
+    }
+  ],
+  "graph-01": [
+    {
+      "lesson_id": "22-disconnected-service-groups",
+      "relationship": "extends",
+      "connection": "Moves from undirected components to directed prerequisites and topological ordering."
+    }
+  ],
+  "graph-02": [
+    {
+      "lesson_id": "24-final-interview-simulation",
+      "relationship": "extends",
+      "connection": "Adds edge prices and a transfer-count state to shortest-route reasoning."
+    }
+  ],
+  "graph-03": [
+    {
+      "lesson_id": "18-hierarchy-by-level",
+      "relationship": "combines",
+      "connection": "Uses breadth-first layers to model simultaneous elapsed minutes."
+    },
+    {
+      "lesson_id": "22-disconnected-service-groups",
+      "relationship": "extends",
+      "connection": "Traverses grid connectivity from many starting components at once."
+    }
+  ],
+  "graph-04": [
+    {
+      "lesson_id": "22-disconnected-service-groups",
+      "relationship": "extends",
+      "connection": "Uses graph traversal plus an identity map to reproduce every edge safely."
+    }
+  ],
+  "graph-05": [
+    {
+      "lesson_id": "22-disconnected-service-groups",
+      "relationship": "extends",
+      "connection": "Computes transitive components with union-find instead of explicit traversal."
+    }
+  ],
+  "graph-06": [
+    {
+      "lesson_id": "24-final-interview-simulation",
+      "relationship": "extends",
+      "connection": "Replaces unweighted BFS layers with priority-ordered weighted distances."
+    },
+    {
+      "lesson_id": "19-highest-priority-items",
+      "relationship": "combines",
+      "connection": "Uses a priority queue to expand the currently cheapest unsettled route."
+    }
+  ],
+  "dp-01": [
+    {
+      "lesson_id": "23-non-adjacent-value",
+      "relationship": "extends",
+      "connection": "Changes position-based states into minimum counts for every reachable amount."
+    }
+  ],
+  "dp-02": [
+    {
+      "lesson_id": "23-non-adjacent-value",
+      "relationship": "reinforces",
+      "connection": "Uses two previous prefix states with validity-dependent transitions."
+    }
+  ],
+  "dp-03": [
+    {
+      "lesson_id": "23-non-adjacent-value",
+      "relationship": "extends",
+      "connection": "Starts from subsequence DP and then compresses states with ordered tails."
+    },
+    {
+      "lesson_id": "13-exact-sorted-lookup",
+      "relationship": "combines",
+      "connection": "Uses binary search to replace the first tail that is not smaller."
+    }
+  ],
+  "dp-04": [
+    {
+      "lesson_id": "23-non-adjacent-value",
+      "relationship": "extends",
+      "connection": "Defines each prefix as reachable when a prior reachable prefix ends with a token."
+    }
+  ],
+  "dp-05": [
+    {
+      "lesson_id": "20-consolidate-schedule-windows",
+      "relationship": "extends",
+      "connection": "Sorts intervals by finish time and proves a greedy selection rather than merging."
+    }
+  ],
+  "dp-06": [
+    {
+      "lesson_id": "23-non-adjacent-value",
+      "relationship": "reinforces",
+      "connection": "Uses the same two-state rolling optimization with a different transition objective."
+    }
+  ]
+}

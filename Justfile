@@ -20,13 +20,17 @@ check:
 hint:
     pnpm workshop hint
 
-# Review the most recently passed solution for possible improvements.
-review:
-    pnpm workshop review
+# Review queued work, or select a verified lesson by id.
+review lesson="":
+    pnpm workshop review {{ lesson }}
 
 # Explicitly reveal a vetted solution without overwriting learner code.
 solution:
     pnpm workshop solution
+
+# Learn, sample, and track supplemental practice without changing core lesson progress.
+practice action="ready" target="" seed="":
+    pnpm practice {{ action }} {{ target }} {{ seed }}
 
 # Clear generated progress, coaching, and timing state; learner files are preserved.
 reset:
