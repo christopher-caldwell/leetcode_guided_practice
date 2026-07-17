@@ -12,9 +12,9 @@
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 65,
   "hints": [
-    "What ordering would make all future overlaps with one interval appear together?",
-    "After ordering, compare the next start with one property of the last merged output.",
-    "Sort copies by start; extend the last output end on overlap, otherwise append a new copied interval."
+    "Sort copied intervals by start time so every interval that can extend the current merged interval appears next to it.",
+    "Compare the next start with the end of the last merged interval; touching endpoints count as overlap.",
+    "Extend the last end on overlap, otherwise append a copied interval. Never sort or reuse the caller’s nested tuples directly."
   ],
   "reviewOf": [5, 10]
 }

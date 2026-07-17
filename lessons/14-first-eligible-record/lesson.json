@@ -12,9 +12,9 @@
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 60,
   "hints": [
-    "View each index as either definitely ineligible or potentially eligible.",
-    "A qualifying midpoint is evidence, but what remains unknown on its left?",
-    "Preserve a qualifying midpoint as a candidate while continuing to search for an earlier one."
+    "A value meeting the threshold is a possible answer, but an earlier qualifying value may still exist to its left.",
+    "Use binary search while storing the best qualifying midpoint found so far and continuing into the left half.",
+    "Move right leftward when values[mid] >= threshold; otherwise move left rightward. Return the stored candidate or -1."
   ],
   "reviewOf": [13]
 }

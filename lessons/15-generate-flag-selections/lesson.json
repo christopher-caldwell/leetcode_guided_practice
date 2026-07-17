@@ -12,9 +12,9 @@
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 70,
   "hints": [
-    "For one value, what are the two mutually exclusive choices a subset can make?",
-    "Model a call by the next undecided index and the decisions already made.",
-    "Explore excluding and including each value; snapshot a completed selection and restore mutable state between branches."
+    "At each input index, a subset makes one of two choices: exclude that value or include it.",
+    "Use backtracking with the next undecided index and one mutable current subset representing choices on the active path.",
+    "Explore exclusion and inclusion, copy the subset at the base case, and pop an included value before returning."
   ],
   "reviewOf": [2]
 }

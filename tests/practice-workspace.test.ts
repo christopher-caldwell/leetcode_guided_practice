@@ -64,9 +64,15 @@ describe('supplemental practice workspace', () => {
         preparePracticeWorkspace(root, problem, contracts[problem.id]!),
       ),
     )
+    const executable = path.join(
+      process.cwd(),
+      'node_modules',
+      '.bin',
+      process.platform === 'win32' ? 'tsc.cmd' : 'tsc',
+    )
     const result = await runProcess(
-      'pnpm',
-      ['exec', 'tsc', '--noEmit', '--project', path.join(root, 'tsconfig.json')],
+      executable,
+      ['--noEmit', '--project', path.join(root, 'tsconfig.json')],
       { cwd: process.cwd(), environment: process.env, timeoutMs: 30_000 },
     )
     expect(result.timedOut).toBe(false)

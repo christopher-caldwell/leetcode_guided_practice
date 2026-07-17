@@ -12,9 +12,9 @@
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 70,
   "hints": [
-    "Separate counting from selecting; what is one candidate after counting finishes?",
-    "If only k candidates may be retained, which retained candidate should be easiest to evict?",
-    "Keep a min-priority queue bounded to k entries, prioritized by frequency, evicting the smallest frequency."
+    "First count each number’s frequency. After counting, each distinct number is one candidate with a numeric priority.",
+    "Keep a min-priority queue of at most k candidates so the least frequent retained candidate is cheapest to evict.",
+    "Enqueue every frequency entry and dequeue whenever size exceeds k; the remaining k values are the answer."
   ],
   "reviewOf": [4]
 }

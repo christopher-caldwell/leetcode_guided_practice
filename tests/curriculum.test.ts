@@ -37,17 +37,15 @@ describe('curriculum integrity', () => {
         expect(source).toContain(functionName)
         expect(publicTest).toContain(functionName)
       }
-      expect(source).toContain('TODO:')
       expect(lesson.hints).toHaveLength(3)
     }
   })
 
-  it('makes the initial analysis fail only at the first intentional reasoning TODO', async () => {
+  it('recognizes incomplete concise analysis independently from code verification', async () => {
     const first = (await loadLessons(root))[0]!
     const failures = await validateAnalysis(first)
-    expect(failures).toHaveLength(1)
     expect(new Set(failures.map((failure) => failure.category))).toEqual(new Set(['analysis']))
-    expect(failures[0]?.summary).toContain('Clarifying questions')
+    expect(failures.at(-1)?.summary).toContain('Correctness and complexity')
   })
 
   it('packages one integrity-checked reference per lesson', async () => {

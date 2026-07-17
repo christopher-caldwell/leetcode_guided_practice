@@ -24,24 +24,20 @@ Select values from an array to maximize their sum without selecting adjacent ind
 - Do not mutate input.
 - Use O(1) auxiliary state beyond the input and return value.
 
-## Clarifying questions to consider
+## Contract checks
 
 - Is selecting no values permitted?
 - Does adjacency refer to indices or numeric values?
 - Are selected positions or only the sum required?
 
-Write your actual assumptions and answers in `lessons/23-non-adjacent-value/analysis.md` before coding.
+These are prompts, not required individual answers. In `lessons/23-non-adjacent-value/analysis.md`, record only a contract detail that affected your implementation.
 
 ## Expected workflow
 
-1. Restate the contract and walk through a small example.
-2. Propose a correct baseline, even if it is too expensive.
-3. Define `n` and analyze the baseline's time and auxiliary space.
-4. Identify the repeated or expensive operation.
-5. Derive an optimization and state its invariant.
-6. Implement only inside the TODO boundary.
-7. Run `just check`, inspect the failure category, and test your own edge cases.
-8. Explain why the final algorithm is correct and state its complexity.
+1. Read the contract and choose one representative edge case.
+2. Implement inside the TODO boundary.
+3. Run `just check`; PASS or FAIL reflects code verification only.
+4. Add the three concise interview notes in `analysis.md` to advance.
 
 ## Editable files and TODO boundary
 
@@ -51,9 +47,9 @@ Write your actual assumptions and answers in `lessons/23-non-adjacent-value/anal
 
 Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node or priority-queue code is infrastructure, not an exercise.
 
-## Automated pass condition
+## Check and progression
 
-All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without dumping internal case details wholesale.
+`just check` always runs the TypeScript and registered lesson verifiers. PASS or FAIL reflects those checks only. The lesson advances after the three concise analysis notes are complete; missing notes display WAITING without changing a PASS into a failure.
 
 A focused TypeScript source policy enforces scalar O(1) auxiliary state instead of a full dynamic-programming table.
 
@@ -63,9 +59,9 @@ A focused TypeScript source policy enforces scalar O(1) auxiliary state instead 
 - Defining state without enough information to make the next decision.
 - Using an O(n) table without recognizing which prior states are actually needed.
 
-## Post-pass reflection
+## Optional follow-up
 
-After CODE VERIFIED, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Run `just check` again to advance, then consider this variation:
+After the lesson advances, consider this variation:
 
 > How would the transition change if the first and last indices were also considered adjacent?
 

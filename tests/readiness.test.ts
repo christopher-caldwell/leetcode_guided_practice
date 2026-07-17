@@ -91,7 +91,7 @@ describe('review selection', () => {
     expect(selectReviewLesson(lessons, progress, lessons[2]!.id)?.id).toBe(lessons[2]!.id)
   })
 
-  it('clears revealed-solution debt offline only after reflection is recorded', () => {
+  it('clears revealed-solution debt offline only after analysis notes are recorded', () => {
     const progress = state().lessons[lessons[0]!.id]!
     progress.reviewRequired = true
     progress.reflectionCompletedAt = null

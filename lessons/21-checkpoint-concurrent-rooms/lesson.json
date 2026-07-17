@@ -12,9 +12,9 @@
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 45,
   "hints": [
-    "Process meetings in an order that makes resource acquisition chronological.",
-    "Which active meeting determines whether any existing room can be reused next?",
-    "Order by start and retain active end times so the earliest ending room can be released first."
+    "Process meetings by start time and track the end times of meetings currently occupying rooms.",
+    "The smallest active end time tells whether any room is available for the next meeting, so use a min-priority queue.",
+    "Release every meeting ending by the next start, add the new end time, and track the largest active-queue size."
   ],
   "reviewOf": [17, 18, 19, 20]
 }

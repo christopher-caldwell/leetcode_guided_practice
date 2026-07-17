@@ -44,7 +44,7 @@ The runner itself is TypeScript because Node is already required for the initial
 
 - Manifest validation
 - Progress serialization
-- Analysis-evidence and post-pass-reflection validation
+- Concise analysis-note validation, separate from code PASS/FAIL
 - Stopwatch transitions
 - Readiness evidence calculation
 - Feedback persistence

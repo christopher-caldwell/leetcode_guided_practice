@@ -9,15 +9,3 @@ export function createCoachProvider(root: string, config: WorkshopConfig): Coach
       return new CodexCoachProvider(root)
   }
 }
-
-export function shouldCoachAttempt(attempt: number): boolean {
-  if (attempt < 1) return false
-  let previous = 1
-  let current = 1
-  while (current < attempt) {
-    const next = previous + current
-    previous = current
-    current = next
-  }
-  return current === attempt
-}

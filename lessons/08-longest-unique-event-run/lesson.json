@@ -12,9 +12,9 @@
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 65,
   "hints": [
-    "Imagine a valid contiguous region ending at the current index. What can invalidate it?",
-    "When a duplicate appears, which boundary can move while preserving all later candidates?",
-    "Track where events were last seen and keep the left boundary beyond any conflicting occurrence."
+    "Maintain a contiguous window with no duplicate event. A repeated event may force the left boundary to move right.",
+    "Store each event’s latest index so the left boundary can jump past a conflicting occurrence instead of moving one step at a time.",
+    "For each right index, set left to max(left, previousIndex + 1), update the last-seen index, and record the largest window length."
   ],
   "reviewOf": [3, 6, 7]
 }

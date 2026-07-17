@@ -12,7 +12,7 @@ status:
 start:
     pnpm workshop start
 
-# Validate the current analysis and TypeScript solution.
+# Verify the TypeScript solution and report concise-note progression separately.
 check:
     pnpm workshop check
 

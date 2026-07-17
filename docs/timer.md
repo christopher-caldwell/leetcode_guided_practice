@@ -134,9 +134,9 @@ You may explicitly pause after a failure when switching from a timed attempt to 
 
 ### Successful code verification
 
-A `just check` whose code and pre-pass analysis evidence verify automatically stops any timer that has recorded time. This is independent of the current timer mode, so changing `.env` mid-attempt cannot strand a running stopwatch. The completed duration remains visible while you write the required post-pass reflection. External coaching review occurs after deterministic success and after the timer has stopped, so model latency is not counted.
+A `just check` whose code verifies automatically stops any timer that has recorded time. This is independent of the current timer mode, so changing `.env` mid-attempt cannot strand a running stopwatch. The completed duration remains visible while you finish the concise analysis notes. External coaching review occurs after deterministic success and after the timer has stopped, so model latency is not counted.
 
-The lesson advances only after the reflection is complete and a subsequent `just check` records it. Reflection time is intentionally outside the interview-attempt stopwatch.
+The lesson advances only after the concise notes are complete and a subsequent `just check` records them. Note-writing time after code verification is outside the interview-attempt stopwatch.
 
 ### Reset only the current stopwatch
 
@@ -189,9 +189,9 @@ just start
 just check
 # If it fails, the clock continues.
 just check
-# CODE VERIFIED stops the clock automatically.
+# PASS stops the clock automatically.
 just timer status
-# Complete Post-pass reflection, then record progression.
+# Complete the three concise notes, then record progression.
 just check
 ```
 

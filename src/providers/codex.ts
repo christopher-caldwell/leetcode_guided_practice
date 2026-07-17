@@ -13,6 +13,7 @@ import {
   type HintResponse,
   type ReviewResponse,
 } from './coach.js'
+import { diagnosisGuidancePercent } from './guidance.js'
 
 type Operation = 'hint' | 'diagnose' | 'review'
 
@@ -25,26 +26,28 @@ export class CodexCoachProvider implements CoachProvider {
   ) {}
 
   async hint(context: CoachContext): Promise<HintResponse> {
-    const depth = Math.min(4, context.hintsUsed + 1)
+    const guidance = Math.min(100, 25 * 2 ** context.hintsUsed)
     return this.execute(
       'hint',
       HintResponseSchema,
       context,
-      `Give one subtle coaching nudge at depth ${depth}/4. The learner may have blank or partial code. ` +
-        'Do not name the complete algorithm unless depth is 4, do not provide pseudocode, do not list steps, ' +
-        'and never provide working code. Make the hint smaller than feels necessary.',
+      `Give one plain, concrete hint at ${guidance}% guidance. The learner may have blank or partial code. ` +
+        'Refer directly to the relevant values, indices, variables, or contract. Avoid riddles, metaphors, and ' +
+        'vague Socratic wording. As the percentage rises, name the useful operation or pattern more directly. ' +
+        'Do not provide working code.',
     )
   }
 
   async diagnose(context: CoachContext): Promise<DiagnosisResponse> {
-    const depth = fibonacciDepth(context.attempts)
+    const guidance = diagnosisGuidancePercent(context.attempts)
     return this.execute(
       'diagnose',
       DiagnosisResponseSchema,
       context,
-      `Diagnose the failed attempt at escalation depth ${depth}/6. Acknowledge what is sound, identify the ` +
-        'single most useful issue, and offer one next experiment. Early depths must be subtle; later depths may ' +
-        'name a useful data-structure operation. Never provide complete code, pseudocode, or a full algorithm.',
+      `Diagnose the failed attempt at ${guidance}% guidance. Be plain and concrete: acknowledge what is sound, ` +
+        'identify the exact failing behavior or line-level idea, and offer one specific next experiment. Avoid ' +
+        'riddles and vague questions. At higher percentages, directly name the useful operation or pattern. ' +
+        'Never provide complete working code.',
     )
   }
 
@@ -82,15 +85,6 @@ export class CodexCoachProvider implements CoachProvider {
 
 export function parseCoachResponse<T>(schema: ZodType<T>, raw: string): T {
   return schema.parse(JSON.parse(raw) as unknown)
-}
-
-function fibonacciDepth(attempts: number): number {
-  const thresholds = [1, 2, 3, 5, 8, 13]
-  let depth = 1
-  for (const [index, threshold] of thresholds.entries()) {
-    if (attempts >= threshold) depth = index + 1
-  }
-  return depth
 }
 
 function buildPrompt(context: CoachContext, instruction: string): string {

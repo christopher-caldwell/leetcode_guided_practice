@@ -12,9 +12,9 @@
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 30,
   "hints": [
-    "What fact about an event’s history is sufficient when you encounter it again?",
-    "You do not need every earlier index; identify which earlier occurrence gives the smallest distance.",
-    "Retain the most recent index for each event and compare before updating it."
+    "When an event repeats, only its most recent earlier index can produce the smallest distance to the current index.",
+    "Store the latest index for each event in a Map and compare the current index with that stored index.",
+    "Return true when the distance is at most maxDistance; otherwise update the event to the current index and continue."
   ],
   "reviewOf": [1, 2, 3, 4, 5]
 }

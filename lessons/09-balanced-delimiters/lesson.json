@@ -12,9 +12,9 @@
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 50,
   "hints": [
-    "When a closer appears, which unmatched opener must it correspond to?",
-    "Choose a structure whose removal order mirrors nested closing order.",
-    "Push openers; for each closer remove and validate the most recent unmatched opener."
+    "A closing delimiter must match the most recent opening delimiter that has not already been closed.",
+    "A stack provides that last-in-first-out order: push openers and pop one when a closer appears.",
+    "Reject a mismatched or missing opener immediately, and return true at the end only when the stack is empty."
   ],
   "reviewOf": [4]
 }

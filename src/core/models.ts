@@ -1,14 +1,6 @@
 import { z } from 'zod'
 
-export const analysisSections = [
-  'Clarifying questions',
-  'Examples and edge cases',
-  'Baseline approach',
-  'Cost analysis',
-  'Optimized approach',
-  'Invariant and correctness',
-  'Final complexity',
-] as const
+export const analysisSections = ['Contract', 'Approach', 'Correctness and complexity'] as const
 
 export const LessonManifestSchema = z.object({
   version: z.literal(1),

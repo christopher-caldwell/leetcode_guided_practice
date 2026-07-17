@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { loadConfig } from '../core/config.js'
 import { saveDiagnosis, saveReview } from '../core/feedback.js'
-import { validateAnalysis, validatePostPassReflection } from '../core/analysis.js'
+import { validateAnalysis } from '../core/analysis.js'
 import { currentLesson, loadLessons } from '../core/lessons.js'
 import type { CheckFailure, LessonManifest, WorkshopState } from '../core/models.js'
 import { assessReadiness } from '../core/readiness.js'
@@ -22,10 +22,11 @@ import {
   timerApplies,
   timerSummary,
 } from '../core/timer.js'
-import { createCoachProvider, shouldCoachAttempt } from '../providers/factory.js'
+import { createCoachProvider } from '../providers/factory.js'
 import type { CoachContext, CoachProvider, HintResponse } from '../providers/coach.js'
 import { revealReference } from '../reference/reveal.js'
 import { checkTypeScript } from '../verification/typescript-adapter.js'
+import { colors } from './colors.js'
 
 const root = process.cwd()
 
@@ -90,7 +91,7 @@ function showStatus(
   }
 
   const progress = state.lessons[lesson.id]!
-  console.log(`Current: ${lesson.order}. ${lesson.title} (${lesson.difficulty})`)
+  console.log(`${colors.cyan('Current:')} ${lesson.order}. ${lesson.title} (${lesson.difficulty})`)
   console.log(`Instructions: ${relative(path.join(lesson.directory, 'instructions.md'))}`)
   console.log(`Analysis:     ${relative(path.join(lesson.directory, 'analysis.md'))}`)
   console.log(`Source:       ${relative(path.join(lesson.directory, lesson.source))}`)
@@ -99,7 +100,9 @@ function showStatus(
       `adaptive diagnoses: ${progress.diagnosesReceived}`,
   )
   if (progress.verifiedAt && !progress.passedAt) {
-    console.log('Stage: implementation verified; complete Post-pass reflection to advance.')
+    console.log(
+      `${colors.yellow('WAITING')} Code passed; complete the short analysis notes to advance.`,
+    )
   }
   if (timerApplies(config, lesson)) {
     console.log(`Timer: ${timerSummary(progress.timer, targetMinutes(config, lesson))}`)
@@ -124,7 +127,7 @@ async function startLesson(
   const progress = state.lessons[lesson.id]!
   if (progress.verifiedAt) {
     console.log(
-      'Implementation is already verified; complete Post-pass reflection and run `just check`.',
+      'Implementation is already verified; complete the short analysis notes and run `just check`.',
     )
     return
   }
@@ -150,25 +153,26 @@ async function checkLesson(
   const progress = state.lessons[lesson.id]!
   const firstVerification = progress.verifiedAt === null
   progress.attempts += 1
-  console.log(`Checking ${lesson.id} — attempt ${progress.attempts}`)
+  console.log(`${colors.cyan('CHECK')} ${lesson.id} — attempt ${progress.attempts}`)
 
-  let failures = await validateAnalysis(lesson)
-  let output = ''
-  if (failures.length === 0) {
-    const result = await checkTypeScript(root, lesson)
-    failures = result.failures
-    output = result.output
-  }
+  const [analysisFailures, result] = await Promise.all([
+    validateAnalysis(lesson),
+    checkTypeScript(root, lesson),
+  ])
 
-  if (failures.length > 0) {
+  if (result.failures.length > 0) {
     await saveState(root, state)
-    printFailures(failures)
-    if (provider && shouldCoachAttempt(progress.attempts)) {
-      console.log(
-        `\nRequesting ${provider.name} coaching at Fibonacci attempt ${progress.attempts}…`,
-      )
+    printFailures(result.failures)
+    printWritingStatus(analysisFailures)
+    if (provider) {
+      console.log(`\nRequesting progressively more direct coaching from ${provider.name}…`)
       try {
-        const context = await coachContext(lesson, progress.attempts, progress.hintsUsed, failures)
+        const context = await coachContext(
+          lesson,
+          progress.attempts,
+          progress.hintsUsed,
+          result.failures,
+        )
         const diagnosis = await provider.diagnose(context)
         const target = await saveDiagnosis(root, lesson.id, progress.attempts, diagnosis)
         progress.diagnosesReceived += 1
@@ -179,10 +183,10 @@ async function checkLesson(
         console.log(`External coaching unavailable: ${message(error)}`)
         console.log('Deterministic failure evidence above remains authoritative.')
       }
-    } else if (provider) {
-      console.log('\nExternal diagnosis is scheduled at attempts 1, 2, 3, 5, 8, 13…')
     }
-    if (process.env.WORKSHOP_DEBUG === 'true' && output) console.log(`\n${output}`)
+    if (process.env.WORKSHOP_DEBUG === 'true' && result.output) {
+      console.log(`\n${result.output}`)
+    }
     process.exitCode = 1
     return
   }
@@ -194,7 +198,7 @@ async function checkLesson(
   }
   await saveState(root, state)
   console.log(
-    "CODE VERIFIED — analysis evidence, types, and this lesson's registered correctness, contract, and complexity checks passed.",
+    `${colors.green('PASS')} — types and this lesson's correctness, contract, and complexity checks passed.`,
   )
 
   if (provider && firstVerification) {
@@ -215,13 +219,12 @@ async function checkLesson(
     }
   }
 
-  const reflectionFailures = await validatePostPassReflection(lesson)
-  if (reflectionFailures.length > 0) {
-    await saveState(root, state)
-    console.log('\nProgression is waiting for the post-pass reflection.')
-    printFailures(reflectionFailures, 'INCOMPLETE')
-    console.log('Complete that section in analysis.md, then run `just check` again.')
-    process.exitCode = 1
+  if (analysisFailures.length > 0) {
+    console.log(
+      `\n${colors.yellow('WAITING')} Tests passed. Progression is waiting for the short analysis notes.`,
+    )
+    printWritingStatus(analysisFailures)
+    console.log('Complete those notes in analysis.md, then run `just check` again.')
     return
   }
 
@@ -229,7 +232,7 @@ async function checkLesson(
   progress.reflectionCompletedAt = completedAt
   progress.passedAt = completedAt
   await saveState(root, state)
-  console.log('PASS — implementation verification and post-pass reflection are complete.')
+  console.log(`${colors.green('ADVANCED')} — code and concise interview notes are complete.`)
 
   const next = getCurrent(lessons, state)
   if (next) {
@@ -268,17 +271,17 @@ async function hint(
     result = {
       focus: `Static hint ${index + 1}/${lesson.hints.length}`,
       hint: lesson.hints[index]!,
-      question: 'What does this change about the next smallest experiment you can make?',
+      question: 'What exact value, index, or state would you inspect or update next?',
     }
   }
 
   progress.hintsUsed = hintNumber
   const target = await saveHint(lesson.id, hintNumber, result)
   await saveState(root, state)
-  console.log(`\n${result.focus}`)
+  console.log(`\n${colors.cyan(result.focus)}`)
   console.log(result.hint)
-  console.log(`Question: ${result.question}`)
-  console.log(`Saved: ${relative(target)}`)
+  console.log(`${colors.cyan('Question:')} ${result.question}`)
+  console.log(`${colors.cyan('Saved:')} ${relative(target)}`)
 }
 
 async function review(
@@ -295,22 +298,15 @@ async function review(
 
   if (!provider) {
     if (!progress.reflectionCompletedAt) {
-      const failures = await validatePostPassReflection(lesson)
-      if (failures.length > 0) {
-        printFailures(failures, 'INCOMPLETE')
-        console.log(
-          `Complete ${relative(path.join(lesson.directory, 'analysis.md'))} and run \`just check\` before clearing review debt.`,
-        )
-        process.exitCode = 1
-        return
-      }
-      console.log('The reflection is complete; run `just check` once to finish lesson progression.')
+      console.log(
+        `${colors.yellow('WAITING')} Complete the concise analysis notes and run \`just check\` before clearing review debt.`,
+      )
       process.exitCode = 1
       return
     }
     recordOfflineReview(progress)
     await saveState(root, state)
-    console.log(`Offline reflection review recorded for ${lesson.id}.`)
+    console.log(`Offline analysis review recorded for ${lesson.id}.`)
     console.log('No external score was created; communication remains self-assessed.')
     return
   }
@@ -433,19 +429,27 @@ function relative(target: string): string {
   return path.relative(root, target) || '.'
 }
 
-function printFailures(failures: CheckFailure[], label = 'FAIL'): void {
-  console.log(label)
+function printFailures(failures: CheckFailure[]): void {
+  console.log(colors.red('FAIL'))
   for (const failure of failures) {
-    console.log(`\n[${failure.category}] ${failure.summary}`)
+    console.log(`\n${colors.red(`[${failure.category}]`)} ${failure.summary}`)
     console.log(failure.evidence)
   }
 }
 
+function printWritingStatus(failures: CheckFailure[]): void {
+  if (failures.length === 0) return
+  console.log(`\n${colors.yellow('NOTES')} These do not affect the test result:`)
+  for (const failure of failures) {
+    console.log(`${colors.yellow('•')} ${failure.summary} ${failure.evidence}`)
+  }
+}
+
 function printDiagnosis(result: Awaited<ReturnType<CoachProvider['diagnose']>>): void {
-  console.log(`\n[${result.category}] ${result.observation}`)
-  console.log(`Working: ${result.whatIsWorking}`)
-  console.log(`Next: ${result.nextStep}`)
-  console.log(`Question: ${result.question}`)
+  console.log(`\n${colors.yellow(`[${result.category}]`)} ${result.observation}`)
+  console.log(`${colors.cyan('Working:')} ${result.whatIsWorking}`)
+  console.log(`${colors.cyan('Next:')} ${result.nextStep}`)
+  console.log(`${colors.cyan('Question:')} ${result.question}`)
 }
 
 function printReview(result: Awaited<ReturnType<CoachProvider['review']>>): void {
@@ -490,7 +494,7 @@ function printReadiness(
     console.log(
       `- ${simulation.id} (${simulation.title}): ${simulation.unassisted ? 'unassisted' : assistance.join(', ') || 'assisted'}; ` +
         `${simulation.attempts} attempt(s); ${timer}; ${review}; ` +
-        `reflection ${simulation.reflectionCompleted ? 'complete' : 'missing'}`,
+        `analysis notes ${simulation.reflectionCompleted ? 'complete' : 'missing'}`,
     )
   }
   console.log(

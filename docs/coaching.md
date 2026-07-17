@@ -39,19 +39,19 @@ The response contains only:
 - One hint capped at 280 characters
 - One question capped at 220 characters
 
-The prompt forbids code, pseudocode, a full algorithm, and multi-step walkthroughs. Hint depth increases slowly with repeated requests.
+The prompt forbids working code. It asks for plain references to the relevant values, indices, variables, or contract and explicitly rejects riddles and vague Socratic wording. Guidance doubles with repeated requests until it reaches the cap.
 
 If Codex fails or returns invalid structure, the CLI reveals the next of three static lesson hints.
 
 ### Diagnosis
 
-A failed `just check` always displays deterministic categories first. With Codex enabled, adaptive diagnosis runs only on Fibonacci-numbered attempts:
+A failed `just check` always displays deterministic categories first. With Codex enabled, every failed attempt may request an adaptive diagnosis. Its guidance percentage grows exponentially and is capped:
 
 ```text
-1, 2, 3, 5, 8, 13, 21, …
+attempt 1: 15%   attempt 2: 26%   attempt 3: 43%   attempt 4: 74%   attempt 5+: 100%
 ```
 
-This produces dense help early without invoking a model on every repeated check. Escalation depth grows at those thresholds. The response identifies what is working, one observation, one next step, and one question. It cannot change the deterministic result.
+The response identifies what is working, one concrete observation, one next experiment, and one question. Higher levels name the relevant operation or pattern directly. Coaching cannot change the deterministic result.
 
 ### Review
 
@@ -62,9 +62,9 @@ After deterministic code verification, Codex reviews the solution and analysis. 
 - Implementation clarity
 - Interview communication
 
-It can suggest improvements even for passing code. Scores are advisory and contribute evidence for readiness reflection; they never relock a deterministic pass.
+It can suggest improvements even for passing code. Scores are advisory readiness evidence; they never relock a deterministic pass.
 
-`just review` repeats this process for queued work or the most recently verified lesson. `just review <lesson-id>` selects a specific verified lesson. A successful provider review clears that lesson's review-required marker after explicit solution revelation. Without a provider, a completed post-pass reflection supplies an explicit offline self-review path; no synthetic model score is created.
+`just review` repeats this process for queued work or the most recently verified lesson. `just review <lesson-id>` selects a specific verified lesson. A successful provider review clears that lesson's review-required marker after explicit solution revelation. Without a provider, completed concise analysis notes supply an explicit offline self-review path; no synthetic model score is created.
 
 ## Execution safety
 

@@ -33,14 +33,14 @@ Run your first check with:
 just check
 ```
 
-The initial failure is intentional: it identifies the first incomplete reasoning section rather than flooding you with implementation failures.
+Starter solutions intentionally fail their registered code checks. Incomplete interview notes are reported separately and never turn a passing implementation into a failure.
 
 ## Daily workflow
 
 ```bash
 just status       # See the current lesson and exact files to open
 just start        # Print those files and deliberately start timing when applicable
-just check        # Validate analysis evidence, code, contracts, and registered scaling checks
+just check        # Run code, contract, and registered scaling checks; report note status separately
 just hint         # Request one small nudge for blank or partial work
 just review       # Review queued work; optionally pass a lesson id
 just solution     # Explicitly reveal a reference without replacing your code
@@ -49,14 +49,15 @@ just solution     # Explicitly reveal a reference without replacing your code
 For every lesson:
 
 1. Read `instructions.md`.
-2. Replace the prompts in `analysis.md` with concise interview reasoning.
-3. Implement the focused TODO in `solutions/typescript/solution.ts`.
-4. Run `just check`.
-5. Use the failure category or `just hint` to make the next small adjustment.
-6. After `CODE VERIFIED`, complete the post-pass reflection.
-7. Run `just check` again to record the reflection and advance.
+2. Implement the focused TODO in `solutions/typescript/solution.ts`.
+3. Run `just check`.
+4. Use the failure category or `just hint` to make the next small adjustment.
+5. Add three concise notes in `analysis.md`: contract, approach, and correctness/complexity.
+6. Run `just check` again to advance if the code passed before the notes were complete.
 
-`check` runs deterministic validation first. It distinguishes incomplete analysis evidence, TypeScript errors, correctness, edge cases, input-contract violations, complexity-sensitive behavior, and runtime failures. Analysis checks require concrete structure such as actual questions, Big-O bounds, and an invariant statement; they do not pretend to semantically grade prose. Post-pass reflection is a separate progression gate.
+`check` always runs deterministic code verification. `PASS` and `FAIL` refer only to types, correctness, edge cases, input contracts, complexity-sensitive behavior, and runtime execution. Missing notes appear under `WAITING` and do not produce a failing exit status, although the lesson does not advance until the three compact notes are present. The note checker requires a direct correctness reason plus labeled Big-O time and space bounds; it does not pretend to semantically grade prose.
+
+Existing work that uses the former seven-section analysis template remains valid; it is read as the same three compact note groups. New untouched lessons use the shorter template.
 
 ## Coaching configuration
 
@@ -74,8 +75,8 @@ Unsupported values fail immediately with a configuration error. There is no seco
 
 With Codex configured:
 
-- `just hint` sends the current partial attempt for one deliberately small nudge.
-- Failed checks request diagnosis on attempts 1, 2, 3, 5, 8, 13, and so on.
+- `just hint` sends the current partial attempt for a concrete hint that doubles in directness across repeated requests until capped.
+- Every failed check requests a diagnosis, with guidance increasing exponentially on consecutive attempts until capped.
 - Verified solutions request advisory feedback about correctness, complexity, clarity, and communication.
 - Codex runs read-only and ephemerally from an empty generated directory, receives an allowlisted environment, returns a constrained structured response, and cannot overwrite your code.
 - Invalid or unavailable external feedback falls back without changing deterministic pass/fail results.
@@ -108,14 +109,14 @@ Read [docs/timer.md](docs/timer.md) before your first timed checkpoint. It docum
 
 Generated state lives under `.workshop/` and is ignored by Git. It contains:
 
-- Verification, reflection, pass, and attempt history
+- Verification, concise-analysis, pass, and attempt history
 - Hint and successful-diagnosis counts plus coaching reports
 - Stopwatch segments
 - Explicitly revealed reference solutions
 
 `just reset` removes that generated state only. It never rewrites `analysis.md`, `solution.ts`, tests, or any other learner-authored file. Use Git if you intentionally want to restore starter code.
 
-When all lessons pass, `just status` becomes the final readiness assessment. “Unassisted” means zero hints, zero successful adaptive diagnoses, and no solution reveal. The report shows those assistance counts, attempts, completed duration versus target, reflection status, optional coach scores, outstanding revealed-solution reviews, and whether the agreed readiness target is met. Time remains evidence rather than a pass/fail gate.
+When all lessons pass, `just status` becomes the final readiness assessment. “Unassisted” means zero hints, zero successful adaptive diagnoses, and no solution reveal. The report shows those assistance counts, attempts, completed duration versus target, analysis-note status, optional coach scores, outstanding revealed-solution reviews, and whether the agreed readiness target is met. Time remains evidence rather than a pass/fail gate.
 
 ## Curriculum
 
@@ -159,7 +160,7 @@ adapted, and deferred proposals.
 
 Complete solutions are not present as readable source in the ordinary lesson path. The packaged reference bundle is integrity-checked and materialized only when you explicitly run `just solution`. It appears under `.workshop/revealed/<lesson>/` and never overwrites your attempt.
 
-Revealing a solution marks the lesson as review-required. You can still pass it, but `just status` keeps it in the review queue. With a coach configured, a successful structured review clears the marker. Offline, complete the post-pass reflection and run `just review <lesson-id>` to record a self-review without inventing model scores.
+Revealing a solution marks the lesson as review-required. You can still pass it, but `just status` keeps it in the review queue. With a coach configured, a successful structured review clears the marker. Offline, complete the concise analysis notes and run `just review <lesson-id>` to record a self-review without inventing model scores.
 
 ## Maintainer verification
 
