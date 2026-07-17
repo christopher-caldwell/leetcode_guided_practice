@@ -67,7 +67,7 @@ A future language implementation should add its own verifier adapter and solutio
 
 ## Coaching boundary
 
-`src/providers/coach.ts` defines the provider-neutral port and normalized schemas. `src/providers/codex.ts` is one external-process adapter. Provider selection occurs in `src/providers/factory.ts`. The Codex process starts from an empty generated directory with an allowlisted environment rather than inheriting unrelated shell credentials.
+`src/providers/coach.ts` defines the provider-neutral coaching and analysis-evaluator ports plus their normalized schemas. `src/providers/codex.ts` is the external-process adapter. Optional coaching selection and the required Codex analysis evaluator are created in `src/providers/factory.ts`. The Codex process starts from an empty generated directory with an allowlisted environment rather than inheriting unrelated shell credentials.
 
 This boundary is independent of solution language: a future Rust verifier could still send source, reasoning, and normalized failures through the same coach port.
 

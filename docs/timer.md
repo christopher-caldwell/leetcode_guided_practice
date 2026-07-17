@@ -134,9 +134,9 @@ You may explicitly pause after a failure when switching from a timed attempt to 
 
 ### Successful code verification
 
-A `just check` whose code verifies automatically stops any timer that has recorded time. This is independent of the current timer mode, so changing `.env` mid-attempt cannot strand a running stopwatch. The completed duration remains visible while you finish the concise analysis notes. External coaching review occurs after deterministic success and after the timer has stopped, so model latency is not counted.
+A `just check` whose code verifies automatically stops any timer that has recorded time. This is independent of the current timer mode, so changing `.env` mid-attempt cannot strand a running stopwatch. The completed duration remains visible while the analysis awaits its Codex verdict. The assessment occurs after deterministic success and after the timer has stopped, so model latency is not counted.
 
-The lesson advances only after the concise notes are complete and a subsequent `just check` records them. Note-writing time after code verification is outside the interview-attempt stopwatch.
+The lesson advances only after Codex passes the explanation. Note-writing and assessment time after code verification are outside the interview-attempt stopwatch.
 
 ### Reset only the current stopwatch
 
@@ -191,7 +191,7 @@ just check
 just check
 # PASS stops the clock automatically.
 just timer status
-# Complete the three concise notes, then record progression.
+# Refine the explanation, then request a new Codex verdict.
 just check
 ```
 

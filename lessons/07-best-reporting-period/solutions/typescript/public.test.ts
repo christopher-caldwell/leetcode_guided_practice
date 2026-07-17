@@ -9,4 +9,14 @@ describe('maxWindowSum public examples', () => {
   it('allows a negative maximum', () => {
     expect(maxWindowSum([-4, -2], 1)).toBe(-2)
   })
+
+  it('rejects invalid window sizes', () => {
+    expect(maxWindowSum([], 1)).toBeNull()
+    expect(maxWindowSum([1], 0)).toBeNull()
+    expect(maxWindowSum([1], 2)).toBeNull()
+  })
+
+  it('uses the entire input when the window has its full length', () => {
+    expect(maxWindowSum([5, 4], 2)).toBe(9)
+  })
 })

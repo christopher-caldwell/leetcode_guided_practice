@@ -10,7 +10,7 @@ Array traversal and comparison functions.
 
 ## Problem statement
 
-Merge every overlapping schedule window. Each window is [start, end] with start <= end. Touching endpoints count as overlap. Do not mutate the input or its nested tuples.
+Merge every overlapping schedule window. Each window is [start, end] with start <= end. Touching endpoints count as overlap. Return the merged windows in ascending start order. Do not mutate the input or its nested tuples.
 
 ### Examples
 
@@ -22,6 +22,7 @@ Merge every overlapping schedule window. Each window is [start, end] with start 
 - 0 <= windows.length <= 100,000
 - Endpoints may be negative.
 - Input order is arbitrary.
+- Output is ordered by ascending start value.
 
 ## Contract checks
 
@@ -36,7 +37,7 @@ These are prompts, not required individual answers. In `lessons/20-consolidate-s
 1. Read the contract and choose one representative edge case.
 2. Implement inside the TODO boundary.
 3. Run `just check`; PASS or FAIL reflects code verification only.
-4. Add the three concise interview notes in `analysis.md` to advance.
+4. Explain the solution in `analysis.md`; after code passes, Codex evaluates the analysis and solution together.
 
 ## Editable files and TODO boundary
 
@@ -48,7 +49,7 @@ Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node o
 
 ## Check and progression
 
-`just check` always runs the TypeScript and registered lesson verifiers. PASS or FAIL reflects those checks only. The lesson advances after the three concise analysis notes are complete; missing notes display WAITING without changing a PASS into a failure.
+`just check` always runs the TypeScript and registered lesson verifiers first. Their PASS or FAIL reflects code verification. After code passes, Codex reads the analysis and submitted solution together, returns a separate analysis PASS or FAIL, and provides feedback in either case. It judges the meaning rather than requiring exact headings, keywords, or phrasing. The lesson advances when both verdicts pass.
 
 ## Common traps
 

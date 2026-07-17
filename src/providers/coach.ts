@@ -32,6 +32,11 @@ export const DiagnosisResponseSchema = z.object({
   question: z.string().min(1).max(220),
 })
 
+export const AnalysisAssessmentResponseSchema = z.object({
+  passed: z.boolean(),
+  feedback: z.string().min(1).max(800),
+})
+
 const ScoreSchema = z.number().int().min(1).max(4)
 
 export const ReviewResponseSchema = z.object({
@@ -49,7 +54,13 @@ export const ReviewResponseSchema = z.object({
 
 export type HintResponse = z.infer<typeof HintResponseSchema>
 export type DiagnosisResponse = z.infer<typeof DiagnosisResponseSchema>
+export type AnalysisAssessmentResponse = z.infer<typeof AnalysisAssessmentResponseSchema>
 export type ReviewResponse = z.infer<typeof ReviewResponseSchema>
+
+export interface AnalysisEvaluator {
+  readonly name: string
+  assessAnalysis(context: CoachContext): Promise<AnalysisAssessmentResponse>
+}
 
 export interface CoachProvider {
   readonly name: string

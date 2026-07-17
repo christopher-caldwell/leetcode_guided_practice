@@ -3,13 +3,39 @@ import os from 'node:os'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
+  AnalysisAssessmentResponseSchema,
   DiagnosisResponseSchema,
   HintResponseSchema,
   ReviewResponseSchema,
 } from '../src/providers/coach.js'
-import { coachEnvironment, CodexCoachProvider, parseCoachResponse } from '../src/providers/codex.js'
+import {
+  coachEnvironment,
+  codexExecutableCandidates,
+  CodexCoachProvider,
+  parseCoachResponse,
+} from '../src/providers/codex.js'
 
 describe('normalized coaching responses', () => {
+  it('never substitutes a fallback for an explicitly selected executable', () => {
+    expect(codexExecutableCandidates('/tmp/fake-codex')).toEqual(['/tmp/fake-codex'])
+  })
+
+  it('accepts a yes-or-no analysis verdict with feedback in either case', () => {
+    expect(
+      AnalysisAssessmentResponseSchema.parse({
+        passed: true,
+        feedback: 'The core explanation is sound; tighten the auxiliary-space justification.',
+      }),
+    ).toBeTruthy()
+    expect(
+      AnalysisAssessmentResponseSchema.parse({
+        passed: false,
+        feedback: 'The approach is identified, but the stated runtime contradicts the loop.',
+      }),
+    ).toBeTruthy()
+    expect(() => AnalysisAssessmentResponseSchema.parse({ passed: true, feedback: '' })).toThrow()
+  })
+
   it('accepts bounded structured hints', () => {
     expect(
       HintResponseSchema.parse({

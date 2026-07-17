@@ -15,4 +15,18 @@ describe('countServiceGroups public examples', () => {
   it('counts isolated services', () => {
     expect(countServiceGroups(3, [])).toBe(3)
   })
+
+  it('handles zero services', () => {
+    expect(countServiceGroups(0, [])).toBe(0)
+  })
+
+  it('tolerates duplicate, reversed, and self connections', () => {
+    expect(
+      countServiceGroups(3, [
+        [0, 1],
+        [1, 0],
+        [2, 2],
+      ]),
+    ).toBe(2)
+  })
 })

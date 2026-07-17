@@ -33,7 +33,7 @@ Run your first check with:
 just check
 ```
 
-Starter solutions intentionally fail their registered code checks. Incomplete interview notes are reported separately and never turn a passing implementation into a failure.
+Starter solutions intentionally fail their registered code checks. After code passes, Codex evaluates the interview explanation semantically and reports a separate analysis verdict.
 
 ## Daily workflow
 
@@ -52,10 +52,10 @@ For every lesson:
 2. Implement the focused TODO in `solutions/typescript/solution.ts`.
 3. Run `just check`.
 4. Use the failure category or `just hint` to make the next small adjustment.
-5. Add three concise notes in `analysis.md`: contract, approach, and correctness/complexity.
-6. Run `just check` again to advance if the code passed before the notes were complete.
+5. Explain the contract, approach, correctness, and complexity in `analysis.md` using your own words.
+6. Run `just check`; after code verification passes, Codex reads the analysis and solution together and returns an analysis pass or fail with feedback.
 
-`check` always runs deterministic code verification. `PASS` and `FAIL` refer only to types, correctness, edge cases, input contracts, complexity-sensitive behavior, and runtime execution. Missing notes appear under `WAITING` and do not produce a failing exit status, although the lesson does not advance until the three compact notes are present. The note checker requires a direct correctness reason plus labeled Big-O time and space bounds; it does not pretend to semantically grade prose.
+`check` always runs deterministic code verification first. Its `PASS` and `FAIL` refer to types, correctness, edge cases, input contracts, complexity-sensitive behavior, and runtime execution. Once code passes, the CLI sends the analysis and submitted solution to an isolated `codex exec` process. Codex returns `ANALYSIS PASS` or `ANALYSIS FAIL` plus feedback. It evaluates the meaning of the explanation instead of requiring specific headings, keywords, connector words, or exact phrasing. The lesson advances only when both verdicts pass.
 
 Existing work that uses the former seven-section analysis template remains valid; it is read as the same three compact note groups. New untouched lessons use the shorter template.
 
@@ -73,11 +73,13 @@ COACH_PROVIDER=codex
 
 Unsupported values fail immediately with a configuration error. There is no second boolean flag.
 
+This setting controls optional hints, diagnoses, and detailed rubric reviews. The analysis assessment performed by `just check` always uses the locally authenticated Codex CLI because its verdict controls lesson progression.
+
 With Codex configured:
 
 - `just hint` sends the current partial attempt for a concrete hint that doubles in directness across repeated requests until capped.
 - Every failed check requests a diagnosis, with guidance increasing exponentially on consecutive attempts until capped.
-- Verified solutions request advisory feedback about correctness, complexity, clarity, and communication.
+- `just review` requests advisory rubric feedback about correctness, complexity, clarity, and communication.
 - Codex runs read-only and ephemerally from an empty generated directory, receives an allowlisted environment, returns a constrained structured response, and cannot overwrite your code.
 - Invalid or unavailable external feedback falls back without changing deterministic pass/fail results.
 
@@ -160,7 +162,7 @@ adapted, and deferred proposals.
 
 Complete solutions are not present as readable source in the ordinary lesson path. The packaged reference bundle is integrity-checked and materialized only when you explicitly run `just solution`. It appears under `.workshop/revealed/<lesson>/` and never overwrites your attempt.
 
-Revealing a solution marks the lesson as review-required. You can still pass it, but `just status` keeps it in the review queue. With a coach configured, a successful structured review clears the marker. Offline, complete the concise analysis notes and run `just review <lesson-id>` to record a self-review without inventing model scores.
+Revealing a solution marks the lesson as review-required. You can still pass it, but `just status` keeps it in the review queue. With optional coaching configured, a successful structured review clears the marker. Otherwise, first earn a passing Codex analysis verdict and then run `just review <lesson-id>` to record the review without inventing rubric scores.
 
 ## Maintainer verification
 

@@ -3,7 +3,6 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { validateAnalysis } from '../src/core/analysis.js'
 import { loadLessons } from '../src/core/lessons.js'
 
 const root = process.cwd()
@@ -32,20 +31,13 @@ describe('curriculum integrity', () => {
       ])
       expect(instructions).toContain(lesson.title)
       expect(instructions).toContain(lesson.source)
-      expect(analysis).toContain(`# Analysis: ${lesson.title}`)
+      expect(analysis.trim().length).toBeGreaterThan(0)
       for (const functionName of lesson.functionNames) {
         expect(source).toContain(functionName)
         expect(publicTest).toContain(functionName)
       }
       expect(lesson.hints).toHaveLength(3)
     }
-  })
-
-  it('recognizes incomplete concise analysis independently from code verification', async () => {
-    const first = (await loadLessons(root))[0]!
-    const failures = await validateAnalysis(first)
-    expect(new Set(failures.map((failure) => failure.category))).toEqual(new Set(['analysis']))
-    expect(failures.at(-1)?.summary).toContain('Correctness and complexity')
   })
 
   it('packages one integrity-checked reference per lesson', async () => {

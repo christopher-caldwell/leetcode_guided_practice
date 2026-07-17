@@ -20,4 +20,28 @@ describe('minimumConcurrentRooms public examples', () => {
       ]),
     ).toBe(1)
   })
+
+  it('tracks the peak rather than the final active count', () => {
+    expect(
+      minimumConcurrentRooms([
+        [1, 10],
+        [2, 9],
+        [3, 8],
+        [20, 21],
+      ]),
+    ).toBe(3)
+  })
+
+  it('handles empty input and preserves meeting order', () => {
+    expect(minimumConcurrentRooms([])).toBe(0)
+    const meetings: Array<[number, number]> = [
+      [5, 6],
+      [1, 3],
+    ]
+    minimumConcurrentRooms(meetings)
+    expect(meetings).toEqual([
+      [5, 6],
+      [1, 3],
+    ])
+  })
 })

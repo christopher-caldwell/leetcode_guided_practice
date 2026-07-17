@@ -1,6 +1,6 @@
 # Coaching Providers
 
-Deterministic tests decide whether code passes. A coaching provider supplies small hints, diagnoses failed attempts, and reviews passing work. These responsibilities are deliberately separate so an unavailable or inconsistent model cannot corrupt progression.
+Deterministic tests decide whether code passes. After code passes, Codex evaluates the analysis and solution together and supplies the separate explanation verdict required for progression. Optional coaching supplies small hints, diagnoses failed attempts, and detailed rubric reviews.
 
 ## Enabling coaching
 
@@ -10,7 +10,7 @@ External coaching uses one optional environment value:
 COACH_PROVIDER=codex
 ```
 
-An unset, empty, or whitespace-only value means external coaching is disabled. Static hints and deterministic failure categories remain available.
+An unset, empty, or whitespace-only value means optional external coaching is disabled. Static hints and deterministic failure categories remain available. The required analysis assessment performed by `just check` still invokes Codex.
 
 Any nonempty value is treated as an attempt to enable a provider and is validated. The initial supported value is `codex`; a typo such as `codxe` fails fast rather than silently disabling feedback.
 
@@ -20,6 +20,8 @@ There is intentionally no `CODEX_COACHING` boolean.
 
 The workshop does not import the OpenAI SDK, call the OpenAI API, read an API key, or manage credentials. It launches the locally installed `codex` executable, which reuses that CLI's existing authentication and subscription behavior.
 
+On macOS, if the `codex` command fails and the ChatGPT app contains its own Codex executable, the adapter retries that bundled executable. This handles a stale standalone CLI without selecting or pinning a different model. Other platforms simply use the configured PATH executable.
+
 Verify your own installation before enabling it:
 
 ```bash
@@ -27,7 +29,13 @@ codex --version
 codex exec --help
 ```
 
-## Three coaching operations
+## Required analysis assessment
+
+After deterministic code verification passes, `just check` sends the learner's analysis and submitted solution to Codex. The response contains a boolean verdict and feedback. Codex is instructed to judge semantic sufficiency rather than template compliance: it does not require specific headings, keywords, connector words, exact notation, polished grammar, exhaustive edge cases, or a formal proof. Minor imprecision and optional improvements should pass; materially absent, wrong, or contradictory reasoning should fail.
+
+Both verdicts receive feedback. A strong pass may simply say there are no meaningful notes. A pass with minor issues affirms the core idea and identifies improvements. A failure acknowledges what is sound and identifies the minimum changes needed. If Codex is unavailable or returns invalid output, code verification is retained but the lesson waits rather than inventing a verdict.
+
+## Optional coaching operations
 
 ### Hint
 
@@ -55,16 +63,16 @@ The response identifies what is working, one concrete observation, one next expe
 
 ### Review
 
-After deterministic code verification, Codex reviews the solution and analysis. It scores four dimensions from 1 through 4:
+On explicit `just review`, Codex reviews the solution and analysis. It scores four dimensions from 1 through 4:
 
 - Correctness reasoning
 - Complexity reasoning
 - Implementation clarity
 - Interview communication
 
-It can suggest improvements even for passing code. Scores are advisory readiness evidence; they never relock a deterministic pass.
+It can suggest improvements even after both required verdicts pass. Scores are advisory readiness evidence.
 
-`just review` repeats this process for queued work or the most recently verified lesson. `just review <lesson-id>` selects a specific verified lesson. A successful provider review clears that lesson's review-required marker after explicit solution revelation. Without a provider, completed concise analysis notes supply an explicit offline self-review path; no synthetic model score is created.
+`just review` reviews queued work or the most recently verified lesson. `just review <lesson-id>` selects a specific verified lesson. A successful provider review clears that lesson's review-required marker after explicit solution revelation. Without optional coaching enabled, a passed Codex analysis assessment supplies an explicit offline-review path; no synthetic rubric score is created.
 
 ## Execution safety
 
@@ -104,6 +112,8 @@ interface CoachProvider {
   review(context: CoachContext): Promise<ReviewResponse>
 }
 ```
+
+The required analysis path uses the smaller `AnalysisEvaluator` port, whose `assessAnalysis` method returns only a boolean verdict and bounded feedback. The Codex adapter implements both ports.
 
 To add a provider such as a different authenticated local CLI:
 

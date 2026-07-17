@@ -21,4 +21,12 @@ describe('mergeSortedStreams public examples', () => {
   it('returns the nonempty stream', () => {
     expect(values(mergeSortedStreams(null, list(0)))).toEqual([0])
   })
+
+  it('handles two empty streams', () => {
+    expect(mergeSortedStreams(null, null)).toBeNull()
+  })
+
+  it('merges negative, duplicate, and uneven streams', () => {
+    expect(values(mergeSortedStreams(list(-5, 2, 2), list(-4, 9)))).toEqual([-5, -4, 2, 2, 9])
+  })
 })

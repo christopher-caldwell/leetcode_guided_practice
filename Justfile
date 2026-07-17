@@ -12,7 +12,7 @@ status:
 start:
     pnpm workshop start
 
-# Verify the TypeScript solution and report concise-note progression separately.
+# Verify the TypeScript solution, then request a semantic Codex analysis verdict.
 check:
     pnpm workshop check
 

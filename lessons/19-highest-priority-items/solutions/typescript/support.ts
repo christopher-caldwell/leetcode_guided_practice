@@ -1,3 +1,11 @@
+const maximumSizeKey = Symbol.for('leetcode-workshop.min-priority-queue.maximum-size')
+
+function recordMaximumSize(size: number): void {
+  const metrics = globalThis as Record<PropertyKey, unknown>
+  const previous = typeof metrics[maximumSizeKey] === 'number' ? metrics[maximumSizeKey] : 0
+  metrics[maximumSizeKey] = Math.max(previous as number, size)
+}
+
 export class MinPriorityQueue<T> {
   private readonly entries: Array<{ value: T; priority: number }> = []
 
@@ -7,6 +15,7 @@ export class MinPriorityQueue<T> {
 
   enqueue(value: T, priority: number): void {
     this.entries.push({ value, priority })
+    recordMaximumSize(this.entries.length)
     this.bubbleUp(this.entries.length - 1)
   }
 

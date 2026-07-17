@@ -10,7 +10,7 @@ Tree traversal from Lessons 17–18.
 
 ## Problem statement
 
-Services are numbered 0 through serviceCount - 1. Undirected connections link services. Return the number of connected groups, including isolated services.
+Services are numbered 0 through serviceCount - 1. Undirected connections link services. Duplicate, reversed, and self-connections may occur. Return the number of connected groups, including isolated services, without mutating the connection list or its tuples.
 
 ### Examples
 
@@ -22,6 +22,9 @@ Services are numbered 0 through serviceCount - 1. Undirected connections link se
 - 0 <= serviceCount <= 100,000
 - 0 <= connections.length <= 200,000
 - No endpoint lies outside the service range.
+- Duplicate, reversed, and self-connections are valid input.
+- The input and its nested connection tuples must remain unchanged.
+- Use iterative DFS or BFS so a worst-case 100,000-service chain does not overflow the JavaScript call stack.
 
 ## Contract checks
 
@@ -36,7 +39,7 @@ These are prompts, not required individual answers. In `lessons/22-disconnected-
 1. Read the contract and choose one representative edge case.
 2. Implement inside the TODO boundary.
 3. Run `just check`; PASS or FAIL reflects code verification only.
-4. Add the three concise interview notes in `analysis.md` to advance.
+4. Explain the solution in `analysis.md`; after code passes, Codex evaluates the analysis and solution together.
 
 ## Editable files and TODO boundary
 
@@ -48,7 +51,7 @@ Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node o
 
 ## Check and progression
 
-`just check` always runs the TypeScript and registered lesson verifiers. PASS or FAIL reflects those checks only. The lesson advances after the three concise analysis notes are complete; missing notes display WAITING without changing a PASS into a failure.
+`just check` always runs the TypeScript and registered lesson verifiers first. Their PASS or FAIL reflects code verification. After code passes, Codex reads the analysis and submitted solution together, returns a separate analysis PASS or FAIL, and provides feedback in either case. It judges the meaning rather than requiring exact headings, keywords, or phrasing. The lesson advances when both verdicts pass.
 
 ## Common traps
 

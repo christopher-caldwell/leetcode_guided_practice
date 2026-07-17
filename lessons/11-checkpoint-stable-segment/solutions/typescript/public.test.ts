@@ -9,4 +9,14 @@ describe('longestStableSegment public examples', () => {
   it('handles one repeated kind', () => {
     expect(longestStableSegment(['a', 'a'], 1)).toBe(2)
   })
+
+  it('shrinks repeatedly until the distinct-kind limit is restored', () => {
+    expect(longestStableSegment(['a', 'b', 'c', 'b', 'b', 'c'], 2)).toBe(5)
+  })
+
+  it('handles empty input and nonpositive limits', () => {
+    expect(longestStableSegment([], 2)).toBe(0)
+    expect(longestStableSegment(['a'], 0)).toBe(0)
+    expect(longestStableSegment(['a'], -1)).toBe(0)
+  })
 })

@@ -9,4 +9,15 @@ describe('maxNonAdjacentValue public examples', () => {
   it('allows selecting nothing', () => {
     expect(maxNonAdjacentValue([-2, -1])).toBe(0)
   })
+
+  it('chooses separated boundary values over a local middle choice', () => {
+    expect(maxNonAdjacentValue([5, 1, 1, 5])).toBe(10)
+  })
+
+  it('handles empty and singleton input without mutation', () => {
+    expect(maxNonAdjacentValue([])).toBe(0)
+    const values = [7]
+    expect(maxNonAdjacentValue(values)).toBe(7)
+    expect(values).toEqual([7])
+  })
 })
