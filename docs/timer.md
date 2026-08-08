@@ -134,9 +134,15 @@ You may explicitly pause after a failure when switching from a timed attempt to 
 
 ### Successful code verification
 
-A `just check` whose code and pre-pass analysis evidence verify automatically stops any timer that has recorded time. This is independent of the current timer mode, so changing `.env` mid-attempt cannot strand a running stopwatch. The completed duration remains visible while you write the required post-pass reflection. External coaching review occurs after deterministic success and after the timer has stopped, so model latency is not counted.
+A `just check` whose code verifies automatically stops any timer that has recorded time. This is
+independent of the current timer mode, so changing `.env` mid-attempt cannot strand a running
+stopwatch. The completed duration remains visible while the analysis awaits a configured provider's
+verdict. The assessment occurs after deterministic success and after the timer has stopped, so model
+latency is not counted.
 
-The lesson advances only after the reflection is complete and a subsequent `just check` records it. Reflection time is intentionally outside the interview-attempt stopwatch.
+With AI feedback enabled, the lesson advances after the provider passes the explanation. Without it,
+the deterministic pass advances immediately. Note-writing and assessment time after code verification
+are outside the interview-attempt stopwatch.
 
 ### Reset only the current stopwatch
 
@@ -189,9 +195,9 @@ just start
 just check
 # If it fails, the clock continues.
 just check
-# CODE VERIFIED stops the clock automatically.
+# PASS stops the clock automatically.
 just timer status
-# Complete Post-pass reflection, then record progression.
+# Refine the explanation, then request a new provider verdict when AI feedback is enabled.
 just check
 ```
 
@@ -241,6 +247,6 @@ A nonempty `WORKSHOP_TIMER_MINUTES` overrides all lesson targets. Empty it to us
 
 The timer never starts implicitly. Run `just start` or `just timer start` before the attempt.
 
-### Codex feedback took time but elapsed duration did not increase
+### AI feedback took time but elapsed duration did not increase
 
 That is intentional. A passing check stops the stopwatch before advisory external review begins, so network and model latency do not affect interview pace.

@@ -94,5 +94,13 @@
   "dp-03": "export function longestImprovingTrend(scores: number[]): number",
   "dp-04": "export function canSegmentServiceAlias(alias: string, dictionary: string[]): boolean",
   "dp-05": "export function scheduleMostMaintenanceJobs(jobs: Array<[number, number]>): number[]",
-  "dp-06": "export function minimumCheckpointCost(costs: number[]): number"
+  "dp-06": "export function minimumCheckpointCost(costs: number[]): number",
+  "focus-01": "export function isMirrorReadable(message: string): boolean",
+  "focus-02": "export function bestContiguousPerformanceRun(changes: number[]): number",
+  "focus-03": "export function peerProductSnapshot(values: number[]): number[]",
+  "focus-04": "export function targetPairPositions(readings: number[], target: number): [number, number] | null",
+  "focus-05": "export function hasRepeatedReading(readings: number[]): boolean",
+  "focus-06": "export function reorderedMessagesMatch(first: string, second: string): boolean",
+  "focus-07": "export function longestUniqueMessageRun(message: string): number",
+  "focus-08": "export function consolidateAvailabilityWindows(intervals: Array<[number, number]>): Array<[number, number]>"
 }

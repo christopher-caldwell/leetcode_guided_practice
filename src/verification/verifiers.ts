@@ -71,6 +71,18 @@ const verifiers: Record<string, (subject: Module) => void> = {
       expect(sameInventory(['x', 'y'], ['x', 'x'])).toBe(false)
       expect(sameInventory([], [])).toBe(true)
     })
+    it('[edge-case] rejects unequal lengths in either direction', () => {
+      expect(sameInventory(['x'], ['x', 'x'])).toBe(false)
+      expect(sameInventory(['x', 'x'], ['x'])).toBe(false)
+      expect(sameInventory([], ['x'])).toBe(false)
+      expect(sameInventory(['x'], [])).toBe(false)
+    })
+    it('[edge-case] rejects extra keys and mismatched counts regardless of iteration order', () => {
+      expect(sameInventory(['x'], ['x', 'y'])).toBe(false)
+      expect(sameInventory(['x', 'y'], ['x', 'y', 'z'])).toBe(false)
+      expect(sameInventory(['x', 'x', 'y'], ['x', 'y', 'y'])).toBe(false)
+      expect(sameInventory(['x', 'y', 'y'], ['x', 'x', 'y'])).toBe(false)
+    })
     it('[edge-case] treats identifiers as case-sensitive', () => {
       expect(sameInventory(['A'], ['a'])).toBe(false)
     })
@@ -116,9 +128,21 @@ const verifiers: Record<string, (subject: Module) => void> = {
       expect(hasNearbyRepeat(['a', 'a'], 0)).toBe(false)
       expect(hasNearbyRepeat([], 4)).toBe(false)
     })
-    it('[complexity] handles a large nonrepeating stream', () => {
-      const events = Array.from({ length: 40_000 }, (_, index) => `event-${index}`)
+    it('[contract] preserves the event stream', () => {
+      const events = ['b', 'a', 'b']
+      hasNearbyRepeat(events, 2)
+      expect(events).toEqual(['b', 'a', 'b'])
+    })
+    it('[complexity] avoids rescanning the full allowed distance', () => {
+      let reads = 0
+      const events = guardedArray(
+        Array.from({ length: 20_000 }, (_, index) => `event-${index}`),
+        () => reads++,
+        100_000,
+      )
       expect(hasNearbyRepeat(events, 100)).toBe(false)
+      expect(hasNearbyRepeat(events, events.length)).toBe(false)
+      expect(reads).toBeLessThan(100_000)
     })
   },
   '07-best-reporting-period': ({ maxWindowSum }) => {
@@ -157,9 +181,20 @@ const verifiers: Record<string, (subject: Module) => void> = {
       expect(longestUniqueRun([])).toBe(0)
       expect(longestUniqueRun(['x', 'x', 'x'])).toBe(1)
     })
-    it('[complexity] handles a long repeating stream', () => {
-      const events = Array.from({ length: 60_000 }, (_, index) => String(index % 200))
-      expect(longestUniqueRun(events)).toBe(200)
+    it('[contract] preserves the event stream', () => {
+      const events = ['c', 'a', 'b', 'a']
+      longestUniqueRun(events)
+      expect(events).toEqual(['c', 'a', 'b', 'a'])
+    })
+    it('[complexity] scans a long all-distinct stream once', () => {
+      let reads = 0
+      const events = guardedArray(
+        Array.from({ length: 30_000 }, (_, index) => `event-${index}`),
+        () => reads++,
+        150_000,
+      )
+      expect(longestUniqueRun(events)).toBe(30_000)
+      expect(reads).toBeLessThan(150_000)
     })
   },
   '09-balanced-delimiters': ({ hasBalancedDelimiters }) => {
@@ -172,6 +207,10 @@ const verifiers: Record<string, (subject: Module) => void> = {
       expect(hasBalancedDelimiters('')).toBe(true)
       expect(hasBalancedDelimiters(']')).toBe(false)
     })
+    it('[complexity] handles the documented deeply nested input scale', () => {
+      const depth = 50_000
+      expect(hasBalancedDelimiters('('.repeat(depth) + ')'.repeat(depth))).toBe(true)
+    })
   },
   '10-merge-sorted-streams': ({ mergeSortedStreams, ListNode }) => {
     it('[correctness] merges negative, duplicate, and uneven streams', () => {
@@ -180,6 +219,12 @@ const verifiers: Record<string, (subject: Module) => void> = {
     })
     it('[edge-case] handles two empty streams', () => {
       expect(mergeSortedStreams(null, null)).toBeNull()
+    })
+    it('[edge-case] returns the nonempty stream when its peer is empty', () => {
+      const first = makeList(ListNode, [1, 2])
+      const second = makeList(ListNode, [3, 4])
+      expect(mergeSortedStreams(first, null)).toBe(first)
+      expect(mergeSortedStreams(null, second)).toBe(second)
     })
     it('[contract] reuses the supplied nodes', () => {
       const first = makeList(ListNode, [1, 3])
@@ -197,11 +242,23 @@ const verifiers: Record<string, (subject: Module) => void> = {
     })
     it('[edge-case] handles nonpositive limits and empty streams', () => {
       expect(longestStableSegment(['a'], 0)).toBe(0)
+      expect(longestStableSegment(['a'], -1)).toBe(0)
       expect(longestStableSegment([], 2)).toBe(0)
     })
-    it('[complexity] scales to a long stream', () => {
-      const events = Array.from({ length: 50_000 }, (_, index) => String(index % 5))
-      expect(longestStableSegment(events, 5)).toBe(50_000)
+    it('[contract] preserves the event stream', () => {
+      const events = ['c', 'a', 'b', 'a']
+      longestStableSegment(events, 2)
+      expect(events).toEqual(['c', 'a', 'b', 'a'])
+    })
+    it('[complexity] repeatedly contracts a long changing window', () => {
+      let reads = 0
+      const events = guardedArray(
+        Array.from({ length: 50_000 }, (_, index) => String(index % 6)),
+        () => reads++,
+        250_000,
+      )
+      expect(longestStableSegment(events, 3)).toBe(3)
+      expect(reads).toBeLessThan(250_000)
     })
   },
   '12-cyclic-dependency-chain': ({ hasCycle, ListNode }) => {
@@ -213,9 +270,11 @@ const verifiers: Record<string, (subject: Module) => void> = {
       two.next = three
       three.next = two
       expect(hasCycle(one)).toBe(true)
+      expect([one.next, two.next, three.next]).toEqual([two, three, two])
       const self = new ListNode(9)
       self.next = self
       expect(hasCycle(self)).toBe(true)
+      expect(self.next).toBe(self)
     })
     it('[edge-case] accepts null and repeated values in acyclic nodes', () => {
       expect(hasCycle(null)).toBe(false)
@@ -252,6 +311,11 @@ const verifiers: Record<string, (subject: Module) => void> = {
       expect(binarySearch([-10, -2, 0, 8, 90], 7)).toBe(-1)
       expect(binarySearch([], 1)).toBe(-1)
     })
+    it('[contract] preserves the sorted input', () => {
+      const values = [-3, 1, 8]
+      binarySearch(values, 1)
+      expect(values).toEqual([-3, 1, 8])
+    })
     it('[complexity] uses logarithmic indexed access', () => {
       let reads = 0
       const values = countedArray(
@@ -268,6 +332,11 @@ const verifiers: Record<string, (subject: Module) => void> = {
       expect(firstAtLeast([1, 1, 1, 4, 9], 2)).toBe(3)
       expect(firstAtLeast([1, 1, 1, 4, 9], 10)).toBe(-1)
       expect(firstAtLeast([], 0)).toBe(-1)
+    })
+    it('[contract] preserves the sorted input', () => {
+      const values = [1, 1, 4]
+      firstAtLeast(values, 1)
+      expect(values).toEqual([1, 1, 4])
     })
     it('[complexity] scales logarithmically', () => {
       let reads = 0
@@ -293,6 +362,10 @@ const verifiers: Record<string, (subject: Module) => void> = {
       const values = [3, 1]
       generateSubsets(values)
       expect(values).toEqual([3, 1])
+    })
+    it('[contract] returns independent subset arrays', () => {
+      const subsets = generateSubsets([1, 2])
+      expect(new Set(subsets).size).toBe(subsets.length)
     })
   },
   '16-checkpoint-processing-rate': ({ minimumProcessingRate }) => {
@@ -327,6 +400,14 @@ const verifiers: Record<string, (subject: Module) => void> = {
       for (let value = 0; value < 1_000; value += 1) root = new TreeNode(value, root)
       expect(maxDepth(root)).toBe(1_000)
     })
+    it('[contract] preserves node values and links', () => {
+      const left = new TreeNode(2)
+      const right = new TreeNode(3)
+      const root = new TreeNode(1, left, right)
+      maxDepth(root)
+      expect([root.val, root.left, root.right]).toEqual([1, left, right])
+      expect([left.val, left.left, left.right]).toEqual([2, null, null])
+    })
   },
   '18-hierarchy-by-level': ({ levelOrder, TreeNode }) => {
     it('[correctness] preserves level and left-to-right order', () => {
@@ -336,6 +417,14 @@ const verifiers: Record<string, (subject: Module) => void> = {
     it('[edge-case] handles empty and skewed trees', () => {
       expect(levelOrder(null)).toEqual([])
       expect(levelOrder(new TreeNode(1, new TreeNode(2, new TreeNode(3))))).toEqual([[1], [2], [3]])
+    })
+    it('[contract] preserves node values and links', () => {
+      const left = new TreeNode(2)
+      const right = new TreeNode(3)
+      const root = new TreeNode(1, left, right)
+      levelOrder(root)
+      expect([root.val, root.left, root.right]).toEqual([1, left, right])
+      expect([right.val, right.left, right.right]).toEqual([3, null, null])
     })
     it('[complexity] traverses a broad tree without front-removal copying', () => {
       const nodes = Array.from({ length: 16_383 }, (_, value) => new TreeNode(value))
@@ -356,6 +445,12 @@ const verifiers: Record<string, (subject: Module) => void> = {
     it('[edge-case] can retain every distinct value', () => {
       expect(topKFrequent([1, 2, 3], 3).sort((a: number, b: number) => a - b)).toEqual([1, 2, 3])
     })
+    it('[edge-case] accepts any valid selection at a tied cutoff without duplicates', () => {
+      const result = topKFrequent([1, 1, 2, 2, 3], 1)
+      expect(result).toHaveLength(1)
+      expect(new Set(result).size).toBe(1)
+      expect([1, 2]).toContain(result[0])
+    })
     it('[contract] preserves input', () => {
       const values = [2, 2, 1]
       topKFrequent(values, 1)
@@ -363,12 +458,14 @@ const verifiers: Record<string, (subject: Module) => void> = {
     })
     it('[complexity] retains a small top-k from many distinct values', () => {
       const values: number[] = []
-      for (let value = 1; value <= 500; value += 1) {
+      for (let value = 1; value <= 446; value += 1) {
         for (let count = 0; count < value; count += 1) values.push(value)
       }
+      resetPriorityQueueMaximumSize()
       expect(topKFrequent(values, 5).sort((a: number, b: number) => a - b)).toEqual([
-        496, 497, 498, 499, 500,
+        442, 443, 444, 445, 446,
       ])
+      expect(readPriorityQueueMaximumSize()).toBeLessThanOrEqual(6)
     })
   },
   '20-consolidate-schedule-windows': ({ mergeWindows }) => {
@@ -402,6 +499,22 @@ const verifiers: Record<string, (subject: Module) => void> = {
       const before = windows.map((window) => [...window])
       mergeWindows(windows)
       expect(windows).toEqual(before)
+    })
+    it('[complexity] sorts and scans a large reverse-ordered disjoint input', () => {
+      let reads = 0
+      const windows = guardedArray(
+        Array.from({ length: 20_000 }, (_, index) => {
+          const start = (20_000 - index) * 2
+          return [start, start + 1] as [number, number]
+        }),
+        () => reads++,
+        200_000,
+      )
+      const merged = mergeWindows(windows)
+      expect(merged).toHaveLength(20_000)
+      expect(merged[0]).toEqual([2, 3])
+      expect(merged.at(-1)).toEqual([40_000, 40_001])
+      expect(reads).toBeLessThan(200_000)
     })
   },
   '21-checkpoint-concurrent-rooms': ({ minimumConcurrentRooms }) => {
@@ -471,6 +584,17 @@ const verifiers: Record<string, (subject: Module) => void> = {
         ]),
       ).toBe(2)
     })
+    it('[contract] preserves the connection list and nested edges', () => {
+      const connections = [
+        [2, 1],
+        [1, 0],
+      ] as Array<[number, number]>
+      countServiceGroups(3, connections)
+      expect(connections).toEqual([
+        [2, 1],
+        [1, 0],
+      ])
+    })
     it('[complexity] handles a long connected chain', () => {
       const connections: Array<[number, number]> = []
       for (let index = 1; index < 20_000; index += 1) connections.push([index - 1, index])
@@ -486,6 +610,11 @@ const verifiers: Record<string, (subject: Module) => void> = {
       expect(maxNonAdjacentValue([])).toBe(0)
       expect(maxNonAdjacentValue([-1, -2])).toBe(0)
       expect(maxNonAdjacentValue([7])).toBe(7)
+    })
+    it('[contract] preserves the input', () => {
+      const values = [5, 1, 1, 5]
+      maxNonAdjacentValue(values)
+      expect(values).toEqual([5, 1, 1, 5])
     })
     it('[complexity] handles a long input', () => {
       expect(maxNonAdjacentValue(Array.from({ length: 100_000 }, () => 1))).toBe(50_000)
@@ -611,4 +740,15 @@ function listValues(head: any): number[] {
 
 function normalizeSubsets(subsets: number[][]): string[] {
   return subsets.map((subset) => [...subset].sort((a, b) => a - b).join(',')).sort()
+}
+
+const priorityQueueMaximumSizeKey = Symbol.for('leetcode-workshop.min-priority-queue.maximum-size')
+
+function resetPriorityQueueMaximumSize(): void {
+  ;(globalThis as Record<PropertyKey, unknown>)[priorityQueueMaximumSizeKey] = 0
+}
+
+function readPriorityQueueMaximumSize(): number {
+  const value = (globalThis as Record<PropertyKey, unknown>)[priorityQueueMaximumSizeKey]
+  return typeof value === 'number' ? value : 0
 }

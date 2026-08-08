@@ -10,7 +10,7 @@ Tree traversal from Lessons 17–18.
 
 ## Problem statement
 
-Services are numbered 0 through serviceCount - 1. Undirected connections link services. Return the number of connected groups, including isolated services.
+Services are numbered 0 through serviceCount - 1. Undirected connections link services. Duplicate, reversed, and self-connections may occur. Return the number of connected groups, including isolated services, without mutating the connection list or its tuples.
 
 ### Examples
 
@@ -22,37 +22,36 @@ Services are numbered 0 through serviceCount - 1. Undirected connections link se
 - 0 <= serviceCount <= 100,000
 - 0 <= connections.length <= 200,000
 - No endpoint lies outside the service range.
+- Duplicate, reversed, and self-connections are valid input.
+- The input and its nested connection tuples must remain unchanged.
+- Use iterative DFS or BFS so a worst-case 100,000-service chain does not overflow the JavaScript call stack.
 
-## Clarifying questions to consider
+## Contract checks
 
 - Are connections directed or undirected?
 - Do isolated services count as groups?
 - Can duplicate connections or self-connections occur?
 
-Write your actual assumptions and answers in `lessons/22-disconnected-service-groups/analysis.md` before coding.
+These are prompts, not required individual answers. In `lessons/22-disconnected-service-groups/learner_analysis.md`, record only a contract detail that affected your implementation.
 
 ## Expected workflow
 
-1. Restate the contract and walk through a small example.
-2. Propose a correct baseline, even if it is too expensive.
-3. Define `n` and analyze the baseline's time and auxiliary space.
-4. Identify the repeated or expensive operation.
-5. Derive an optimization and state its invariant.
-6. Implement only inside the TODO boundary.
-7. Run `just check`, inspect the failure category, and test your own edge cases.
-8. Explain why the final algorithm is correct and state its complexity.
+1. Read the contract and choose one representative edge case.
+2. Implement inside the TODO boundary.
+3. Run `just check`; PASS or FAIL reflects code verification only.
+4. Explain the solution in `learner_analysis.md`; after code passes, the configured AI provider evaluates the lesson contract, analysis, and solution. Without one, reasoning remains self-assessed.
 
 ## Editable files and TODO boundary
 
-- Reasoning: `lessons/22-disconnected-service-groups/analysis.md`
-- Implementation: `lessons/22-disconnected-service-groups/solutions/typescript/solution.ts`
+- Reasoning: `lessons/22-disconnected-service-groups/learner_analysis.md`
+- Implementation: `lessons/22-disconnected-service-groups/solutions/typescript/learner_solution.ts`
 - Visible examples: `lessons/22-disconnected-service-groups/solutions/typescript/public.test.ts`
 
-Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node or priority-queue code is infrastructure, not an exercise.
+Edit `learner_analysis.md` and the TODO implementation in `learner_solution.ts`. Supplied node or priority-queue code is infrastructure, not an exercise.
 
-## Automated pass condition
+## Check and progression
 
-All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without dumping internal case details wholesale.
+`just check` always runs the TypeScript and registered lesson verifiers first. Their PASS or FAIL reflects code verification. With a configured AI provider, the agent then returns a separate analysis PASS or FAIL with feedback. It judges meaning rather than exact headings, keywords, or phrasing, and minor issues must still pass. The lesson advances when both verdicts pass. Without AI feedback, the deterministic verdict alone advances.
 
 ## Common traps
 
@@ -60,9 +59,9 @@ All required analysis sections must contain your reasoning. The TypeScript proje
 - Adding only one direction to an undirected adjacency structure.
 - Marking visited too late and enqueuing the same node repeatedly.
 
-## Post-pass reflection
+## Optional follow-up
 
-After CODE VERIFIED, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Run `just check` again to advance, then consider this variation:
+After the lesson advances, consider this variation:
 
 > How would the result change if connections were directed and strongly connected groups were required?
 

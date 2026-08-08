@@ -1,35 +1,15 @@
 # Analysis: Reconcile Two Inventories
 
-Keep this concise enough to communicate during an interview. Replace every TODO prompt with your own reasoning.
+Keep these notes short enough to say aloud in an interview. Three compact entries are enough.
 
-## Clarifying questions
+## Contract
 
-<!-- TODO: List the questions you would ask, then state the assumptions you will use. -->
+<!-- TODO: Record only a contract detail or edge case that affected your implementation. -->
 
-## Examples and edge cases
+## Approach
 
-<!-- TODO: Trace one representative example plus at least two boundary cases. -->
+<!-- TODO: Describe the algorithm directly in two to four sentences. Mention a baseline only when it is genuinely different. -->
 
-## Baseline approach
+## Correctness and complexity
 
-<!-- TODO: Describe a correct first approach before optimizing it. -->
-
-## Cost analysis
-
-<!-- TODO: Define n (and any other variables), then derive baseline time and auxiliary space. -->
-
-## Optimized approach
-
-<!-- TODO: Identify the expensive operation and explain the improved strategy without relying only on a pattern name. -->
-
-## Invariant and correctness
-
-<!-- TODO: State what remains true during execution and why the result follows at termination. -->
-
-## Final complexity
-
-<!-- TODO: State and justify final worst-case time and auxiliary-space complexity. -->
-
-## Post-pass reflection
-
-<!-- Complete this after CODE VERIFIED and before advancing: what signal should help you recognize related problems later? -->
+<!-- TODO: Give one reason the result is correct, then state explicit Big-O time and auxiliary-space bounds. -->

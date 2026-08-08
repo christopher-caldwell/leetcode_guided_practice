@@ -8,13 +8,13 @@
   "skills": ["hash-map lookup", "complements", "time-space tradeoffs", "O(n) reasoning"],
   "prerequisite": "Lesson 2 and basic TypeScript Map usage.",
   "functionNames": ["pairSumAtScale"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 50,
   "hints": [
-    "Rewrite a + b = target as a question you can ask after observing only a.",
-    "What key-value pair would let you answer that question without scanning prior elements?",
-    "For each value, check whether its needed counterpart was seen earlier; then record the current index."
+    "For the current value x, the only useful earlier value is target - x. Ask whether that complement has already appeared.",
+    "Store each previously seen value as a Map key and its index as the value, giving average O(1) complement lookup.",
+    "At each index, check the Map for target - nums[i] before storing nums[i], which also prevents reusing the same index."
   ],
   "reviewOf": [1, 2]
 }

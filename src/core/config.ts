@@ -3,9 +3,10 @@ import { z } from 'zod'
 const optionalProvider = z.preprocess(
   (value) => {
     if (typeof value !== 'string' || value.trim() === '') return undefined
-    return value.trim().toLowerCase()
+    const normalized = value.trim().toLowerCase()
+    return normalized === 'codex' || normalized === 'claude' ? normalized : undefined
   },
-  z.enum(['codex']).optional(),
+  z.enum(['codex', 'claude']).optional(),
 )
 
 const optionalMinutes = z.preprocess((value) => {
@@ -32,7 +33,7 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env): Worksh
     const details = result.error.issues.map((issue) => issue.message).join('; ')
     throw new Error(
       `Invalid workshop environment: ${details}. ` +
-        'COACH_PROVIDER may be empty or "codex"; WORKSHOP_TIMER_MODE must be off, checkpoints, or all.',
+        'WORKSHOP_TIMER_MODE must be off, checkpoints, or all.',
     )
   }
 

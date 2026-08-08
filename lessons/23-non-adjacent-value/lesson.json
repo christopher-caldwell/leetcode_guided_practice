@@ -8,13 +8,13 @@
   "skills": ["dynamic programming", "state transitions", "space optimization"],
   "prerequisite": "Baseline decomposition and comfort with array iteration.",
   "functionNames": ["maxNonAdjacentValue"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 75,
   "hints": [
-    "At index i, partition optimal solutions by whether they include i.",
-    "Which earlier optimal totals are compatible with taking or skipping the current value?",
-    "The best prefix total is the larger of the previous best and the current value plus the best ending before its neighbor."
+    "At each value, compare two possibilities: skip it and keep the previous best, or take it plus the best from before its neighbor.",
+    "Only the previous two prefix totals are needed, so the dynamic-programming state can use two scalar variables.",
+    "Update current = max(previous, value + twoBack), then shift the two saved totals forward. Starting at zero permits selecting nothing."
   ],
   "reviewOf": [15]
 }

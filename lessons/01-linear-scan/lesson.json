@@ -8,13 +8,13 @@
   "skills": ["input contracts", "linear scans", "operation counting", "O(n) reasoning"],
   "prerequisite": "Comfort reading and writing a TypeScript loop.",
   "functionNames": ["findFirstIndex"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
-  "recommendedMinutes": 30,
+  "recommendedMinutes": 15,
   "hints": [
-    "What single piece of information must you inspect before you can rule an index in or out?",
-    "Choose a loop invariant describing which prefix has already been proven not to contain the answer.",
-    "Stop as soon as equality is established; otherwise exhaust the input and use the absence sentinel."
+    "Scan from index 0 upward and compare each value directly with the target; unsorted input gives no safe way to skip an unchecked index.",
+    "At index i, every earlier index has already been checked and does not match. That fact proves a match at i is the first match.",
+    "Return i immediately when values[i] equals target. If the loop finishes without a match, return -1."
   ],
   "reviewOf": []
 }

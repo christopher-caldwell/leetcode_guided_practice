@@ -8,13 +8,13 @@
   "skills": ["binary search", "search intervals", "logarithmic complexity"],
   "prerequisite": "Array indexing and explicit loop invariants.",
   "functionNames": ["binarySearch"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 55,
   "hints": [
-    "Which ordering fact lets one comparison eliminate many candidates?",
-    "Choose and write down one precise meaning for both search boundaries.",
-    "Inspect the midpoint; equality returns, and ordering determines which half can still contain the target."
+    "Compare the target with the middle value. Sorted order proves that one entire half cannot contain the target.",
+    "Choose a precise search interval—such as inclusive low and high indices—and preserve that meaning on every update.",
+    "Return the midpoint on equality; otherwise move low above mid or high below mid, and return -1 when the interval is empty."
   ],
   "reviewOf": [1, 5]
 }

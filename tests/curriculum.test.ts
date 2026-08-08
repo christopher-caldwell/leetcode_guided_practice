@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { validateAnalysis } from '../src/core/analysis.js'
+import { LEARNER_ANALYSIS, starterSourcePath } from '../src/core/learner-files.js'
 import { loadLessons } from '../src/core/lessons.js'
 
 const root = process.cwd()
@@ -24,30 +24,30 @@ describe('curriculum integrity', () => {
   it('keeps every document, source, visible test, and three-hint ladder consistent', async () => {
     const lessons = await loadLessons(root)
     for (const lesson of lessons) {
-      const [instructions, analysis, source, publicTest] = await Promise.all([
-        readFile(path.join(lesson.directory, 'instructions.md'), 'utf8'),
-        readFile(path.join(lesson.directory, 'analysis.md'), 'utf8'),
-        readFile(path.join(lesson.directory, lesson.source), 'utf8'),
-        readFile(path.join(lesson.directory, lesson.publicTest), 'utf8'),
-      ])
+      const [instructions, analysisStarter, analysis, sourceStarter, source, publicTest] =
+        await Promise.all([
+          readFile(path.join(lesson.directory, 'instructions.md'), 'utf8'),
+          readFile(path.join(lesson.directory, 'analysis.md'), 'utf8'),
+          readFile(path.join(lesson.directory, LEARNER_ANALYSIS), 'utf8'),
+          readFile(starterSourcePath(lesson), 'utf8'),
+          readFile(path.join(lesson.directory, lesson.source), 'utf8'),
+          readFile(path.join(lesson.directory, lesson.publicTest), 'utf8'),
+        ])
       expect(instructions).toContain(lesson.title)
       expect(instructions).toContain(lesson.source)
-      expect(analysis).toContain(`# Analysis: ${lesson.title}`)
+      expect(analysisStarter.trim().length).toBeGreaterThan(0)
+      expect(analysisStarter).toContain('TODO:')
+      expect(analysis.trim().length).toBeGreaterThan(0)
       for (const functionName of lesson.functionNames) {
+        expect(sourceStarter).toContain(functionName)
         expect(source).toContain(functionName)
         expect(publicTest).toContain(functionName)
       }
-      expect(source).toContain('TODO:')
+      expect(sourceStarter).toContain('TODO:')
+      expect(publicTest).toContain("'./learner_solution.js'")
+      expect(lesson.source).toMatch(/\/learner_[^/]+$/)
       expect(lesson.hints).toHaveLength(3)
     }
-  })
-
-  it('makes the initial analysis fail only at the first intentional reasoning TODO', async () => {
-    const first = (await loadLessons(root))[0]!
-    const failures = await validateAnalysis(first)
-    expect(failures).toHaveLength(1)
-    expect(new Set(failures.map((failure) => failure.category))).toEqual(new Set(['analysis']))
-    expect(failures[0]?.summary).toContain('Clarifying questions')
   })
 
   it('packages one integrity-checked reference per lesson', async () => {

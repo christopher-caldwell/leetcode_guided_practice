@@ -8,13 +8,13 @@
   "skills": ["linked-list traversal", "pointer invariants", "sentinel nodes"],
   "prerequisite": "Two-pointer reasoning from Lesson 5. ListNode is supplied.",
   "functionNames": ["mergeSortedStreams"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 65,
   "hints": [
-    "At any moment, where can the smallest remaining value possibly be?",
-    "Maintain one reference to the output head and another to its last confirmed node.",
-    "Attach the smaller current node, advance only that input, then append the remaining list when one ends."
+    "Because both lists are sorted, the smallest remaining node must be at the head of one of the two remaining lists.",
+    "Keep a tail pointer for the merged list, attach the smaller current node, and advance only the list that supplied it.",
+    "An optional sentinel simplifies the head case; when one list ends, attach the entire remainder of the other list."
   ],
   "reviewOf": [5]
 }

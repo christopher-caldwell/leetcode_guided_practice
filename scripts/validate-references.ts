@@ -46,7 +46,7 @@ export async function prepareReferenceValidation(
     if (digest !== entry.sha256) throw new Error(`Reference integrity failed for ${lesson.id}`)
 
     const lessonRoot = path.join(generatedRoot, lesson.id)
-    const solutionPath = path.join(lessonRoot, 'solution.ts')
+    const solutionPath = path.join(lessonRoot, path.basename(lesson.source))
     const publicTestPath = path.join(lessonRoot, 'public.test.ts')
     await mkdir(lessonRoot, { recursive: true })
     await writeFile(solutionPath, content, 'utf8')

@@ -2,6 +2,8 @@ node_modules/
 dist/
 .workshop/
 practice/attempts/
+/lessons/*/learner_analysis.md
+/lessons/*/solutions/*/learner_solution.*
 .env
 *.log
 .DS_Store

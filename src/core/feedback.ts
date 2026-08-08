@@ -1,7 +1,31 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { stateDirectory } from './state.js'
-import type { DiagnosisResponse, ReviewResponse } from '../providers/coach.js'
+import type {
+  AnalysisAssessmentResponse,
+  DiagnosisResponse,
+  ReviewResponse,
+} from '../providers/coach.js'
+
+export async function saveAnalysisAssessment(
+  root: string,
+  lessonId: string,
+  response: AnalysisAssessmentResponse,
+): Promise<string> {
+  const directory = path.join(stateDirectory(root), 'feedback', lessonId)
+  await mkdir(directory, { recursive: true })
+  const target = path.join(directory, `analysis-assessment-${Date.now()}.md`)
+  const content = `# Analysis assessment
+
+- Verdict: ${response.passed ? 'PASS' : 'FAIL'}
+
+## Feedback
+
+${response.feedback}
+`
+  await writeFile(target, content, 'utf8')
+  return target
+}
 
 export async function saveDiagnosis(
   root: string,

@@ -238,5 +238,15 @@
       "Check whether different decision paths revisit the same state; if not, test whether an exchange argument supports a greedy choice.",
       "Choose memoization or tabulation, define base cases explicitly, then compress space only after the full transition is correct."
     ]
+  },
+  "focused-interview-arrays": {
+    "blurb": "This recognition-first group contains the complete array and string shortlist for the current company interview: complement and membership lookup, frequency counting, sliding windows, opposing pointers, sort-and-scan interval merging, running best state, and prefix/suffix aggregation. Start from a baseline and define each piece of state before naming a pattern; the point is clean reasoning from an unlabeled prompt, not recalling a title.",
+    "recommended_after_lesson": 5,
+    "resource": null,
+    "hint_ladder": [
+      "State exactly what one candidate contains and describe the direct approach without naming an optimized pattern yet.",
+      "Identify which comparisons, sums, or products the direct approach repeats, then ask what a boundary or retained value could summarize.",
+      "Choose the matching invariant: remembered lookup facts, exact counts, a valid window, inward-moving boundaries, an ordered merged tail, the best result ending here, or state strictly to each side."
+    ]
   }
 }

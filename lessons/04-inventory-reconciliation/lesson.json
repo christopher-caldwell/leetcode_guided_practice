@@ -8,13 +8,13 @@
   "skills": ["frequency maps", "multiset equality", "early rejection"],
   "prerequisite": "Lesson 3 and TypeScript Map iteration.",
   "functionNames": ["sameInventory"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 45,
   "hints": [
-    "Which property besides membership distinguishes a multiset from a set?",
-    "Record a numeric fact per identifier while reading one inventory, then reconcile it with the other.",
-    "Reject unequal lengths; increment counts from one input and decrement for the other, rejecting overuse."
+    "Membership alone is insufficient: duplicate counts must also match between the two inventories.",
+    "Use a Map from identifier to count. Count the first inventory, then subtract while reading the second.",
+    "Reject unequal lengths or any identifier whose remaining count is zero; otherwise every count reconciles."
   ],
   "reviewOf": [1, 3]
 }

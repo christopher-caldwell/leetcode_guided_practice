@@ -8,13 +8,13 @@
   "skills": ["queues", "breadth-first search", "level boundaries"],
   "prerequisite": "Lesson 17 and array-based queue mechanics.",
   "functionNames": ["levelOrder"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 65,
   "hints": [
-    "Which processing order visits every node at depth d before depth d + 1?",
-    "At the start of a level, what does the current queue length tell you?",
-    "Use a queue with a moving read index; consume exactly the current queued count into each level."
+    "Breadth-first search visits every node at one depth before moving to the next depth.",
+    "At the start of each level, the current queue length minus the read index is exactly the number of nodes in that level.",
+    "Consume that many nodes into one result array, enqueue their children, and use a moving read index instead of Array.shift()."
   ],
   "reviewOf": [9, 17]
 }

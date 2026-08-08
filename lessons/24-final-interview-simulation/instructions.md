@@ -24,36 +24,32 @@ Complete both parts. Part A returns the inclusive boundaries of the shortest con
 - Services are numbered 0 through serviceCount - 1.
 - Do not mutate inputs.
 
-## Clarifying questions to consider
+## Contract checks
 
 - How are equal-length covering ranges tied?
 - Does required multiplicity matter?
 - Does a route from a service to itself use zero edges?
 
-Write your actual assumptions and answers in `lessons/24-final-interview-simulation/analysis.md` before coding. In the Baseline, Cost, Optimized, Invariant, and Final Complexity sections, label and address both `Part A` and `Part B` explicitly.
+These are prompts, not required individual answers. In `lessons/24-final-interview-simulation/learner_analysis.md`, record only a contract detail that affected your implementation.
 
 ## Expected workflow
 
-1. Restate the contract and walk through a small example.
-2. Propose a correct baseline, even if it is too expensive.
-3. Define `n` and analyze the baseline's time and auxiliary space.
-4. Identify the repeated or expensive operation.
-5. Derive an optimization and state its invariant.
-6. Implement only inside the TODO boundary.
-7. Run `just check`, inspect the failure category, and test your own edge cases.
-8. Explain why the final algorithm is correct and state its complexity.
+1. Read the contract and choose one representative edge case.
+2. Implement inside the TODO boundary.
+3. Run `just check`; PASS or FAIL reflects code verification only.
+4. Explain the solution in `learner_analysis.md`; after code passes, the configured AI provider evaluates the lesson contract, analysis, and solution. Without one, reasoning remains self-assessed.
 
 ## Editable files and TODO boundary
 
-- Reasoning: `lessons/24-final-interview-simulation/analysis.md`
-- Implementation: `lessons/24-final-interview-simulation/solutions/typescript/solution.ts`
+- Reasoning: `lessons/24-final-interview-simulation/learner_analysis.md`
+- Implementation: `lessons/24-final-interview-simulation/solutions/typescript/learner_solution.ts`
 - Visible examples: `lessons/24-final-interview-simulation/solutions/typescript/public.test.ts`
 
-Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node or priority-queue code is infrastructure, not an exercise.
+Edit `learner_analysis.md` and the TODO implementation in `learner_solution.ts`. Supplied node or priority-queue code is infrastructure, not an exercise.
 
-## Automated pass condition
+## Check and progression
 
-All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without dumping internal case details wholesale.
+`just check` always runs the TypeScript and registered lesson verifiers first. Their PASS or FAIL reflects code verification. With a configured AI provider, the agent then returns a separate analysis PASS or FAIL with feedback. It judges meaning rather than exact headings, keywords, or phrasing, and minor issues must still pass. The lesson advances when both verdicts pass. Without AI feedback, the deterministic verdict alone advances.
 
 The final verifier includes an adjacency-order counterexample for DFS discovery depth, a guarded 20,000-event covering-range case, and a 20,000-service route.
 
@@ -63,9 +59,9 @@ The final verifier includes an adjacency-order counterexample for DFS discovery 
 - Returning the first valid covering range without proving it is shortest.
 - Using depth-first discovery depth as an unweighted shortest-path guarantee.
 
-## Post-pass reflection
+## Optional follow-up
 
-After CODE VERIFIED, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Run `just check` again to advance, then consider this variation:
+After the lesson advances, consider this variation:
 
 > How would Part B change if connections had nonnegative travel times?
 

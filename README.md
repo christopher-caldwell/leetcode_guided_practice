@@ -9,9 +9,11 @@ The project contains 24 progressively checked lessons. The CLI tracks local prog
 - Node.js 22 or newer
 - pnpm 10 or newer
 - [just](https://github.com/casey/just)
-- Optional: an installed and authenticated Codex CLI for adaptive coaching
+- Optional: an installed and authenticated Codex CLI or Claude Code CLI for AI feedback
 
-No OpenAI API key or direct OpenAI API integration is used. When enabled, coaching invokes your existing authenticated `codex exec` CLI.
+No direct model API integration is used. AI feedback invokes the selected locally authenticated CLI.
+Claude support is experimental. Fresh supplemental-practice generation currently remains a separate,
+explicit Codex CLI operation.
 
 ## Start here
 
@@ -24,8 +26,11 @@ just status
 Then open the three paths printed by `just status`. For lesson 1 these are:
 
 - `lessons/01-linear-scan/instructions.md`
-- `lessons/01-linear-scan/analysis.md`
-- `lessons/01-linear-scan/solutions/typescript/solution.ts`
+- `lessons/01-linear-scan/learner_analysis.md`
+- `lessons/01-linear-scan/solutions/typescript/learner_solution.ts`
+
+`just bootstrap` creates each ignored learner file from the clean tracked starter beside it. It
+only creates missing files, so running it again never overwrites your work.
 
 Run your first check with:
 
@@ -33,14 +38,16 @@ Run your first check with:
 just check
 ```
 
-The initial failure is intentional: it identifies the first incomplete reasoning section rather than flooding you with implementation failures.
+Starter solutions intentionally fail their registered code checks. With no AI provider, passing those
+checks advances the lesson and the interview explanation remains self-assessed. With Codex or Claude
+configured, the selected agent also returns a structured semantic analysis verdict.
 
 ## Daily workflow
 
 ```bash
 just status       # See the current lesson and exact files to open
 just start        # Print those files and deliberately start timing when applicable
-just check        # Validate analysis evidence, code, contracts, and registered scaling checks
+just check        # Run deterministic checks, then optional structured AI assessment
 just hint         # Request one small nudge for blank or partial work
 just review       # Review queued work; optionally pass a lesson id
 just solution     # Explicitly reveal a reference without replacing your code
@@ -49,36 +56,56 @@ just solution     # Explicitly reveal a reference without replacing your code
 For every lesson:
 
 1. Read `instructions.md`.
-2. Replace the prompts in `analysis.md` with concise interview reasoning.
-3. Implement the focused TODO in `solutions/typescript/solution.ts`.
-4. Run `just check`.
-5. Use the failure category or `just hint` to make the next small adjustment.
-6. After `CODE VERIFIED`, complete the post-pass reflection.
-7. Run `just check` again to record the reflection and advance.
+2. Implement the focused TODO in `solutions/typescript/learner_solution.ts`.
+3. Run `just check`.
+4. Use the failure category or `just hint` to make the next small adjustment.
+5. Explain the contract, approach, correctness, and complexity in `learner_analysis.md` using your own words.
+6. Run `just check`; after code verification passes, the configured agent reads the lesson contract,
+   analysis, and solution together and returns an analysis pass or fail with feedback. Without an
+   agent, deterministic verification advances the lesson.
 
-`check` runs deterministic validation first. It distinguishes incomplete analysis evidence, TypeScript errors, correctness, edge cases, input-contract violations, complexity-sensitive behavior, and runtime failures. Analysis checks require concrete structure such as actual questions, Big-O bounds, and an invariant statement; they do not pretend to semantically grade prose. Post-pass reflection is a separate progression gate.
+`check` always runs deterministic code verification first. Its `PASS` and `FAIL` refer to types,
+correctness, edge cases, input contracts, complexity-sensitive behavior, and runtime execution. When
+AI feedback is enabled, the selected CLI returns `ANALYSIS PASS` or `ANALYSIS FAIL` plus feedback.
+The agent evaluates meaning rather than headings, keywords, connector words, or exact phrasing; minor
+imprecision and optional improvements must still pass. An AI failure can pause progression only when
+a supported provider is explicitly configured.
+
+All untouched lessons use the same short three-part analysis template. Existing work using an older,
+longer format remains valid because agent assessment is semantic rather than template-based.
 
 ## Coaching configuration
 
-External coaching is controlled solely by the presence of a supported provider:
+AI feedback is controlled solely by the selected provider:
 
 ```dotenv
-# Empty means no external process; static hints still work.
+# Empty means deterministic checks and static hints only.
 COACH_PROVIDER=
 
-# A nonempty supported value enables it.
+# Stable provider.
 COACH_PROVIDER=codex
+
+# Experimental provider.
+COACH_PROVIDER=claude
 ```
 
-Unsupported values fail immediately with a configuration error. There is no second boolean flag.
+Values are trimmed and case-insensitive. Any value other than `codex` or `claude` behaves like an
+empty value: no AI process runs, deterministic checks alone control progression, and static hints
+remain available. There is no second boolean flag.
 
-With Codex configured:
+This one setting controls hints, failed-attempt diagnoses, detailed rubric reviews, and the semantic
+analysis assessment after code passes. If a selected CLI is unavailable or returns invalid structured
+output, deterministic verification is retained and the lesson waits for a later assessment. Clear or
+change `COACH_PROVIDER` if you want deterministic-only progression.
 
-- `just hint` sends the current partial attempt for one deliberately small nudge.
-- Failed checks request diagnosis on attempts 1, 2, 3, 5, 8, 13, and so on.
-- Verified solutions request advisory feedback about correctness, complexity, clarity, and communication.
-- Codex runs read-only and ephemerally from an empty generated directory, receives an allowlisted environment, returns a constrained structured response, and cannot overwrite your code.
-- Invalid or unavailable external feedback falls back without changing deterministic pass/fail results.
+With a supported provider configured:
+
+- `just hint` sends the current partial attempt for a concrete hint that doubles in directness across repeated requests until capped.
+- Every failed check requests a diagnosis, with guidance increasing exponentially on consecutive attempts until capped.
+- `just review` requests advisory rubric feedback about correctness, complexity, clarity, and communication.
+- The agent runs non-interactively from an empty generated directory with tools disabled or read-only,
+  receives an allowlisted environment, returns a schema-validated response, and cannot overwrite your code.
+- Hint and diagnosis failures fall back safely; assessment failures retain the deterministic result.
 
 Read [docs/coaching.md](docs/coaching.md) for data flow, response contracts, troubleshooting, and adding another provider.
 
@@ -108,14 +135,26 @@ Read [docs/timer.md](docs/timer.md) before your first timed checkpoint. It docum
 
 Generated state lives under `.workshop/` and is ignored by Git. It contains:
 
-- Verification, reflection, pass, and attempt history
+- Verification, optional AI-analysis, pass, and attempt history
 - Hint and successful-diagnosis counts plus coaching reports
 - Stopwatch segments
 - Explicitly revealed reference solutions
 
-`just reset` removes that generated state only. It never rewrites `analysis.md`, `solution.ts`, tests, or any other learner-authored file. Use Git if you intentionally want to restore starter code.
+`just reset` removes that generated state only. It never rewrites `learner_analysis.md`,
+`learner_solution.ts`, tests, or any other learner-authored file. To start an exercise over,
+delete only its learner file and rerun `just bootstrap`; the tracked starter is never changed.
 
-When all lessons pass, `just status` becomes the final readiness assessment. “Unassisted” means zero hints, zero successful adaptive diagnoses, and no solution reveal. The report shows those assistance counts, attempts, completed duration versus target, reflection status, optional coach scores, outstanding revealed-solution reviews, and whether the agreed readiness target is met. Time remains evidence rather than a pass/fail gate.
+Curriculum learner files are ignored so a normal clone starts clean even after the repository
+owner has practiced. If you fork the workshop and want Git history for your own attempts, remove
+the two `/lessons/*/.../learner_*` rules from `.gitignore` (or add selected files with `git add -f`).
+This affects the current working tree; old solutions already present in earlier Git commits remain
+available in repository history.
+
+When all lessons pass, `just status` becomes the final readiness assessment. “Unassisted” means zero
+hints, zero successful adaptive diagnoses, and no solution reveal. The report shows those assistance
+counts, attempts, completed duration versus target, reasoning-assessment status, optional coach scores,
+and outstanding revealed-solution reviews. Assistance, time, and scores are evidence rather than
+pass/fail gates; completing the curriculum and clearing revealed-solution review debt meets the target.
 
 ## Curriculum
 
@@ -136,7 +175,7 @@ Concepts return under different surface stories. Checkpoint lesson manifests int
 
 ## Supplemental practice catalog
 
-After or alongside the progressive curriculum, use the validated 96-question catalog for grouped
+After or alongside the progressive curriculum, use the validated 104-question catalog for grouped
 transfer practice without changing lesson progression:
 
 ```bash
@@ -144,6 +183,7 @@ just practice groups
 just practice learn graph-search
 just practice                 # Readiness-aware blind prompt
 just practice start graph-01  # Record an attempt
+just practice fresh focus-04  # Ask Codex for a new presentation and numbered workspace
 just practice hint graph-01 1
 just practice done graph-01 4 # Complete with confidence 4/5
 just practice map graph-search
@@ -157,9 +197,14 @@ adapted, and deferred proposals.
 
 ## Reference-solution policy
 
-Complete solutions are not present as readable source in the ordinary lesson path. The packaged reference bundle is integrity-checked and materialized only when you explicitly run `just solution`. It appears under `.workshop/revealed/<lesson>/` and never overwrites your attempt.
+Complete solutions are not present in the tracked lesson starters. The packaged reference bundle is
+integrity-checked and materialized only when you explicitly run `just solution`. It appears under
+`.workshop/revealed/<lesson>/` and never overwrites your ignored learner attempt.
 
-Revealing a solution marks the lesson as review-required. You can still pass it, but `just status` keeps it in the review queue. With a coach configured, a successful structured review clears the marker. Offline, complete the post-pass reflection and run `just review <lesson-id>` to record a self-review without inventing model scores.
+Revealing a solution marks the lesson as review-required. You can still pass it, but `just status`
+keeps it in the review queue. With AI feedback configured, a successful structured review clears the
+marker. Otherwise, after deterministic verification, `just review <lesson-id>` records a self-assessed
+review without inventing rubric scores.
 
 ## Maintainer verification
 

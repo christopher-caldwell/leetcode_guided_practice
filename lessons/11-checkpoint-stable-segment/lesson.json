@@ -8,13 +8,13 @@
   "skills": ["mixed retrieval", "invariant-driven optimization"],
   "prerequisite": "Lessons 7–10. The relevant pattern is intentionally not announced.",
   "functionNames": ["longestStableSegment"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 40,
   "hints": [
-    "Define a candidate segment and the exact fact that can make it invalid as it grows.",
-    "What per-identifier information lets the opposite boundary restore validity incrementally?",
-    "Grow one boundary, maintain counts, and move the other boundary until the number of positive counts is allowed."
+    "Maintain a window containing at most allowedKinds distinct identifiers; adding a new right value can make the window invalid.",
+    "Track counts inside the window so moving the left boundary can remove an identifier exactly when its count reaches zero.",
+    "Expand right, shrink left while the distinct count is too large, and update the best length after validity is restored."
   ],
   "reviewOf": [7, 8, 9, 10]
 }

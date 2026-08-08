@@ -8,13 +8,13 @@
   "skills": ["mixed retrieval", "monotonic feasibility reasoning"],
   "prerequisite": "Lessons 12–15. The relevant pattern is intentionally not announced.",
   "functionNames": ["minimumProcessingRate"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 45,
   "hints": [
-    "For a proposed rate, can feasibility be evaluated without constructing a schedule?",
-    "As rate increases, describe how the truth of the feasibility predicate changes.",
-    "Search the ordered range of candidate rates for the first feasible value, using ceiling division per job."
+    "For a proposed rate, total required hours is the sum of ceil(job / rate) across all jobs.",
+    "Feasibility is monotonic: once a rate is fast enough, every larger rate is also fast enough. Binary-search that boundary.",
+    "Search positive rates from 1 through max(jobs), keeping a feasible midpoint as a candidate and continuing left."
   ],
   "reviewOf": [12, 13, 14, 15]
 }

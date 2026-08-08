@@ -1,4 +1,4 @@
-import { mkdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { loadLessons } from '../src/core/lessons.js'
@@ -24,8 +24,23 @@ const fixtures: KnownWrongFixture[] = [
     lessonId: '02-pair-sum-baseline',
     expectedCategory: 'correctness',
     source: `export function pairSumBaseline(values: number[], target: number): [number, number] | null {
-  for (let index = 1; index < values.length; index += 1) {
-    if (values[0]! + values[index]! === target) return [0, index]
+  for (let left = 0; left < Math.min(values.length, 1); left += 1) {
+    for (let right = left + 1; right < values.length; right += 1) {
+      if (values[left]! + values[right]! === target) return [left, right]
+    }
+  }
+  return null
+}`,
+  },
+  {
+    lessonId: '02-pair-sum-baseline',
+    expectedCategory: 'complexity',
+    source: `export function pairSumBaseline(values: number[], target: number): [number, number] | null {
+  const seen = new Map<number, number>()
+  for (let index = 0; index < values.length; index += 1) {
+    const earlier = seen.get(target - values[index]!)
+    if (earlier !== undefined) return [earlier, index]
+    seen.set(values[index]!, index)
   }
   return null
 }`,
@@ -43,12 +58,40 @@ const fixtures: KnownWrongFixture[] = [
 }`,
   },
   {
+    lessonId: '04-inventory-reconciliation',
+    expectedCategory: 'edge-case',
+    source: `export function sameInventory(first: string[], second: string[]): boolean {
+  const firstCounts = new Map<string, number>()
+  const secondCounts = new Map<string, number>()
+  for (const item of first) firstCounts.set(item, (firstCounts.get(item) ?? 0) + 1)
+  for (const item of second) secondCounts.set(item, (secondCounts.get(item) ?? 0) + 1)
+  for (const [item, count] of firstCounts) {
+    if (secondCounts.get(item) !== count) return false
+  }
+  return true
+}`,
+  },
+  {
+    lessonId: '04-inventory-reconciliation',
+    expectedCategory: 'complexity',
+    source: `export function sameInventory(first: string[], second: string[]): boolean {
+  return [...first].sort().join('|') === [...second].sort().join('|')
+}`,
+  },
+  {
     lessonId: '05-compact-sorted-identifiers',
     expectedCategory: 'complexity',
     source: `export function compactSortedIds(values: number[]): number {
   const distinct = [...new Set(values)]
   distinct.forEach((value, index) => (values[index] = value))
   return distinct.length
+}`,
+  },
+  {
+    lessonId: '06-checkpoint-nearby-events',
+    expectedCategory: 'correctness',
+    source: `export function hasNearbyRepeat(events: string[], maxDistance: number): boolean {
+  return events.some((event, index) => index > 0 && maxDistance > 0 && events[index - 1] === event)
 }`,
   },
   {
@@ -66,6 +109,49 @@ const fixtures: KnownWrongFixture[] = [
 }`,
   },
   {
+    lessonId: '08-longest-unique-event-run',
+    expectedCategory: 'correctness',
+    source: `export function longestUniqueRun(events: string[]): number {
+  const seen = new Set<string>()
+  for (const event of events) {
+    if (seen.has(event)) return seen.size
+    seen.add(event)
+  }
+  return seen.size
+}`,
+  },
+  {
+    lessonId: '09-balanced-delimiters',
+    expectedCategory: 'correctness',
+    source: `export function hasBalancedDelimiters(input: string): boolean {
+  return ['()', '[]', '{}'].every(([open, close]) =>
+    [...input].filter((value) => value === open).length ===
+    [...input].filter((value) => value === close).length)
+}`,
+  },
+  {
+    lessonId: '10-merge-sorted-streams',
+    expectedCategory: 'contract',
+    source: `export class ListNode {
+  constructor(public val: number, public next: ListNode | null = null) {}
+}
+export function mergeSortedStreams(first: ListNode | null, second: ListNode | null): ListNode | null {
+  const values: number[] = []
+  while (first) { values.push(first.val); first = first.next }
+  while (second) { values.push(second.val); second = second.next }
+  values.sort((left, right) => left - right)
+  return values.reduceRight<ListNode | null>((next, value) => new ListNode(value, next), null)
+}`,
+  },
+  {
+    lessonId: '11-checkpoint-stable-segment',
+    expectedCategory: 'correctness',
+    source: `export function longestStableSegment(events: string[], allowedKinds: number): number {
+  if (allowedKinds <= 0) return 0
+  return new Set(events).size <= allowedKinds ? events.length : allowedKinds
+}`,
+  },
+  {
     lessonId: '12-cyclic-dependency-chain',
     expectedCategory: 'complexity',
     source: `export class ListNode {
@@ -78,6 +164,27 @@ export function hasCycle(head: ListNode | null): boolean {
     seen.add(node)
   }
   return false
+}`,
+  },
+  {
+    lessonId: '13-exact-sorted-lookup',
+    expectedCategory: 'complexity',
+    source: `export function binarySearch(values: number[], target: number): number {
+  return values.indexOf(target)
+}`,
+  },
+  {
+    lessonId: '14-first-eligible-record',
+    expectedCategory: 'complexity',
+    source: `export function firstAtLeast(values: number[], threshold: number): number {
+  return values.findIndex((value) => value >= threshold)
+}`,
+  },
+  {
+    lessonId: '15-generate-flag-selections',
+    expectedCategory: 'correctness',
+    source: `export function generateSubsets(values: number[]): number[][] {
+  return [[], [...values]]
 }`,
   },
   {
@@ -130,6 +237,51 @@ export function levelOrder(root: TreeNode | null): number[][] {
 }`,
   },
   {
+    lessonId: '19-highest-priority-items',
+    expectedCategory: 'complexity',
+    source: `import { MinPriorityQueue } from './support.js'
+export function topKFrequent(values: number[], k: number): number[] {
+  const counts = new Map<number, number>()
+  for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1)
+  const queue = new MinPriorityQueue<number>()
+  for (const [value, frequency] of counts) queue.enqueue(value, frequency)
+  while (queue.size > k) queue.dequeue()
+  const result: number[] = []
+  while (queue.size > 0) result.push(queue.dequeue()!)
+  return result
+}`,
+  },
+  {
+    lessonId: '20-consolidate-schedule-windows',
+    expectedCategory: 'correctness',
+    source: `export type Window = [number, number]
+export function mergeWindows(windows: Window[]): Window[] {
+  const result = windows.map(([start, end]): Window => [start, end])
+  for (let index = 1; index < result.length; index += 1) {
+    const previous = result[index - 1]!
+    const current = result[index]!
+    if (current[0] <= previous[1]) previous[1] = Math.max(previous[1], current[1])
+  }
+  return result
+}`,
+  },
+  {
+    lessonId: '21-checkpoint-concurrent-rooms',
+    expectedCategory: 'edge-case',
+    source: `export type Meeting = [number, number]
+export function minimumConcurrentRooms(meetings: Meeting[]): number {
+  return meetings.length
+}`,
+  },
+  {
+    lessonId: '22-disconnected-service-groups',
+    expectedCategory: 'edge-case',
+    source: `export type Connection = [number, number]
+export function countServiceGroups(serviceCount: number, connections: Connection[]): number {
+  return serviceCount - connections.length
+}`,
+  },
+  {
     lessonId: '23-non-adjacent-value',
     expectedCategory: 'complexity',
     source: `export function maxNonAdjacentValue(values: number[]): number {
@@ -142,7 +294,7 @@ export function levelOrder(root: TreeNode | null): number[][] {
   },
   {
     lessonId: '24-final-interview-simulation',
-    expectedCategory: 'correctness',
+    expectedCategory: 'complexity',
     source: `export type Edge = [number, number]
 export function smallestCoveringRange(events: string[], required: string[]): [number, number] | null {
   if (required.length === 0) return null
@@ -157,6 +309,56 @@ export function smallestCoveringRange(events: string[], required: string[]): [nu
       if ([...need].every(([key, count]) => (seen.get(key) ?? 0) >= count)) {
         if (!best || right - left < best[1] - best[0]) best = [left, right]
         break
+      }
+    }
+  }
+  return best
+}
+export function shortestRoute(count: number, edges: Edge[], start: number, end: number): number {
+  if (start === end) return 0
+  const graph = Array.from({ length: count }, () => [] as number[])
+  for (const [left, right] of edges) { graph[left]!.push(right); graph[right]!.push(left) }
+  const queue: Array<[number, number]> = [[start, 0]]
+  const seen = new Set([start])
+  let read = 0
+  while (read < queue.length) {
+    const [node, distance] = queue[read++]!
+    for (const next of graph[node]!) {
+      if (seen.has(next)) continue
+      if (next === end) return distance + 1
+      seen.add(next)
+      queue.push([next, distance + 1])
+    }
+  }
+  return -1
+}`,
+  },
+  {
+    lessonId: '24-final-interview-simulation',
+    expectedCategory: 'correctness',
+    source: `export type Edge = [number, number]
+export function smallestCoveringRange(events: string[], required: string[]): [number, number] | null {
+  if (required.length === 0) return null
+  const needed = new Map<string, number>()
+  for (const event of required) needed.set(event, (needed.get(event) ?? 0) + 1)
+  const present = new Map<string, number>()
+  let matched = 0
+  let left = 0
+  let best: [number, number] | null = null
+  for (let right = 0; right < events.length; right += 1) {
+    const incoming = events[right]!
+    if (needed.has(incoming)) {
+      const count = (present.get(incoming) ?? 0) + 1
+      present.set(incoming, count)
+      if (count <= needed.get(incoming)!) matched += 1
+    }
+    while (matched === required.length) {
+      if (!best || right - left < best[1] - best[0]) best = [left, right]
+      const outgoing = events[left++]!
+      if (needed.has(outgoing)) {
+        const count = present.get(outgoing)! - 1
+        present.set(outgoing, count)
+        if (count < needed.get(outgoing)!) matched -= 1
       }
     }
   }
@@ -181,29 +383,43 @@ export function shortestRoute(count: number, edges: Edge[], start: number, end: 
 ]
 
 describe('known-wrong verifier regressions', () => {
-  it('rejects representative incomplete and wrong-complexity solutions through the real adapter', async () => {
-    const root = process.cwd()
-    const generated = path.join(
-      stateDirectory(root),
-      'generated',
-      `known-wrong-${process.pid}-${Date.now()}`,
-    )
-    const lessons = new Map((await loadLessons(root)).map((lesson) => [lesson.id, lesson]))
+  const cases = fixtures.map((fixture, index) => ({ ...fixture, fixtureNumber: index + 1 }))
 
-    try {
-      for (const fixture of fixtures) {
+  it.each(cases)(
+    'rejects $lessonId fixture $fixtureNumber through the real adapter',
+    async (fixture) => {
+      const root = process.cwd()
+      const generated = path.join(
+        stateDirectory(root),
+        'generated',
+        `known-wrong-${process.pid}-${fixture.fixtureNumber}-${Date.now()}`,
+      )
+      const lessons = new Map((await loadLessons(root)).map((lesson) => [lesson.id, lesson]))
+
+      try {
         const directory = path.join(generated, fixture.lessonId)
         const solutionPath = path.join(directory, 'solution.ts')
         const publicTestPath = path.join(directory, 'public.test.ts')
+        const lesson = lessons.get(fixture.lessonId)!
         await mkdir(directory, { recursive: true })
         await writeFile(solutionPath, `${fixture.source}\n`, 'utf8')
+        if (fixture.lessonId === '19-highest-priority-items') {
+          await writeFile(
+            path.join(directory, 'support.ts'),
+            await readFile(
+              path.join(lesson.directory, 'solutions', 'typescript', 'support.ts'),
+              'utf8',
+            ),
+            'utf8',
+          )
+        }
         await writeFile(
           publicTestPath,
           `import { describe, expect, it } from 'vitest'\n` +
             `describe('fixture import', () => { it('loads', () => expect(true).toBe(true)) })\n`,
           'utf8',
         )
-        const result = await checkTypeScript(root, lessons.get(fixture.lessonId)!, {
+        const result = await checkTypeScript(root, lesson, {
           solutionPath,
           publicTestPath,
           skipTypecheck: true,
@@ -214,9 +430,10 @@ describe('known-wrong verifier regressions', () => {
           result.failures.map((failure) => failure.category),
           fixture.lessonId,
         ).toContain(fixture.expectedCategory)
+      } finally {
+        await rm(generated, { recursive: true, force: true })
       }
-    } finally {
-      await rm(generated, { recursive: true, force: true })
-    }
-  }, 30_000)
+    },
+    30_000,
+  )
 })

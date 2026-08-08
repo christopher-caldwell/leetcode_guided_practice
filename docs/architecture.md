@@ -7,8 +7,9 @@ Justfile
   -> TypeScript CLI
       -> core lesson/state/timer services
       -> TypeScript verification adapter
-      -> optional CoachProvider
+      -> optional AI feedback provider
           -> Codex CLI adapter
+          -> experimental Claude Code CLI adapter
       -> packaged reference revealer
 ```
 
@@ -20,10 +21,12 @@ Each lesson is self-contained:
 lessons/<id>/
 ├── lesson.json
 ├── instructions.md
-├── analysis.md
+├── analysis.md                # tracked clean starter
+├── learner_analysis.md        # ignored working copy
 └── solutions/
     └── typescript/
-        ├── solution.ts
+        ├── solution.ts        # tracked clean starter
+        ├── learner_solution.ts # ignored working copy used by the runner
         ├── public.test.ts
         └── support.ts       # only where supplied infrastructure is needed
 ```
@@ -44,7 +47,6 @@ The runner itself is TypeScript because Node is already required for the initial
 
 - Manifest validation
 - Progress serialization
-- Analysis-evidence and post-pass-reflection validation
 - Stopwatch transitions
 - Readiness evidence calculation
 - Feedback persistence
@@ -67,13 +69,23 @@ A future language implementation should add its own verifier adapter and solutio
 
 ## Coaching boundary
 
-`src/providers/coach.ts` defines the provider-neutral port and normalized schemas. `src/providers/codex.ts` is one external-process adapter. Provider selection occurs in `src/providers/factory.ts`. The Codex process starts from an empty generated directory with an allowlisted environment rather than inheriting unrelated shell credentials.
+`src/providers/coach.ts` defines provider-neutral coaching and analysis-evaluator ports plus their
+normalized schemas. `src/providers/codex.ts` is the stable Codex external-process adapter;
+`src/providers/claude.ts` is the experimental Claude Code adapter. `src/providers/prompts.ts` keeps
+their grading and coaching instructions identical. Provider selection lives in
+`src/providers/factory.ts`. Both processes start from an empty generated directory with mutation
+tools disabled or read-only and an allowlisted environment rather than inheriting unrelated shell
+credentials. With no supported provider, deterministic verification alone advances progression.
 
 This boundary is independent of solution language: a future Rust verifier could still send source, reasoning, and normalized failures through the same coach port.
 
 ## Reference boundary
 
-Readable complete solutions are absent from lesson directories and runner source. `assets/reference-solutions.json` contains base64-packaged content with SHA-256 integrity hashes. Encoding is not claimed as encryption; its purpose is to keep solutions out of the ordinary browsing path, not defeat deliberate reverse engineering.
+Readable complete solutions are absent from tracked lesson starters and runner source. Ignored
+learner files are created locally by `just bootstrap`. `assets/reference-solutions.json` contains
+base64-packaged content with SHA-256 integrity hashes. Encoding is not claimed as encryption; its
+purpose is to keep solutions out of the ordinary browsing path, not defeat deliberate reverse
+engineering.
 
 `just solution` validates and materializes only the current lesson under `.workshop/revealed/`. It also copies supplied support code when necessary and marks the lesson for review.
 
@@ -91,4 +103,6 @@ All mutable runner state is under `.workshop/`:
 └── revealed/
 ```
 
-No reset operation writes to `lessons/`. Atomic state saves write a temporary file and rename it over `progress.json`.
+No reset operation writes to `lessons/`. Bootstrap only creates missing learner files from tracked
+starters; it never overwrites them. Atomic state saves write a temporary file and rename it over
+`progress.json`.

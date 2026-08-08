@@ -8,13 +8,13 @@
   "skills": ["two pointers", "in-place mutation", "write-boundary invariants"],
   "prerequisite": "Lessons 1–4 and array mutation semantics.",
   "functionNames": ["compactSortedIds"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 50,
   "hints": [
-    "Separate the position being inspected from the boundary of the valid output prefix.",
-    "What fact about the last written value lets sorted input identify a new value?",
-    "Advance a read position through input and a write position only when a new distinct value is found."
+    "Use one index to read every value and another index to mark where the next distinct value should be written.",
+    "Because the input is sorted, a value is new exactly when it differs from the last value written to the output prefix.",
+    "Advance the write index only for a new value, assign that value into the prefix, and return the final write length."
   ],
   "reviewOf": [1, 4]
 }

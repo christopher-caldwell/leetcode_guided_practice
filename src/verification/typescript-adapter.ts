@@ -36,7 +36,7 @@ export async function checkTypeScript(
   options: TypeScriptCheckOptions = {},
 ): Promise<CheckResult> {
   if (!options.skipTypecheck) {
-    const typecheck = await runProcess('pnpm', ['exec', 'tsc', '--noEmit'], {
+    const typecheck = await runProcess(projectExecutable(root, 'tsc'), ['--noEmit'], {
       cwd: root,
       environment: process.env,
       timeoutMs: TYPECHECK_TIMEOUT_MS,
@@ -76,16 +76,8 @@ export async function checkTypeScript(
   )
   const internalTest = 'src/verification/lesson-verifier.test.ts'
   const vitest = await runProcess(
-    'pnpm',
-    [
-      'exec',
-      'vitest',
-      'run',
-      publicTest,
-      internalTest,
-      '--reporter=json',
-      `--outputFile=${outputFile}`,
-    ],
+    projectExecutable(root, 'vitest'),
+    ['run', publicTest, internalTest, '--reporter=json', `--outputFile=${outputFile}`],
     {
       cwd: root,
       environment: {
@@ -126,6 +118,11 @@ export async function checkTypeScript(
     failures: failures.slice(0, 4),
     output: `${vitest.stdout}\n${vitest.stderr}`,
   }
+}
+
+function projectExecutable(root: string, name: string): string {
+  const executable = process.platform === 'win32' ? `${name}.cmd` : name
+  return path.join(root, 'node_modules', '.bin', executable)
 }
 
 function timeoutFailure(

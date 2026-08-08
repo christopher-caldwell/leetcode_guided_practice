@@ -8,13 +8,13 @@
   "skills": ["tree recursion", "depth-first search", "structural induction"],
   "prerequisite": "Recursion from Lesson 15. TreeNode is supplied.",
   "functionNames": ["maxDepth"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 55,
   "hints": [
-    "If each child could report its depth, what must the parent compute?",
-    "Choose a base-case depth that makes a leaf’s result follow naturally.",
-    "A nonempty node contributes one plus the larger depth reported by its children."
+    "The depth at a node is one plus the larger depth of its left and right children.",
+    "Use depth 0 for null, which makes a leaf evaluate naturally to 1.",
+    "Recursively compute both child depths and return 1 + max(leftDepth, rightDepth)."
   ],
   "reviewOf": [15]
 }

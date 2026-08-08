@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "groups": [
+    {
+      "id": "focused-interview-arrays",
+      "title": "Focused array and string interview drills",
+      "summary": "Recognition-first one-offs for the complete array and string problem shortlist identified for the current company interview.",
+      "recognition_signals": [
+        "The prompt asks for repeated lookup, a contiguous region, moving boundaries, locally ordered ranges, or a result accumulated during one or two scans.",
+        "A direct solution repeatedly searches or recomputes work that a lookup structure, monotonic pointer, sorted order, or compact running state can replace."
+      ],
+      "common_wrong_approaches": [
+        "Jumping to a memorized algorithm name before defining the brute-force search space makes state variables easy to misuse.",
+        "Storing every candidate pair, string, subarray, or merged prefix obscures the invariant and creates avoidable allocations or quadratic work."
+      ],
+      "problems": [
+        {
+          "id": "focus-01",
+          "origin": "FI1",
+          "title": "Mirror-Readable Message",
+          "primary_concept": "opposing two pointers",
+          "secondary_concepts": ["string normalization", "monotonic boundaries"],
+          "difficulty": "easy",
+          "statement": "A message is mirror-readable when its ASCII letters and digits read identically from left to right and right to left. Ignore every other character and letter case. Return whether a supplied message is mirror-readable.",
+          "constraints": [
+            "0 <= message.length <= 100000",
+            "Messages contain printable ASCII characters",
+            "Do not construct a normalized copy of the complete message"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "length": [0, 1, 100000],
+            "content": ["letters", "digits", "punctuation", "mixed-case"],
+            "result": [true, false]
+          },
+          "edge_cases": [
+            "empty message",
+            "message containing no letters or digits",
+            "case-only differences",
+            "mismatch near the center"
+          ],
+          "examples": [
+            {
+              "input": { "message": "A man, a plan, a canal: Panama" },
+              "output": true
+            },
+            { "input": { "message": "release car" }, "output": false }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "focus-02",
+          "origin": "FI2",
+          "title": "Best Contiguous Performance Run",
+          "primary_concept": "running best state",
+          "secondary_concepts": ["contiguous subarrays", "one-dimensional dynamic programming"],
+          "difficulty": "medium",
+          "statement": "Daily performance changes are recorded as a nonempty integer array. Return the greatest total change produced by one nonempty contiguous run of days.",
+          "constraints": [
+            "1 <= changes.length <= 100000",
+            "Every value and every possible contiguous sum is a safe integer",
+            "Do not mutate changes"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(1)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [1, 2, 10, 100000],
+            "values": ["all-negative", "all-positive", "mixed", "contains-zero"],
+            "best_position": ["start", "middle", "end", "complete-array"]
+          },
+          "edge_cases": [
+            "one value",
+            "all values negative",
+            "the best run begins after a large negative value",
+            "the complete input is optimal"
+          ],
+          "examples": [
+            { "input": { "changes": [-2, 1, -3, 4, -1, 2, 1, -5, 4] }, "output": 6 },
+            { "input": { "changes": [-4, -2, -7] }, "output": -2 }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "focus-03",
+          "origin": "FI3",
+          "title": "Peer Product Snapshot",
+          "primary_concept": "prefix and suffix products",
+          "secondary_concepts": ["output-buffer reuse", "division-free aggregation"],
+          "difficulty": "medium",
+          "statement": "For every position in an integer array, return the product of all values at the other positions. The value at the current position must be excluded by index, and division is not allowed.",
+          "constraints": [
+            "2 <= values.length <= 100000",
+            "Every required product is a safe integer",
+            "Do not mutate values and do not use division"
+          ],
+          "expected_complexity": {
+            "time": "O(n)",
+            "space": "O(1) auxiliary space excluding the returned array"
+          },
+          "answer_type": "values",
+          "generator_parameters": {
+            "length": [2, 3, 10, 100000],
+            "zeros": [0, 1, 2],
+            "signs": ["positive", "negative", "mixed"]
+          },
+          "edge_cases": ["two values", "one zero", "more than one zero", "negative values"],
+          "examples": [
+            { "input": { "values": [1, 2, 3, 4] }, "output": [24, 12, 8, 6] },
+            { "input": { "values": [-1, 1, 0, -3, 3] }, "output": [0, 0, 9, 0, 0] }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "focus-04",
+          "origin": "FI4",
+          "title": "Target Pair Positions",
+          "primary_concept": "complement lookup",
+          "secondary_concepts": ["hash maps", "distinct-index handling"],
+          "difficulty": "easy",
+          "statement": "Given integer readings and a target total, return the indices of two distinct positions whose values add to the target. Return null when no pair exists. When several pairs work, prefer the smallest second index and then the smallest first index.",
+          "constraints": [
+            "0 <= readings.length <= 100000",
+            "Every reading and the target are safe integers",
+            "Do not mutate readings"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "indices",
+          "generator_parameters": {
+            "length": [0, 1, 2, 100000],
+            "values": ["positive", "negative", "mixed", "duplicates"],
+            "solution": ["none", "early", "late", "multiple"]
+          },
+          "edge_cases": [
+            "empty or singleton input",
+            "duplicate values at different indices",
+            "negative values",
+            "no matching pair"
+          ],
+          "examples": [
+            { "input": { "readings": [2, 7, 11, 15], "target": 9 }, "output": [0, 1] },
+            { "input": { "readings": [3, 3], "target": 6 }, "output": [0, 1] }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "focus-05",
+          "origin": "FI5",
+          "title": "Repeated Reading Check",
+          "primary_concept": "set membership",
+          "secondary_concepts": ["early return", "stream processing"],
+          "difficulty": "easy",
+          "statement": "Return true when an integer reading occurs at more than one distinct position in an array. Return false when every reading is unique.",
+          "constraints": [
+            "0 <= readings.length <= 100000",
+            "Every reading is a safe integer",
+            "Do not mutate readings"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(n)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "length": [0, 1, 10, 100000],
+            "duplicate": ["none", "adjacent", "early", "late"]
+          },
+          "edge_cases": [
+            "empty input",
+            "one reading",
+            "first two readings match",
+            "duplicate occurs at the end"
+          ],
+          "examples": [
+            { "input": { "readings": [1, 2, 3, 1] }, "output": true },
+            { "input": { "readings": [1, 2, 3, 4] }, "output": false }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "focus-06",
+          "origin": "FI6",
+          "title": "Reordered Message Match",
+          "primary_concept": "frequency map",
+          "secondary_concepts": ["multiset equality", "early rejection"],
+          "difficulty": "easy",
+          "statement": "Two lowercase messages match when one can be rearranged to produce the other using every character exactly once. Return whether the supplied messages match.",
+          "constraints": [
+            "0 <= first.length, second.length <= 100000",
+            "Messages contain only lowercase English letters",
+            "Character multiplicity matters"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(k)" },
+          "answer_type": "boolean",
+          "generator_parameters": {
+            "length": [0, 1, 10, 100000],
+            "relationship": ["equal", "reordered", "missing-character", "wrong-count"]
+          },
+          "edge_cases": [
+            "both messages empty",
+            "different lengths",
+            "same characters with different counts",
+            "repeated characters"
+          ],
+          "examples": [
+            { "input": { "first": "listen", "second": "silent" }, "output": true },
+            { "input": { "first": "rat", "second": "car" }, "output": false }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "focus-07",
+          "origin": "FI7",
+          "title": "Longest Unique Message Run",
+          "primary_concept": "variable sliding window",
+          "secondary_concepts": ["last-seen indices", "window invariants"],
+          "difficulty": "medium",
+          "statement": "Return the length of the longest contiguous portion of a message that contains no repeated character. Character comparisons are case-sensitive.",
+          "constraints": [
+            "0 <= message.length <= 100000",
+            "Messages contain printable ASCII characters",
+            "The result is a length, not the substring"
+          ],
+          "expected_complexity": { "time": "O(n)", "space": "O(k)" },
+          "answer_type": "number",
+          "generator_parameters": {
+            "length": [0, 1, 10, 100000],
+            "repetition": ["none", "adjacent", "overlapping", "far-apart"]
+          },
+          "edge_cases": [
+            "empty message",
+            "all characters equal",
+            "a prior occurrence lies before the current left boundary",
+            "the complete message is unique"
+          ],
+          "examples": [
+            { "input": { "message": "abcabcbb" }, "output": 3 },
+            { "input": { "message": "abba" }, "output": 2 }
+          ],
+          "related_lessons": []
+        },
+        {
+          "id": "focus-08",
+          "origin": "FI8",
+          "title": "Consolidate Availability Windows",
+          "primary_concept": "sort then scan",
+          "secondary_concepts": ["interval merging", "output-tail invariant"],
+          "difficulty": "medium",
+          "statement": "Given unsorted closed availability intervals, merge every pair of intervals that overlaps or touches and return the consolidated intervals ordered by start time.",
+          "constraints": [
+            "0 <= intervals.length <= 100000",
+            "Every interval is a safe-integer tuple [start, end] with start <= end",
+            "Do not mutate the input array or its tuples"
+          ],
+          "expected_complexity": { "time": "O(n log n)", "space": "O(n)" },
+          "answer_type": "intervals",
+          "generator_parameters": {
+            "length": [0, 1, 10, 100000],
+            "layout": ["disjoint", "touching", "overlapping", "nested", "unsorted"]
+          },
+          "edge_cases": [
+            "empty input",
+            "one interval",
+            "one interval contains several others",
+            "intervals touch at one endpoint"
+          ],
+          "examples": [
+            {
+              "input": {
+                "intervals": [
+                  [1, 3],
+                  [2, 6],
+                  [8, 10],
+                  [15, 18]
+                ]
+              },
+              "output": [
+                [1, 6],
+                [8, 10],
+                [15, 18]
+              ]
+            },
+            {
+              "input": {
+                "intervals": [
+                  [1, 4],
+                  [4, 5]
+                ]
+              },
+              "output": [[1, 5]]
+            }
+          ],
+          "related_lessons": []
+        }
+      ]
+    }
+  ]
+}

@@ -103,6 +103,31 @@ export const PracticeContractMapSchema = z.record(
   z.string().min(20),
 )
 
+export const GeneratedPracticeVariantSchema = z.object({
+  title: z.string().min(8).max(100),
+  statement: z.string().min(60).max(800),
+  constraints: z.array(z.string().min(8).max(180)).min(3).max(6),
+  examples: z
+    .array(
+      z.object({
+        input: z.string().min(1).max(500),
+        output: z.string().min(1).max(500),
+        explanation: z.string().min(1).max(400).nullable(),
+      }),
+    )
+    .min(2)
+    .max(4),
+})
+
+export const GeneratedPracticeAttemptSchema = z.object({
+  version: z.literal(1),
+  base_problem_id: z.string().regex(/^[a-z]+-[0-9]{2}$/),
+  attempt_number: z.number().int().positive(),
+  generated_at: z.string().datetime(),
+  generator: z.literal('codex'),
+  variant: GeneratedPracticeVariantSchema,
+})
+
 export type PracticeProblem = z.infer<typeof PracticeProblemSchema>
 export type PracticeGroup = z.infer<typeof PracticeGroupSchema>
 export type PracticeCatalog = z.infer<typeof PracticeCatalogSchema>
@@ -111,3 +136,5 @@ export type CoreLessonMap = z.infer<typeof CoreLessonMapSchema>
 export type ConceptGuide = z.infer<typeof ConceptGuideSchema>
 export type ConceptGuideMap = z.infer<typeof ConceptGuideMapSchema>
 export type PracticeContractMap = z.infer<typeof PracticeContractMapSchema>
+export type GeneratedPracticeVariant = z.infer<typeof GeneratedPracticeVariantSchema>
+export type GeneratedPracticeAttempt = z.infer<typeof GeneratedPracticeAttemptSchema>

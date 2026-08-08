@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { loadConfig } from '../src/core/config.js'
-import { shouldCoachAttempt } from '../src/providers/factory.js'
+import { diagnosisGuidancePercent } from '../src/providers/guidance.js'
 
 describe('workshop configuration', () => {
   it('uses provider presence as the coaching switch', () => {
@@ -8,11 +8,13 @@ describe('workshop configuration', () => {
     expect(loadConfig({ COACH_PROVIDER: '   ' }).coachProvider).toBeUndefined()
     expect(loadConfig({ COACH_PROVIDER: 'codex' }).coachProvider).toBe('codex')
     expect(loadConfig({ COACH_PROVIDER: 'CODEX' }).coachProvider).toBe('codex')
+    expect(loadConfig({ COACH_PROVIDER: 'claude' }).coachProvider).toBe('claude')
+    expect(loadConfig({ COACH_PROVIDER: 'CLAUDE' }).coachProvider).toBe('claude')
   })
 
-  it('rejects every unsupported nonempty provider', () => {
-    expect(() => loadConfig({ COACH_PROVIDER: 'claude' })).toThrow(/Invalid workshop environment/)
-    expect(() => loadConfig({ COACH_PROVIDER: 'true' })).toThrow(/Invalid workshop environment/)
+  it('treats every unsupported provider value as disabled', () => {
+    expect(loadConfig({ COACH_PROVIDER: 'true' }).coachProvider).toBeUndefined()
+    expect(loadConfig({ COACH_PROVIDER: 'codxe' }).coachProvider).toBeUndefined()
   })
 
   it('validates timer modes and minute overrides', () => {
@@ -26,9 +28,9 @@ describe('workshop configuration', () => {
   })
 })
 
-describe('adaptive diagnosis schedule', () => {
-  it('coaches only on Fibonacci-numbered failed attempts', () => {
-    const coached = Array.from({ length: 15 }, (_, index) => index + 1).filter(shouldCoachAttempt)
-    expect(coached).toEqual([1, 2, 3, 5, 8, 13])
+describe('adaptive diagnosis guidance', () => {
+  it('increases on every attempt with exponential growth and a cap', () => {
+    const guidance = Array.from({ length: 8 }, (_, index) => diagnosisGuidancePercent(index + 1))
+    expect(guidance).toEqual([15, 26, 43, 74, 100, 100, 100, 100])
   })
 })

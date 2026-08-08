@@ -1,5 +1,6 @@
 import type { WorkshopConfig } from '../core/config.js'
-import type { CoachProvider } from './coach.js'
+import type { AnalysisEvaluator, CoachProvider } from './coach.js'
+import { ClaudeCoachProvider } from './claude.js'
 import { CodexCoachProvider } from './codex.js'
 
 export function createCoachProvider(root: string, config: WorkshopConfig): CoachProvider | null {
@@ -7,17 +8,21 @@ export function createCoachProvider(root: string, config: WorkshopConfig): Coach
   switch (config.coachProvider) {
     case 'codex':
       return new CodexCoachProvider(root)
+    case 'claude':
+      return new ClaudeCoachProvider(root)
   }
 }
 
-export function shouldCoachAttempt(attempt: number): boolean {
-  if (attempt < 1) return false
-  let previous = 1
-  let current = 1
-  while (current < attempt) {
-    const next = previous + current
-    previous = current
-    current = next
+export function createAnalysisEvaluator(
+  root: string,
+  config: WorkshopConfig,
+): AnalysisEvaluator | null {
+  switch (config.coachProvider) {
+    case 'codex':
+      return new CodexCoachProvider(root)
+    case 'claude':
+      return new ClaudeCoachProvider(root)
+    default:
+      return null
   }
-  return current === attempt
 }

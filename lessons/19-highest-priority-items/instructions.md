@@ -10,7 +10,7 @@ Frequency maps from Lesson 4. A tested MinPriorityQueue is supplied.
 
 ## Problem statement
 
-Return the k most frequent numbers in any order. At least k distinct numbers exist. Use the supplied priority queue and avoid sorting all distinct values.
+Return the k most frequent numbers in any order. At least k distinct numbers exist. Use the supplied priority queue, retain at most k candidates after each frequency is processed, avoid sorting all distinct values, and do not mutate the input.
 
 When frequencies tie at the kth cutoff, any k values whose frequencies are at least that cutoff are valid; output order does not matter.
 
@@ -24,37 +24,35 @@ When frequencies tie at the kth cutoff, any k values whose frequencies are at le
 - 1 <= values.length <= 100,000
 - 1 <= k <= number of distinct values
 - Values may be negative.
+- The priority queue may temporarily reach k + 1 entries before the least frequent candidate is evicted.
+- The input must remain unchanged.
 
-## Clarifying questions to consider
+## Contract checks
 
 - Does output order matter?
 - Can frequencies tie?
 - What does k bound: input values or distinct values?
 
-Write your actual assumptions and answers in `lessons/19-highest-priority-items/analysis.md` before coding.
+These are prompts, not required individual answers. In `lessons/19-highest-priority-items/learner_analysis.md`, record only a contract detail that affected your implementation.
 
 ## Expected workflow
 
-1. Restate the contract and walk through a small example.
-2. Propose a correct baseline, even if it is too expensive.
-3. Define `n` and analyze the baseline's time and auxiliary space.
-4. Identify the repeated or expensive operation.
-5. Derive an optimization and state its invariant.
-6. Implement only inside the TODO boundary.
-7. Run `just check`, inspect the failure category, and test your own edge cases.
-8. Explain why the final algorithm is correct and state its complexity.
+1. Read the contract and choose one representative edge case.
+2. Implement inside the TODO boundary.
+3. Run `just check`; PASS or FAIL reflects code verification only.
+4. Explain the solution in `learner_analysis.md`; after code passes, the configured AI provider evaluates the lesson contract, analysis, and solution. Without one, reasoning remains self-assessed.
 
 ## Editable files and TODO boundary
 
-- Reasoning: `lessons/19-highest-priority-items/analysis.md`
-- Implementation: `lessons/19-highest-priority-items/solutions/typescript/solution.ts`
+- Reasoning: `lessons/19-highest-priority-items/learner_analysis.md`
+- Implementation: `lessons/19-highest-priority-items/solutions/typescript/learner_solution.ts`
 - Visible examples: `lessons/19-highest-priority-items/solutions/typescript/public.test.ts`
 
-Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node or priority-queue code is infrastructure, not an exercise.
+Edit `learner_analysis.md` and the TODO implementation in `learner_solution.ts`. Supplied node or priority-queue code is infrastructure, not an exercise.
 
-## Automated pass condition
+## Check and progression
 
-All required analysis sections must contain your reasoning. The TypeScript project must type-check, public examples and internal deterministic cases must pass, the input contract must be preserved, and any complexity guard for this lesson must pass. Failure output labels the category without dumping internal case details wholesale.
+`just check` always runs the TypeScript and registered lesson verifiers first. Their PASS or FAIL reflects code verification. With a configured AI provider, the agent then returns a separate analysis PASS or FAIL with feedback. It judges meaning rather than exact headings, keywords, or phrasing, and minor issues must still pass. The lesson advances when both verdicts pass. Without AI feedback, the deterministic verdict alone advances.
 
 The verifier requires construction of the supplied `MinPriorityQueue`, rejects `.sort()`/`.toSorted()` inside `topKFrequent`, and exercises small k against many distinct values.
 
@@ -64,9 +62,9 @@ The verifier requires construction of the supplied `MinPriorityQueue`, rejects `
 - Keeping the least useful side of the priority queue.
 - Calling heap construction O(1) because its API is supplied.
 
-## Post-pass reflection
+## Optional follow-up
 
-After CODE VERIFIED, record what observation unlocked the efficient approach, which invariant you would say aloud, and what you would do differently on a fresh problem. Run `just check` again to advance, then consider this variation:
+After the lesson advances, consider this variation:
 
 > How would the tradeoff change if values arrived as an unbounded stream?
 

@@ -12,13 +12,13 @@
   ],
   "prerequisite": "Lessons 1–23. Relevant patterns are intentionally not announced.",
   "functionNames": ["smallestCoveringRange", "shortestRoute"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 75,
   "hints": [
-    "For each part, identify what changes incrementally as one frontier or boundary advances.",
-    "Part A needs a validity summary for a contiguous candidate; Part B needs exploration ordered by edge count.",
-    "Maintain required counts while contracting valid ranges; process graph layers in increasing distance while marking visited."
+    "Part A needs a variable-size window with required multiplicities; Part B needs breadth-first search because each edge has equal cost.",
+    "For Part A, count satisfied requirements while expanding and contracting a window. For Part B, process graph nodes in distance layers.",
+    "Part A records the shortest valid window while moving left; Part B marks nodes when enqueued and returns the first distance reaching the target."
   ],
   "reviewOf": [1, 3, 8, 18, 22, 23]
 }

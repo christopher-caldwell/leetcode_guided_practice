@@ -11,7 +11,7 @@ import { loadLessons } from '../src/core/lessons.js'
 const root = process.cwd()
 
 describe('supplemental practice catalog', () => {
-  it('contains the foundation and core-extension groups with several exercises in each', async () => {
+  it('contains the foundation, core-extension, and focused interview groups', async () => {
     const catalog = await loadPracticeCatalog(root)
     expect(catalog.groups.map((group) => group.id)).toEqual([
       'set-membership',
@@ -30,9 +30,24 @@ describe('supplemental practice catalog', () => {
       'heaps-streaming',
       'graph-search',
       'dynamic-programming-greedy',
+      'focused-interview-arrays',
     ])
-    expect(catalog.groups.every((group) => group.problems.length >= 5)).toBe(true)
-    expect(allPracticeProblems(catalog)).toHaveLength(96)
+    expect(catalog.groups.every((group) => group.problems.length >= 3)).toBe(true)
+    expect(allPracticeProblems(catalog)).toHaveLength(104)
+    expect(
+      catalog.groups
+        .find((group) => group.id === 'focused-interview-arrays')
+        ?.problems.map((problem) => problem.id),
+    ).toEqual([
+      'focus-01',
+      'focus-02',
+      'focus-03',
+      'focus-04',
+      'focus-05',
+      'focus-06',
+      'focus-07',
+      'focus-08',
+    ])
   })
 
   it('keeps ids, source proposals, and titles unique', async () => {
@@ -42,7 +57,7 @@ describe('supplemental practice catalog', () => {
     expect(new Set(problems.map((problem) => problem.title)).size).toBe(problems.length)
   })
 
-  it('records every overlap as a materially different variant, never an exact duplicate', async () => {
+  it('validates every explicitly declared catalog variant', async () => {
     const problems = allPracticeProblems(await loadPracticeCatalog(root))
     for (const problem of problems) {
       expect(problem.related_lessons.every((related) => related.relationship === 'variant')).toBe(

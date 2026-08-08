@@ -3,13 +3,40 @@ import os from 'node:os'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
+  AnalysisAssessmentResponseSchema,
   DiagnosisResponseSchema,
   HintResponseSchema,
   ReviewResponseSchema,
 } from '../src/providers/coach.js'
-import { coachEnvironment, CodexCoachProvider, parseCoachResponse } from '../src/providers/codex.js'
+import {
+  coachEnvironment,
+  codexExecutableCandidates,
+  CodexCoachProvider,
+  parseCoachResponse,
+} from '../src/providers/codex.js'
+import { ClaudeCoachProvider, parseClaudeResponse } from '../src/providers/claude.js'
 
 describe('normalized coaching responses', () => {
+  it('never substitutes a fallback for an explicitly selected executable', () => {
+    expect(codexExecutableCandidates('/tmp/fake-codex')).toEqual(['/tmp/fake-codex'])
+  })
+
+  it('accepts a yes-or-no analysis verdict with feedback in either case', () => {
+    expect(
+      AnalysisAssessmentResponseSchema.parse({
+        passed: true,
+        feedback: 'The core explanation is sound; tighten the auxiliary-space justification.',
+      }),
+    ).toBeTruthy()
+    expect(
+      AnalysisAssessmentResponseSchema.parse({
+        passed: false,
+        feedback: 'The approach is identified, but the stated runtime contradicts the loop.',
+      }),
+    ).toBeTruthy()
+    expect(() => AnalysisAssessmentResponseSchema.parse({ passed: true, feedback: '' })).toThrow()
+  })
+
   it('accepts bounded structured hints', () => {
     expect(
       HintResponseSchema.parse({
@@ -84,6 +111,7 @@ describe('normalized coaching responses', () => {
           reviewOf: [],
           directory: root,
         },
+        instructions: '# Example\n\nReturn the requested result.',
         source: 'throw new Error("TODO")',
         analysis: '# Analysis',
         attempts: 0,
@@ -148,6 +176,7 @@ writeFileSync(output, JSON.stringify({
           reviewOf: [],
           directory: root,
         },
+        instructions: '# Example\n\nReturn the requested result.',
         source: 'return false',
         analysis: '# Analysis',
         attempts: 1,
@@ -158,6 +187,72 @@ writeFileSync(output, JSON.stringify({
     } finally {
       if (previous === undefined) delete process.env.WORKSHOP_TEST_SECRET
       else process.env.WORKSHOP_TEST_SECRET = previous
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('parses Claude structured-output envelopes', () => {
+    const value = {
+      focus: 'Invariant',
+      hint: 'Track what remains true before each update.',
+      question: 'What does the retained state represent?',
+    }
+    expect(
+      parseClaudeResponse(HintResponseSchema, JSON.stringify({ structured_output: value })),
+    ).toEqual(value)
+    expect(
+      parseClaudeResponse(HintResponseSchema, JSON.stringify({ result: JSON.stringify(value) })),
+    ).toEqual(value)
+  })
+
+  it('invokes experimental Claude coaching with schema output and tools disabled', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'claude-coach-'))
+    const executable = path.join(root, 'fake-claude.mjs')
+    await writeFile(
+      executable,
+      `#!/usr/bin/env node
+const args = process.argv.slice(2)
+let prompt = ''
+for await (const chunk of process.stdin) prompt += chunk
+const toolsIndex = args.indexOf('--tools')
+const safe = args.includes('--json-schema') && toolsIndex >= 0 && args[toolsIndex + 1] === ''
+process.stdout.write(JSON.stringify({ structured_output: {
+  focus: safe && prompt.includes('LESSON INSTRUCTIONS') ? 'isolated' : 'unsafe',
+  hint: 'Inspect the deterministic boundary first.',
+  question: 'Which contract fact controls the next step?'
+}}))
+`,
+      'utf8',
+    )
+    await chmod(executable, 0o755)
+    try {
+      const result = await new ClaudeCoachProvider(root, executable).hint({
+        lesson: {
+          version: 1,
+          id: '01-example',
+          order: 1,
+          title: 'Example',
+          kind: 'lesson',
+          difficulty: 'foundation',
+          skills: ['reasoning'],
+          prerequisite: 'None',
+          functionNames: ['example'],
+          source: 'solutions/typescript/solution.ts',
+          publicTest: 'solutions/typescript/public.test.ts',
+          recommendedMinutes: 30,
+          hints: ['one', 'two', 'three'],
+          reviewOf: [],
+          directory: root,
+        },
+        instructions: '# Example\n\nReturn the requested result.',
+        source: 'return false',
+        analysis: '# Analysis',
+        attempts: 1,
+        hintsUsed: 0,
+        failures: [],
+      })
+      expect(result.focus).toBe('isolated')
+    } finally {
       await rm(root, { recursive: true, force: true })
     }
   })

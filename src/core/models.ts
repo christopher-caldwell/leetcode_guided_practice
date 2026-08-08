@@ -1,15 +1,5 @@
 import { z } from 'zod'
 
-export const analysisSections = [
-  'Clarifying questions',
-  'Examples and edge cases',
-  'Baseline approach',
-  'Cost analysis',
-  'Optimized approach',
-  'Invariant and correctness',
-  'Final complexity',
-] as const
-
 export const LessonManifestSchema = z.object({
   version: z.literal(1),
   id: z.string().regex(/^\d{2}-[a-z0-9-]+$/),

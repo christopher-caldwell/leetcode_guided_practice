@@ -7,6 +7,7 @@
   "scripts": {
     "workshop": "tsx src/cli/index.ts",
     "practice": "tsx src/practice/index.ts",
+    "bootstrap:learners": "tsx scripts/bootstrap-learners.ts",
     "test": "vitest run tests",
     "test:foundation": "vitest run tests",
     "test:lesson": "vitest run src/verification/lesson-verifier.test.ts",

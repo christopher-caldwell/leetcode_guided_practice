@@ -8,13 +8,13 @@
   "skills": ["brute-force baselines", "nested-loop cost", "distinct-index contracts"],
   "prerequisite": "Lesson 1 and the ability to trace a loop.",
   "functionNames": ["pairSumBaseline"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 40,
   "hints": [
-    "For a fixed first index, which later indices could form a distinct pair?",
-    "Draw the index-pair grid and cross out the diagonal and mirrored half.",
-    "Enumerate i from left to right and j only after i; return when nums[i] + nums[j] matches."
+    "For each index i, test it with every later index j so the two indices are distinct and each unordered pair is checked once.",
+    "Use nested loops with j starting at i + 1. The number of tested pairs grows quadratically.",
+    "Return [i, j] when nums[i] + nums[j] equals target; return null after every distinct pair has been tested."
   ],
   "reviewOf": [1]
 }
