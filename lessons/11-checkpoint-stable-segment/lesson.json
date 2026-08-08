@@ -8,7 +8,7 @@
   "skills": ["mixed retrieval", "invariant-driven optimization"],
   "prerequisite": "Lessons 7–10. The relevant pattern is intentionally not announced.",
   "functionNames": ["longestStableSegment"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 40,
   "hints": [

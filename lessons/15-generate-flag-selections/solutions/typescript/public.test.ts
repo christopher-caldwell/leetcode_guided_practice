@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generateSubsets } from './solution.js'
+import { generateSubsets } from './learner_solution.js'
 
 const normalized = (sets: number[][]): string[] =>
   sets.map((set) => [...set].sort((a, b) => a - b).join(',')).sort()

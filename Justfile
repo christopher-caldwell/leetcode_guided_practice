@@ -3,6 +3,7 @@ set dotenv-load := true
 # Install the pinned project dependencies.
 bootstrap:
     pnpm install --frozen-lockfile
+    pnpm bootstrap:learners
 
 # Show the current lesson, files, progress, coaching, and timer state.
 status:
@@ -12,7 +13,7 @@ status:
 start:
     pnpm workshop start
 
-# Verify the TypeScript solution, then request a semantic Codex analysis verdict.
+# Verify the solution, then request semantic feedback when an AI provider is configured.
 check:
     pnpm workshop check
 
@@ -28,7 +29,7 @@ review lesson="":
 solution:
     pnpm workshop solution
 
-# Learn, sample, and track supplemental practice without changing core lesson progress.
+# Learn, sample, generate fresh variants, and track practice without changing core progression.
 practice action="ready" target="" seed="":
     pnpm practice {{ action }} {{ target }} {{ seed }}
 

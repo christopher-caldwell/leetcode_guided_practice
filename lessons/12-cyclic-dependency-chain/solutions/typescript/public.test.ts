@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { hasCycle, ListNode } from './solution.js'
+import { hasCycle, ListNode } from './learner_solution.js'
 
 describe('hasCycle public examples', () => {
   it('detects a cycle', () => {

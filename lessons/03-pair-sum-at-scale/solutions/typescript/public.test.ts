@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pairSumAtScale } from './solution.js'
+import { pairSumAtScale } from './learner_solution.js'
 
 function expectValidPair(result: [number, number] | null, values: number[], target: number): void {
   expect(result).not.toBeNull()

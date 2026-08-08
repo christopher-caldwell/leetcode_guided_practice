@@ -8,7 +8,7 @@
   "skills": ["hash-map lookup", "complements", "time-space tradeoffs", "O(n) reasoning"],
   "prerequisite": "Lesson 2 and basic TypeScript Map usage.",
   "functionNames": ["pairSumAtScale"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 50,
   "hints": [

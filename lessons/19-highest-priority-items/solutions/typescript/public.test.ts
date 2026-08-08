@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { topKFrequent } from './solution.js'
+import { topKFrequent } from './learner_solution.js'
 
 describe('topKFrequent public examples', () => {
   it('returns the two most frequent values', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { compactSortedIds } from './solution.js'
+import { compactSortedIds } from './learner_solution.js'
 
 describe('compactSortedIds public examples', () => {
   it('writes unique values into the returned prefix', () => {

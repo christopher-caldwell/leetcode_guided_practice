@@ -47,10 +47,10 @@ describe('readiness evidence', () => {
     const evidence = assessReadiness(lessons, progress, { timerMode: 'checkpoints' })
     expect(evidence.unassistedCount).toBe(1)
     expect(evidence.finalUnassisted).toBe(true)
-    expect(evidence.targetMet).toBe(false)
+    expect(evidence.targetMet).toBe(true)
   })
 
-  it('keeps provider scores advisory while requiring final independence and cleared review debt', () => {
+  it('keeps provider scores and assistance advisory while requiring cleared review debt', () => {
     const progress = state()
     let evidence = assessReadiness(lessons, progress, { timerMode: 'checkpoints' })
     expect(evidence.targetMet).toBe(true)
@@ -64,7 +64,7 @@ describe('readiness evidence', () => {
     progress.lessons[lessons[2]!.id]!.solutionRevealedAt = passed
     evidence = assessReadiness(lessons, progress, { timerMode: 'checkpoints' })
     expect(evidence.finalUnassisted).toBe(false)
-    expect(evidence.targetMet).toBe(false)
+    expect(evidence.targetMet).toBe(true)
   })
 
   it('retains completed timer evidence without making time a correctness gate', () => {
@@ -91,14 +91,14 @@ describe('review selection', () => {
     expect(selectReviewLesson(lessons, progress, lessons[2]!.id)?.id).toBe(lessons[2]!.id)
   })
 
-  it('clears revealed-solution debt offline only after analysis notes are recorded', () => {
+  it('clears revealed-solution debt offline after deterministic verification', () => {
     const progress = state().lessons[lessons[0]!.id]!
     progress.reviewRequired = true
-    progress.reflectionCompletedAt = null
+    progress.verifiedAt = null
     expect(recordOfflineReview(progress)).toBe(false)
     expect(progress.reviewRequired).toBe(true)
 
-    progress.reflectionCompletedAt = passed
+    progress.verifiedAt = passed
     expect(recordOfflineReview(progress, new Date(passed))).toBe(true)
     expect(progress).toMatchObject({
       reviewRequired: false,

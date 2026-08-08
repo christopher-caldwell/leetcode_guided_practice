@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { hasNearbyRepeat } from './solution.js'
+import { hasNearbyRepeat } from './learner_solution.js'
 
 describe('hasNearbyRepeat public examples', () => {
   it('detects a repeat within the distance', () => {

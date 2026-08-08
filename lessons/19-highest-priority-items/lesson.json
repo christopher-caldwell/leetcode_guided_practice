@@ -8,7 +8,7 @@
   "skills": ["heaps", "priority queues", "top-k selection", "bounded retained state"],
   "prerequisite": "Frequency maps from Lesson 4. A tested MinPriorityQueue is supplied.",
   "functionNames": ["topKFrequent"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 70,
   "hints": [

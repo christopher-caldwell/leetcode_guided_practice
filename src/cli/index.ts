@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { loadConfig } from '../core/config.js'
 import { saveAnalysisAssessment, saveDiagnosis, saveReview } from '../core/feedback.js'
+import { LEARNER_ANALYSIS } from '../core/learner-files.js'
 import { currentLesson, loadLessons } from '../core/lessons.js'
 import type { CheckFailure, LessonManifest, WorkshopState } from '../core/models.js'
 import { assessReadiness } from '../core/readiness.js'
@@ -43,7 +44,7 @@ async function main(): Promise<void> {
   const lessons = await loadLessons(root)
   const state = await loadState(root, lessons)
   const provider = createCoachProvider(root, config)
-  const analysisEvaluator = createAnalysisEvaluator(root)
+  const analysisEvaluator = createAnalysisEvaluator(root, config)
 
   switch (command) {
     case 'status':
@@ -99,7 +100,7 @@ function showStatus(
   const progress = state.lessons[lesson.id]!
   console.log(`${colors.cyan('Current:')} ${lesson.order}. ${lesson.title} (${lesson.difficulty})`)
   console.log(`Instructions: ${relative(path.join(lesson.directory, 'instructions.md'))}`)
-  console.log(`Analysis:     ${relative(path.join(lesson.directory, 'analysis.md'))}`)
+  console.log(`Analysis:     ${relative(path.join(lesson.directory, LEARNER_ANALYSIS))}`)
   console.log(`Source:       ${relative(path.join(lesson.directory, lesson.source))}`)
   console.log(
     `Attempts: ${progress.attempts}; hints: ${progress.hintsUsed}; ` +
@@ -107,7 +108,7 @@ function showStatus(
   )
   if (progress.verifiedAt && !progress.passedAt) {
     console.log(
-      `${colors.yellow('WAITING')} Code passed; a passing Codex analysis assessment is required to advance.`,
+      `${colors.yellow('WAITING')} Code passed; the configured AI provider has not accepted the analysis yet.`,
     )
   }
   if (timerApplies(config, lesson)) {
@@ -128,12 +129,12 @@ async function startLesson(
   const lesson = requireCurrent(lessons, state)
   console.log(`Lesson ${lesson.order}: ${lesson.title}`)
   console.log(`Open ${relative(path.join(lesson.directory, 'instructions.md'))}`)
-  console.log(`Then edit ${relative(path.join(lesson.directory, 'analysis.md'))}`)
+  console.log(`Then edit ${relative(path.join(lesson.directory, LEARNER_ANALYSIS))}`)
   console.log(`and ${relative(path.join(lesson.directory, lesson.source))}`)
   const progress = state.lessons[lesson.id]!
   if (progress.verifiedAt) {
     console.log(
-      'Implementation is already verified; run `just check` to request a new Codex analysis assessment.',
+      'Implementation is already verified; run `just check` to request a new AI analysis assessment.',
     )
     return
   }
@@ -154,7 +155,7 @@ async function checkLesson(
   lessons: LessonManifest[],
   state: WorkshopState,
   provider: CoachProvider | null,
-  analysisEvaluator: AnalysisEvaluator,
+  analysisEvaluator: AnalysisEvaluator | null,
 ): Promise<void> {
   const lesson = requireCurrent(lessons, state)
   const progress = state.lessons[lesson.id]!
@@ -203,6 +204,16 @@ async function checkLesson(
     `${colors.green('PASS')} — types and this lesson's correctness, contract, and complexity checks passed.`,
   )
 
+  if (!analysisEvaluator) {
+    progress.passedAt = new Date().toISOString()
+    await saveState(root, state)
+    console.log(
+      `${colors.green('ADVANCED')} — deterministic checks passed; interview reasoning remains self-assessed because AI feedback is disabled.`,
+    )
+    printNextLesson(lessons, state)
+    return
+  }
+
   console.log(`Requesting analysis assessment from ${analysisEvaluator.name}…`)
   let assessment: AnalysisAssessmentResponse
   try {
@@ -211,13 +222,15 @@ async function checkLesson(
     )
   } catch (error) {
     console.log(`${colors.yellow('ANALYSIS UNAVAILABLE')} — ${message(error)}`)
-    console.log('Code verification is retained; progression is waiting for a Codex verdict.')
+    console.log(
+      'Code verification is retained; progression is waiting for the configured provider.',
+    )
     process.exitCode = 1
     return
   }
 
   const assessmentPath = await saveAnalysisAssessment(root, lesson.id, assessment)
-  printAnalysisAssessment(assessment)
+  printAnalysisAssessment(analysisEvaluator.name, assessment)
   console.log(`Saved: ${relative(assessmentPath)}`)
   if (!assessment.passed) {
     console.log('Revise the analysis in your own words, then run `just check` again.')
@@ -230,18 +243,9 @@ async function checkLesson(
   progress.passedAt = completedAt
   await saveState(root, state)
   console.log(
-    `${colors.green('ADVANCED')} — code verification and Codex analysis assessment passed.`,
+    `${colors.green('ADVANCED')} — code verification and ${analysisEvaluator.name} analysis assessment passed.`,
   )
-
-  const next = getCurrent(lessons, state)
-  if (next) {
-    console.log(`Next: ${next.order}. ${next.title}`)
-    console.log(`Open ${relative(path.join(next.directory, 'instructions.md'))}`)
-  } else {
-    console.log(
-      'All lessons passed. Use `just status` to review completion and review-queue state.',
-    )
-  }
+  printNextLesson(lessons, state)
 }
 
 async function hint(
@@ -296,13 +300,6 @@ async function review(
   const progress = state.lessons[lesson.id]!
 
   if (!provider) {
-    if (!progress.reflectionCompletedAt) {
-      console.log(
-        `${colors.yellow('WAITING')} Earn a passing Codex analysis verdict with \`just check\` before clearing review debt.`,
-      )
-      process.exitCode = 1
-      return
-    }
     recordOfflineReview(progress)
     await saveState(root, state)
     console.log(`Offline analysis review recorded for ${lesson.id}.`)
@@ -391,11 +388,12 @@ async function coachContext(
   hintsUsed: number,
   failures: CheckFailure[],
 ): Promise<CoachContext> {
-  const [source, analysis] = await Promise.all([
+  const [instructions, source, analysis] = await Promise.all([
+    readFile(path.join(lesson.directory, 'instructions.md'), 'utf8'),
     readFile(path.join(lesson.directory, lesson.source), 'utf8'),
-    readFile(path.join(lesson.directory, 'analysis.md'), 'utf8'),
+    readFile(path.join(lesson.directory, LEARNER_ANALYSIS), 'utf8'),
   ])
-  return { lesson, source, analysis, attempts, hintsUsed, failures }
+  return { lesson, instructions, source, analysis, attempts, hintsUsed, failures }
 }
 
 async function saveHint(
@@ -443,13 +441,23 @@ function printDiagnosis(result: Awaited<ReturnType<CoachProvider['diagnose']>>):
   console.log(`${colors.cyan('Question:')} ${result.question}`)
 }
 
-function printAnalysisAssessment(result: AnalysisAssessmentResponse): void {
+function printAnalysisAssessment(providerName: string, result: AnalysisAssessmentResponse): void {
   console.log(
-    `\n${result.passed ? colors.green('ANALYSIS PASS') : colors.red('ANALYSIS FAIL')} — Codex ${
+    `\n${result.passed ? colors.green('ANALYSIS PASS') : colors.red('ANALYSIS FAIL')} — ${providerName} ${
       result.passed ? 'accepted' : 'did not accept'
     } the interview explanation.`,
   )
   console.log(`${colors.cyan('Feedback:')} ${result.feedback}`)
+}
+
+function printNextLesson(lessons: LessonManifest[], state: WorkshopState): void {
+  const next = getCurrent(lessons, state)
+  if (next) {
+    console.log(`Next: ${next.order}. ${next.title}`)
+    console.log(`Open ${relative(path.join(next.directory, 'instructions.md'))}`)
+    return
+  }
+  console.log('All lessons passed. Use `just status` to review completion and review-queue state.')
 }
 
 function printReview(result: Awaited<ReturnType<CoachProvider['review']>>): void {
@@ -494,7 +502,7 @@ function printReadiness(
     console.log(
       `- ${simulation.id} (${simulation.title}): ${simulation.unassisted ? 'unassisted' : assistance.join(', ') || 'assisted'}; ` +
         `${simulation.attempts} attempt(s); ${timer}; ${review}; ` +
-        `analysis notes ${simulation.reflectionCompleted ? 'complete' : 'missing'}`,
+        `reasoning ${simulation.reflectionCompleted ? 'AI-assessed' : 'self-assessed'}`,
     )
   }
   console.log(
@@ -508,9 +516,7 @@ function printReadiness(
   }
   console.log(`Readiness target: ${evidence.targetMet ? 'MET' : 'NOT YET MET'}`)
   if (!evidence.targetMet) {
-    console.log(
-      'Complete the final and at least two mixed simulations without hints, diagnoses, or solution reveal, then clear any review debt.',
-    )
+    console.log('Complete the curriculum and clear any revealed-solution review debt.')
   }
 }
 

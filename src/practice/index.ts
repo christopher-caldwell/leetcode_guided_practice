@@ -20,7 +20,11 @@ import {
   type PracticeProgress,
 } from './progress.js'
 import { readyPracticeProblems } from './readiness.js'
+import { CodexPracticeGenerator } from './generator.js'
 import {
+  freshPracticeWorkspacePaths,
+  nextFreshPracticeAttemptNumber,
+  prepareFreshPracticeWorkspace,
   preparePracticeWorkspace,
   practiceWorkspaceExists,
   practiceWorkspacePaths,
@@ -33,6 +37,7 @@ import type {
   PracticeContractMap,
   PracticeGroup,
   PracticeProblem,
+  GeneratedPracticeVariant,
 } from './models.js'
 
 const root = process.cwd()
@@ -126,12 +131,40 @@ async function main(): Promise<void> {
       console.log(`Type-check with: just practice check ${problem.id}`)
       return
     }
+    case 'fresh': {
+      const problem = requireProblem(catalog, process.argv[3])
+      const contract = requireContract(practiceContracts, problem.id)
+      const attemptNumber = await nextFreshPracticeAttemptNumber(root, problem.id)
+      console.log(`Generating fresh ${problem.id} presentation with Codex…`)
+      const generated = await new CodexPracticeGenerator(root).generate(problem, contract)
+      const workspace = await prepareFreshPracticeWorkspace(
+        root,
+        problem,
+        contract,
+        attemptNumber,
+        generated,
+      )
+      recordPracticeAttempt(practiceProgress, problem.id)
+      await savePracticeProgress(root, practiceProgress)
+      printGeneratedPrompt(generated, contract, problem.id, attemptNumber)
+      console.log(`\nFresh attempt ${attemptNumber} created:`)
+      console.log(`Prompt:   ${path.relative(root, workspace.prompt)}`)
+      console.log(`Analysis: ${path.relative(root, workspace.analysis)}`)
+      console.log(`Solution: ${path.relative(root, workspace.solution)}`)
+      console.log(`Type-check with: just practice check ${problem.id} ${attemptNumber}`)
+      return
+    }
     case 'check': {
       const problem = requireProblem(catalog, process.argv[3])
-      const workspace = practiceWorkspacePaths(root, problem.id)
+      const rawAttempt = process.argv[4]
+      const workspace = rawAttempt
+        ? freshPracticeWorkspacePaths(root, problem.id, parseAttemptNumber(rawAttempt))
+        : practiceWorkspacePaths(root, problem.id)
       if (!(await practiceWorkspaceExists(workspace))) {
         throw new Error(
-          `No workspace exists for ${problem.id}. Run \`just practice start ${problem.id}\`.`,
+          rawAttempt
+            ? `No fresh workspace exists for ${problem.id} attempt ${rawAttempt}.`
+            : `No workspace exists for ${problem.id}. Run \`just practice start ${problem.id}\` or \`just practice fresh ${problem.id}\`.`,
         )
       }
       const result = await runProcess(
@@ -147,7 +180,7 @@ async function main(): Promise<void> {
         return
       }
       console.log(
-        `${problem.id} TYPECHECKED — this confirms the contract, not algorithm correctness.`,
+        `${problem.id}${rawAttempt ? ` attempt ${rawAttempt}` : ''} TYPECHECKED — this confirms the contract, not algorithm correctness.`,
       )
       return
     }
@@ -171,7 +204,7 @@ async function main(): Promise<void> {
       return
     default:
       throw new Error(
-        'Use groups, list [group], map [group], learn <group|id>, hint <id> [1-3], show <id>, sample [group] [seed], ready [group] [seed], start <id>, check <id>, done <id> <1-5>, progress [group], or reveal <id>.',
+        'Use groups, list [group], map [group], learn <group|id>, hint <id> [1-3], show <id>, sample [group] [seed], ready [group] [seed], start <id>, fresh <id>, check <id> [attempt], done <id> <1-5>, progress [group], or reveal <id>.',
       )
   }
 }
@@ -244,6 +277,28 @@ function printPrompt(problem: PracticeProblem, contract: string): void {
   }
   console.log(`\nCatalog id: ${problem.id}`)
   console.log(`After your attempt: just practice reveal ${problem.id}`)
+}
+
+function printGeneratedPrompt(
+  generated: GeneratedPracticeVariant,
+  contract: string,
+  problemId: string,
+  attemptNumber: number,
+): void {
+  console.log(`${generated.title}\n`)
+  console.log(generated.statement)
+  console.log(`\nTypeScript contract\n${contract}`)
+  console.log('\nConstraints')
+  for (const constraint of generated.constraints) console.log(`- ${constraint}`)
+  console.log('\nExamples')
+  for (const example of generated.examples) {
+    console.log(`Input:  ${example.input}`)
+    console.log(`Output: ${example.output}`)
+    if (example.explanation) console.log(`Why:    ${example.explanation}`)
+  }
+  console.log(`\nCatalog id: ${problemId}`)
+  console.log(`Fresh attempt: ${attemptNumber}`)
+  console.log(`After your attempt: just practice reveal ${problemId}`)
 }
 
 function printReveal(
@@ -323,6 +378,14 @@ function parseConfidence(raw?: string): number {
   return confidence
 }
 
+function parseAttemptNumber(raw: string): number {
+  const attempt = Number(raw)
+  if (!Number.isInteger(attempt) || attempt < 1) {
+    throw new Error('Fresh attempt number must be a positive integer.')
+  }
+  return attempt
+}
+
 function printPracticeProgress(
   catalog: PracticeCatalog,
   progress: PracticeProgress,
@@ -330,12 +393,17 @@ function printPracticeProgress(
 ): void {
   const problems = problemsInGroup(catalog, groupId)
   const attempted = problems.filter((problem) => (progress.problems[problem.id]?.attempts ?? 0) > 0)
+  const totalAttempts = problems.reduce(
+    (total, problem) => total + (progress.problems[problem.id]?.attempts ?? 0),
+    0,
+  )
   const completed = problems.filter((problem) => progress.problems[problem.id]?.completedAt)
   const confidences = completed
     .map((problem) => progress.problems[problem.id]?.confidence)
     .filter((value): value is number => value !== null && value !== undefined)
   console.log(`Practice progress: ${completed.length}/${problems.length} complete`)
-  console.log(`Attempted: ${attempted.length}`)
+  console.log(`Attempted problems: ${attempted.length}`)
+  console.log(`Recorded attempts: ${totalAttempts}`)
   if (confidences.length > 0) {
     const average = confidences.reduce((sum, value) => sum + value, 0) / confidences.length
     console.log(`Average confidence: ${average.toFixed(1)}/5`)

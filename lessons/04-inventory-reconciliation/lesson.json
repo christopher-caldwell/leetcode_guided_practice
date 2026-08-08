@@ -8,7 +8,7 @@
   "skills": ["frequency maps", "multiset equality", "early rejection"],
   "prerequisite": "Lesson 3 and TypeScript Map iteration.",
   "functionNames": ["sameInventory"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 45,
   "hints": [

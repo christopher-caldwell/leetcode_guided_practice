@@ -8,7 +8,7 @@
   "skills": ["dynamic programming", "state transitions", "space optimization"],
   "prerequisite": "Baseline decomposition and comfort with array iteration.",
   "functionNames": ["maxNonAdjacentValue"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 75,
   "hints": [

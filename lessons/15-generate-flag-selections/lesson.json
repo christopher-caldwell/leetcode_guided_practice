@@ -8,7 +8,7 @@
   "skills": ["recursion", "backtracking", "decision trees", "state restoration"],
   "prerequisite": "Basic recursion and array copying.",
   "functionNames": ["generateSubsets"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 70,
   "hints": [

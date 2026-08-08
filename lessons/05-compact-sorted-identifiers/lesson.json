@@ -8,7 +8,7 @@
   "skills": ["two pointers", "in-place mutation", "write-boundary invariants"],
   "prerequisite": "Lessons 1–4 and array mutation semantics.",
   "functionNames": ["compactSortedIds"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 50,
   "hints": [

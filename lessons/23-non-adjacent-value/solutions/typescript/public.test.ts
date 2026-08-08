@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { maxNonAdjacentValue } from './solution.js'
+import { maxNonAdjacentValue } from './learner_solution.js'
 
 describe('maxNonAdjacentValue public examples', () => {
   it('chooses the best non-adjacent combination', () => {

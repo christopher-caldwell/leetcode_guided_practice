@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findFirstIndex } from './solution.js'
+import { findFirstIndex } from './learner_solution.js'
 
 describe('findFirstIndex public examples', () => {
   it('returns the first matching index', () => {

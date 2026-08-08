@@ -34,9 +34,6 @@ export async function loadState(root: string, lessons: LessonManifest[]): Promis
     state.lessons[lesson.id] ??= newLessonProgress()
     const progress = state.lessons[lesson.id]!
     if (progress.passedAt && !progress.verifiedAt) progress.verifiedAt = progress.passedAt
-    if (progress.passedAt && !progress.reflectionCompletedAt) {
-      progress.reflectionCompletedAt = progress.passedAt
-    }
   }
   return state
 }

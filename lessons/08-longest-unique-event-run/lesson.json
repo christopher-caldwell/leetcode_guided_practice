@@ -8,7 +8,7 @@
   "skills": ["variable sliding windows", "window invariants", "last-seen information"],
   "prerequisite": "Lessons 3, 6, and 7.",
   "functionNames": ["longestUniqueRun"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 65,
   "hints": [

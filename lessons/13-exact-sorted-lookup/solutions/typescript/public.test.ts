@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { binarySearch } from './solution.js'
+import { binarySearch } from './learner_solution.js'
 
 describe('binarySearch public examples', () => {
   it('finds an exact value', () => {

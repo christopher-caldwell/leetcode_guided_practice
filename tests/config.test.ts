@@ -8,11 +8,13 @@ describe('workshop configuration', () => {
     expect(loadConfig({ COACH_PROVIDER: '   ' }).coachProvider).toBeUndefined()
     expect(loadConfig({ COACH_PROVIDER: 'codex' }).coachProvider).toBe('codex')
     expect(loadConfig({ COACH_PROVIDER: 'CODEX' }).coachProvider).toBe('codex')
+    expect(loadConfig({ COACH_PROVIDER: 'claude' }).coachProvider).toBe('claude')
+    expect(loadConfig({ COACH_PROVIDER: 'CLAUDE' }).coachProvider).toBe('claude')
   })
 
-  it('rejects every unsupported nonempty provider', () => {
-    expect(() => loadConfig({ COACH_PROVIDER: 'claude' })).toThrow(/Invalid workshop environment/)
-    expect(() => loadConfig({ COACH_PROVIDER: 'true' })).toThrow(/Invalid workshop environment/)
+  it('treats every unsupported provider value as disabled', () => {
+    expect(loadConfig({ COACH_PROVIDER: 'true' }).coachProvider).toBeUndefined()
+    expect(loadConfig({ COACH_PROVIDER: 'codxe' }).coachProvider).toBeUndefined()
   })
 
   it('validates timer modes and minute overrides', () => {

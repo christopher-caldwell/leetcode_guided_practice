@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { longestStableSegment } from './solution.js'
+import { longestStableSegment } from './learner_solution.js'
 
 describe('longestStableSegment public examples', () => {
   it('finds the longest permitted segment', () => {

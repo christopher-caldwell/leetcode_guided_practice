@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mergeWindows } from './solution.js'
+import { mergeWindows } from './learner_solution.js'
 
 describe('mergeWindows public examples', () => {
   it('merges overlapping windows', () => {

@@ -8,7 +8,7 @@
   "skills": ["binary search", "search intervals", "logarithmic complexity"],
   "prerequisite": "Array indexing and explicit loop invariants.",
   "functionNames": ["binarySearch"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 55,
   "hints": [

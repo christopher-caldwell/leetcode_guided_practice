@@ -8,7 +8,7 @@
   "skills": ["linked-list traversal", "pointer invariants", "sentinel nodes"],
   "prerequisite": "Two-pointer reasoning from Lesson 5. ListNode is supplied.",
   "functionNames": ["mergeSortedStreams"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 65,
   "hints": [

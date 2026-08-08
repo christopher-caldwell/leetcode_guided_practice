@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { hasBalancedDelimiters } from './solution.js'
+import { hasBalancedDelimiters } from './learner_solution.js'
 
 describe('hasBalancedDelimiters public examples', () => {
   it('accepts properly nested delimiters', () => {

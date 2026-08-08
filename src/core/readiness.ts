@@ -72,6 +72,7 @@ export function assessReadiness(
     acceptableReviewCount,
     outstandingReviewIds,
     finalUnassisted,
-    targetMet: unassistedCount >= 2 && finalUnassisted && outstandingReviewIds.length === 0,
+    targetMet:
+      simulations.every((simulation) => simulation.passed) && outstandingReviewIds.length === 0,
   }
 }

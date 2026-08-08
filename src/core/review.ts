@@ -22,7 +22,7 @@ export function selectReviewLesson(
 }
 
 export function recordOfflineReview(progress: LessonProgress, now = new Date()): boolean {
-  if (!progress.reflectionCompletedAt) return false
+  if (!progress.verifiedAt) return false
   progress.offlineReviewCompletedAt = now.toISOString()
   progress.reviewRequired = false
   return true

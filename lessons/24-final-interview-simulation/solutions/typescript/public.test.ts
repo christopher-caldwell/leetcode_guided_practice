@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { shortestRoute, smallestCoveringRange } from './solution.js'
+import { shortestRoute, smallestCoveringRange } from './learner_solution.js'
 
 describe('final simulation public examples', () => {
   it('finds the smallest covering event range', () => {

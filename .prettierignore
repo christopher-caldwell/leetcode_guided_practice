@@ -3,5 +3,5 @@ dist
 .workshop
 assets/reference-solutions.json
 leetcode-interview-prep-project-prompt.md
-lessons/*/analysis.md
-lessons/*/solutions/*/solution.*
+lessons/*/learner_analysis.md
+lessons/*/solutions/*/learner_solution.*

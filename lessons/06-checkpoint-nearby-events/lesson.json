@@ -8,7 +8,7 @@
   "skills": ["mixed retrieval", "constraint-driven data-structure selection"],
   "prerequisite": "Lessons 1–5. The relevant pattern is intentionally not announced.",
   "functionNames": ["hasNearbyRepeat"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 30,
   "hints": [

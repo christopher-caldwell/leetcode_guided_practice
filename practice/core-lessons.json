@@ -745,5 +745,61 @@
       "relationship": "reinforces",
       "connection": "Uses the same two-state rolling optimization with a different transition objective."
     }
+  ],
+  "focus-01": [
+    {
+      "lesson_id": "05-compact-sorted-identifiers",
+      "relationship": "extends",
+      "connection": "Changes same-direction write and read boundaries into opposing boundaries that skip irrelevant characters."
+    }
+  ],
+  "focus-02": [
+    {
+      "lesson_id": "01-linear-scan",
+      "relationship": "extends",
+      "connection": "Retains a single forward scan while adding separate state for the best run ending here and the best run anywhere."
+    }
+  ],
+  "focus-03": [
+    {
+      "lesson_id": "07-best-reporting-period",
+      "relationship": "extends",
+      "connection": "Generalizes incremental aggregation into left-to-right and right-to-left passes whose products meet at each index."
+    }
+  ],
+  "focus-04": [
+    {
+      "lesson_id": "03-pair-sum-at-scale",
+      "relationship": "reinforces",
+      "connection": "Provides a direct one-off repetition of complement lookup with distinct indices and duplicate values."
+    }
+  ],
+  "focus-05": [
+    {
+      "lesson_id": "06-checkpoint-nearby-events",
+      "relationship": "reinforces",
+      "connection": "Removes the distance constraint so only existence in the previously seen set matters."
+    }
+  ],
+  "focus-06": [
+    {
+      "lesson_id": "04-inventory-reconciliation",
+      "relationship": "reinforces",
+      "connection": "Applies the same exact-multiplicity comparison to characters in two strings."
+    }
+  ],
+  "focus-07": [
+    {
+      "lesson_id": "08-longest-unique-event-run",
+      "relationship": "reinforces",
+      "connection": "Repeats the no-duplicate sliding-window invariant directly over characters in a string."
+    }
+  ],
+  "focus-08": [
+    {
+      "lesson_id": "20-consolidate-schedule-windows",
+      "relationship": "reinforces",
+      "connection": "Provides a direct one-off repetition of sorting intervals and merging against the output tail."
+    }
   ]
 }

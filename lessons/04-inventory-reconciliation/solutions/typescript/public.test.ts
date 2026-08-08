@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { sameInventory } from './solution.js'
+import { sameInventory } from './learner_solution.js'
 
 describe('sameInventory public examples', () => {
   it('ignores order but preserves multiplicity', () => {

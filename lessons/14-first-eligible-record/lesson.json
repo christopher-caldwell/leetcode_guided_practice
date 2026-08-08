@@ -8,7 +8,7 @@
   "skills": ["boundary binary search", "monotonic predicates", "candidate preservation"],
   "prerequisite": "Lesson 13.",
   "functionNames": ["firstAtLeast"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 60,
   "hints": [

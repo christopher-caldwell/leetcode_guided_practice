@@ -8,7 +8,7 @@
   "skills": ["sorting as preprocessing", "interval merging", "output-tail invariants"],
   "prerequisite": "Array traversal and comparison functions.",
   "functionNames": ["mergeWindows"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 65,
   "hints": [

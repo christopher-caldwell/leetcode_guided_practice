@@ -1,7 +1,7 @@
 # Supplemental Practice Catalog
 
 This bank extends the 24 progressive lessons without changing their unlock order or readiness
-assessment. It contains 96 prompts: six in each of sixteen concept groups. Catalog entries are
+assessment. It contains 104 prompts across seventeen concept groups. Catalog entries are
 validated metadata, not additional graded lessons, so they do not require references and cannot
 block workshop progress.
 
@@ -35,9 +35,40 @@ just practice progress prefix-state
 ```
 
 `start` creates `practice/attempts/<id>/analysis.md` and `solution.ts` once, then preserves everything
-you write there on later starts and resets. `check` type-checks that workspace against the displayed
-contract; completion remains self-assessed because supplemental prompts do not yet have 96 packaged
-reference implementations and deterministic verifiers.
+you write there on later starts and resets. Use it to resume one persistent workspace.
+
+For a clean interview-style repetition, ask Codex for a fresh presentation of the same underlying
+problem:
+
+```bash
+just practice fresh focus-04
+```
+
+Each successful call creates a new numbered directory without touching earlier attempts:
+
+```text
+practice/attempts/focus-04/attempt-001/
+  prompt.md
+  analysis.md
+  solution.ts
+  tsconfig.json
+  variant.json
+```
+
+Codex changes the story, nouns, examples, and framing while preserving the catalog problem's fixed
+TypeScript contract, target complexity, important edge cases, and underlying technique. It receives
+the titles and statements of earlier generated attempts so it can avoid repeating them. The
+learner-facing prompt does not name the canonical problem or pattern.
+
+Type-check a numbered attempt by passing its displayed attempt number:
+
+```bash
+just practice check focus-04 1
+```
+
+`check` confirms only that the workspace satisfies the TypeScript contract; completion remains
+self-assessed because supplemental prompts do not have packaged reference implementations and
+deterministic verifiers.
 
 Practice history lives in `.workshop/practice-progress.json`. It is separate from lesson pass state,
 and `just reset` clears that generated history without deleting learner-authored practice work.
@@ -99,6 +130,54 @@ These problems deliberately include both direct reinforcement and extensions. Fo
 monotonic-stack exercises begin from lesson 9's LIFO reasoning, while weighted graph routes extend
 the unweighted shortest-path work in lesson 24.
 
+## Focused company-interview group
+
+`focused-interview-arrays` is a recognition-first group containing the complete current company
+interview shortlist without changing the 24-lesson path:
+
+| ID       | Canonical problem                              |
+| -------- | ---------------------------------------------- |
+| focus-01 | Valid Palindrome                               |
+| focus-02 | Maximum Subarray                               |
+| focus-03 | Product of Array Except Self                   |
+| focus-04 | Two Sum                                        |
+| focus-05 | Contains Duplicate                             |
+| focus-06 | Valid Anagram                                  |
+| focus-07 | Longest Substring Without Repeating Characters |
+| focus-08 | Merge Intervals                                |
+
+Use the surface-story prompts blind; their titles do not name the canonical LeetCode problems and
+`show`, `ready`, and `start` continue to hide concept metadata:
+
+```bash
+just practice list focused-interview-arrays
+just practice ready focused-interview-arrays
+just practice sample focused-interview-arrays company-session-1
+```
+
+`ready` respects each problem's core-lesson mapping. For a deliberate company-prep one-off, start
+any ID directly even if its related core lesson is later in the progressive path:
+
+```bash
+just practice start focus-04
+```
+
+Unlike the broader transfer catalog, this focused group intentionally repeats canonical problem
+shapes already present in core lessons. The repetition provides one stable place to rehearse the
+entire shortlist without advancing through unrelated curriculum topics.
+
+### Fresh-generation boundary
+
+`fresh` invokes the locally authenticated Codex CLI directly; it does not depend on
+`COACH_PROVIDER`. Generation uses `codex exec --ephemeral --sandbox read-only` from an isolated
+generated directory, an allowlisted environment, a structured output schema, and a bounded process
+timeout. Codex cannot edit the attempt workspace. The workshop validates its response and writes the
+new files only after generation succeeds. A failed or invalid generation creates no attempt and does
+not increment progress.
+
+Generated prompt records and learner attempts survive `just reset`. Temporary schemas and raw Codex
+output under `.workshop/generated/` do not.
+
 ## Evaluation of the submitted catalog
 
 The proposals are broadly strong. They are especially useful as transfer practice because they
@@ -138,14 +217,14 @@ Several needed contract repairs before inclusion:
 These remain reasonable future variants, but they add less value than the selected set or need a
 more substantial contract decision:
 
-| Proposals                            | Reason                                                                                                                                                    |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A2 boolean form, C1 any-pair form    | Exact duplicates of core lessons 6 and 2/3. Their richer result variants could be separate prompts later.                                                 |
-| E9                                   | Exact `k = 0` specialization of added proposal E2.                                                                                                        |
-| A7, B3, C6, C10, D8, E8, F2, G2, G7  | Sound but close to a selected exercise with a smaller or mostly cosmetic transfer step.                                                                   |
-| B4, D3                               | Text and contact normalization need a precise configurable policy before examples and tests can be authoritative.                                         |
-| B7, B9, C9, D6, D10, E6, E7, E10, F6 | Valuable second-batch material, but they introduce another major technique, representation, parser, or numeric contract beyond the group's primary focus. |
-| E12                                  | The requested result is ambiguous, and its explanation describes repeated prefixes while its title suggests a different statistic.                        |
+| Proposals                            | Reason                                                                                                                                                           |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A2 boolean form, C1 any-pair form    | Exact duplicates remain omitted from the general transfer bank; the focused company group now provides canonical one-off equivalents under stable `focus-*` IDs. |
+| E9                                   | Exact `k = 0` specialization of added proposal E2.                                                                                                               |
+| A7, B3, C6, C10, D8, E8, F2, G2, G7  | Sound but close to a selected exercise with a smaller or mostly cosmetic transfer step.                                                                          |
+| B4, D3                               | Text and contact normalization need a precise configurable policy before examples and tests can be authoritative.                                                |
+| B7, B9, C9, D6, D10, E6, E7, E10, F6 | Valuable second-batch material, but they introduce another major technique, representation, parser, or numeric contract beyond the group's primary focus.        |
+| E12                                  | The requested result is ambiguous, and its explanation describes repeated prefixes while its title suggests a different statistic.                               |
 
 The omitted items are not rejected wholesale. A future expansion should favor the advanced items
 above after adding executable starter files and verifiers, rather than adding more near-identical

@@ -44,6 +44,21 @@ describe('check command result semantics', () => {
     )
     expect(result.stdout).not.toContain('ADVANCED')
   }, 35_000)
+
+  it('advances on deterministic checks alone when AI feedback is disabled', async () => {
+    const root = await createWorkshopRoot({
+      passed: false,
+      feedback: 'This response should never be requested.',
+    })
+
+    const result = await runCheck(root, '')
+
+    expect(result.exitCode, `${result.stdout}\n${result.stderr}`).toBe(0)
+    expect(result.stdout).toContain('PASS —')
+    expect(result.stdout).toContain('reasoning remains self-assessed')
+    expect(result.stdout).toContain('ADVANCED')
+    expect(result.stdout).not.toContain('ANALYSIS FAIL')
+  }, 35_000)
 })
 
 async function createWorkshopRoot(assessment: {
@@ -90,7 +105,7 @@ async function createWorkshopRoot(assessment: {
         skills: ['linear scans'],
         prerequisite: 'TypeScript loops',
         functionNames: ['findFirstIndex'],
-        source: 'solutions/typescript/solution.ts',
+        source: 'solutions/typescript/learner_solution.ts',
         publicTest: 'solutions/typescript/public.test.ts',
         recommendedMinutes: 15,
         hints: ['one', 'two', 'three'],
@@ -99,18 +114,23 @@ async function createWorkshopRoot(assessment: {
       'utf8',
     ),
     writeFile(
-      path.join(lesson, 'analysis.md'),
+      path.join(lesson, 'learner_analysis.md'),
       '# Analysis\n\nI scan from left to right and return the first match. The scan is O(n) time and O(1) space.\n',
       'utf8',
     ),
     writeFile(
-      path.join(solutionDirectory, 'solution.ts'),
+      path.join(lesson, 'instructions.md'),
+      '# Find the First Matching Record\n\nReturn the first matching index without mutating input.\n',
+      'utf8',
+    ),
+    writeFile(
+      path.join(solutionDirectory, 'learner_solution.ts'),
       'export function findFirstIndex(values: number[], target: number): number {\n  return values.findIndex((value) => value === target)\n}\n',
       'utf8',
     ),
     writeFile(
       path.join(solutionDirectory, 'public.test.ts'),
-      "import { expect, it } from 'vitest'\nimport { findFirstIndex } from './solution.js'\nit('finds the first match', () => expect(findFirstIndex([2, 2], 2)).toBe(0))\n",
+      "import { expect, it } from 'vitest'\nimport { findFirstIndex } from './learner_solution.js'\nit('finds the first match', () => expect(findFirstIndex([2, 2], 2)).toBe(0))\n",
       'utf8',
     ),
     writeFile(
@@ -137,7 +157,7 @@ writeFileSync(output, JSON.stringify(response))
   return root
 }
 
-async function runCheck(root: string) {
+async function runCheck(root: string, provider = 'codex') {
   const repository = process.cwd()
   return runProcess(
     process.execPath,
@@ -147,7 +167,7 @@ async function runCheck(root: string) {
       environment: {
         ...process.env,
         PATH: `${path.join(root, 'bin')}:${process.env.PATH ?? ''}`,
-        COACH_PROVIDER: '',
+        COACH_PROVIDER: provider,
         WORKSHOP_TIMER_MODE: 'off',
         NO_COLOR: '1',
       },

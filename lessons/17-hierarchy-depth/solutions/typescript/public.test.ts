@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { maxDepth, TreeNode } from './solution.js'
+import { maxDepth, TreeNode } from './learner_solution.js'
 
 describe('maxDepth public examples', () => {
   it('counts nodes on the longest path', () => {

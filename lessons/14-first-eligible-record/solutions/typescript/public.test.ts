@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { firstAtLeast } from './solution.js'
+import { firstAtLeast } from './learner_solution.js'
 
 describe('firstAtLeast public examples', () => {
   it('returns the first duplicate meeting the threshold', () => {

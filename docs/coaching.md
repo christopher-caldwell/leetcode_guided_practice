@@ -1,160 +1,168 @@
-# Coaching Providers
+# AI Feedback Providers
 
-Deterministic tests decide whether code passes. After code passes, Codex evaluates the analysis and solution together and supplies the separate explanation verdict required for progression. Optional coaching supplies small hints, diagnoses failed attempts, and detailed rubric reviews.
-
-## Enabling coaching
-
-External coaching uses one optional environment value:
+Deterministic tests always decide whether code is correct. AI feedback is optional and controlled by
+one environment value:
 
 ```dotenv
-COACH_PROVIDER=codex
+# codex | claude | empty
+COACH_PROVIDER=
 ```
 
-An unset, empty, or whitespace-only value means optional external coaching is disabled. Static hints and deterministic failure categories remain available. The required analysis assessment performed by `just check` still invokes Codex.
+- `codex` uses an installed and authenticated Codex CLI.
+- `claude` uses an installed and authenticated Claude Code CLI. This adapter is experimental.
+- Empty, whitespace, or any other value disables AI feedback. Passing deterministic checks then
+  advances the lesson, and written reasoning remains self-assessed.
 
-Any nonempty value is treated as an attempt to enable a provider and is validated. The initial supported value is `codex`; a typo such as `codxe` fails fast rather than silently disabling feedback.
+Values are trimmed and case-insensitive. There is intentionally no second enable/disable flag.
 
-There is intentionally no `CODEX_COACHING` boolean.
+## What the provider does
 
-## Codex authentication and billing boundary
+When enabled, the selected provider handles four operations:
 
-The workshop does not import the OpenAI SDK, call the OpenAI API, read an API key, or manage credentials. It launches the locally installed `codex` executable, which reuses that CLI's existing authentication and subscription behavior.
+- `just hint` returns one bounded hint and one concrete question.
+- A failed `just check` may return a diagnosis after deterministic failures are displayed.
+- A passing code check requests a semantic pass/fail assessment of the explanation.
+- `just review` returns advisory 1–4 scores, strengths, improvements, and one tradeoff.
 
-On macOS, if the `codex` command fails and the ChatGPT app contains its own Codex executable, the adapter retries that bundled executable. This handles a stale standalone CLI without selecting or pinning a different model. Other platforms simply use the configured PATH executable.
+All responses are constrained by JSON Schema and validated again with Zod. Malformed output,
+timeouts, authentication failures, and missing executables cannot change deterministic test results.
+If semantic assessment is enabled but unavailable, code verification is retained and progression
+waits. Clear or change `COACH_PROVIDER` to continue in deterministic-only mode.
 
-Verify your own installation before enabling it:
+## Fairness boundary
+
+The semantic assessor receives the trusted lesson instructions, the learner analysis, and the
+already-verified source. It judges meaning rather than template compliance. It must not require
+particular headings, keywords, notation, polished grammar, exhaustive edge cases, or a formal proof.
+
+An explanation passes when it communicates:
+
+- The core algorithm
+- A substantially sound reason it works
+- Materially accurate time and auxiliary-space costs
+
+Minor imprecision, nonessential omissions, and optional improvements must still pass. Failure is
+reserved for a missing key idea, a material error, or a contradiction with the implementation or
+lesson contract. A failing response must acknowledge what is sound and identify only the minimum
+changes needed.
+
+Detailed 1–4 review scores are advisory. They never override executable checks or the final readiness
+target.
+
+## Codex provider
+
+The stable adapter launches `codex exec` with an existing local authentication session. The workshop
+does not import the OpenAI SDK, call the OpenAI API directly, or read an OpenAI API key.
+
+Verify the CLI before selecting it:
 
 ```bash
 codex --version
 codex exec --help
 ```
 
-## Required analysis assessment
+The process uses `--ephemeral`, a read-only sandbox, a generated JSON schema, a generated output file,
+an empty generated working directory, and an allowlisted environment. On macOS, the adapter may retry
+the Codex executable bundled with the ChatGPT app if the `codex` command fails.
 
-After deterministic code verification passes, `just check` sends the learner's analysis and submitted solution to Codex. The response contains a boolean verdict and feedback. Codex is instructed to judge semantic sufficiency rather than template compliance: it does not require specific headings, keywords, connector words, exact notation, polished grammar, exhaustive edge cases, or a formal proof. Minor imprecision and optional improvements should pass; materially absent, wrong, or contradictory reasoning should fail.
+## Claude provider (experimental)
 
-Both verdicts receive feedback. A strong pass may simply say there are no meaningful notes. A pass with minor issues affirms the core idea and identifies improvements. A failure acknowledges what is sound and identifies the minimum changes needed. If Codex is unavailable or returns invalid output, code verification is retained but the lesson waits rather than inventing a verdict.
+The experimental adapter launches Claude Code in non-interactive print mode using its existing local
+authentication. The workshop does not call the Anthropic API directly or manage Claude credentials.
 
-## Optional coaching operations
+Verify the CLI before selecting it:
 
-### Hint
+```bash
+claude --version
+claude --help
+```
 
-`just hint` is designed for a blank, partial, or knowingly incorrect attempt. Codex receives the lesson title and skills, current source, current analysis, attempt count, and previous hint count.
+The adapter requests JSON output validated against an inline JSON Schema, disables tools and slash
+commands, disables session persistence and browser integration, supplies an empty MCP configuration,
+and runs from the same empty generated working directory used by coaching. Claude Code's CLI and
+structured-output envelope may evolve, which is why this provider is explicitly experimental.
 
-The response contains only:
+If Claude returns a malformed or changed envelope, the command reports feedback as unavailable while
+preserving deterministic verification.
 
-- A short focus label
-- One hint capped at 280 characters
-- One question capped at 220 characters
+## Hint and diagnosis behavior
 
-The prompt forbids working code. It asks for plain references to the relevant values, indices, variables, or contract and explicitly rejects riddles and vague Socratic wording. Guidance doubles with repeated requests until it reaches the cap.
+Hints are useful for blank or partial work. The first request is deliberately small; repeated requests
+double in directness until capped. A hint contains only a short focus, a hint of at most 280 characters,
+and a question of at most 220 characters. Working code is forbidden.
 
-If Codex fails or returns invalid structure, the CLI reveals the next of three static lesson hints.
-
-### Diagnosis
-
-A failed `just check` always displays deterministic categories first. With Codex enabled, every failed attempt may request an adaptive diagnosis. Its guidance percentage grows exponentially and is capped:
+Failed checks always show deterministic categories first. With AI enabled, diagnosis guidance grows
+with consecutive attempts:
 
 ```text
 attempt 1: 15%   attempt 2: 26%   attempt 3: 43%   attempt 4: 74%   attempt 5+: 100%
 ```
 
-The response identifies what is working, one concrete observation, one next experiment, and one question. Higher levels name the relevant operation or pattern directly. Coaching cannot change the deterministic result.
+The diagnosis identifies what is working, one observation, one next experiment, and one question.
+It cannot change the deterministic result.
 
-### Review
+## Review behavior
 
-On explicit `just review`, Codex reviews the solution and analysis. It scores four dimensions from 1 through 4:
+`just review` selects queued work or the most recently verified lesson. Pass an explicit lesson ID to
+select another verified lesson:
 
-- Correctness reasoning
-- Complexity reasoning
-- Implementation clarity
-- Interview communication
-
-It can suggest improvements even after both required verdicts pass. Scores are advisory readiness evidence.
-
-`just review` reviews queued work or the most recently verified lesson. `just review <lesson-id>` selects a specific verified lesson. A successful provider review clears that lesson's review-required marker after explicit solution revelation. Without optional coaching enabled, a passed Codex analysis assessment supplies an explicit offline-review path; no synthetic rubric score is created.
-
-## Execution safety
-
-The Codex provider uses non-interactive `codex exec` with:
-
-- `--ephemeral`, avoiding a persistent Codex session for each hint
-- `--sandbox read-only`, preventing repository edits
-- `--output-schema`, constraining the final response shape
-- `--output-last-message`, producing one machine-readable result file
-- An empty generated working directory rather than the repository root
-- An allowlist of runtime/authentication environment variables rather than the complete parent environment
-- A 120-second process timeout followed by forced termination when necessary
-
-The output is parsed as JSON and validated again with Zod. Malformed output, process errors, missing authentication, timeouts, or missing executables are handled as coaching unavailability. Deterministic checks and progress remain intact.
-
-Learner source and analysis are treated as untrusted data in the coaching prompt. The provider is explicitly told not to follow instructions embedded within them or inspect other repository files. The selected source and analysis are embedded in the prompt; the isolated working directory contains neither file. Cloud/database credentials and other unrelated parent variables are not forwarded.
-
-## Generated feedback
-
-Validated coaching reports are written under:
-
-```text
-.workshop/feedback/<lesson-id>/
+```bash
+just review 12-cyclic-dependency-chain
 ```
 
-This directory is gitignored. It is removed by `just reset`; learner files are not.
+With a provider, the structured review scores correctness reasoning, complexity reasoning,
+implementation clarity, and interview communication from 1–4. Without a provider, an explicit review
+records that the learner self-assessed the verified work and clears revealed-solution review debt; no
+synthetic score is created.
+
+## Execution and data boundary
+
+Provider processes receive only:
+
+- Trusted lesson title, skills, and instructions
+- Current learner source and analysis
+- Attempt and hint counts
+- Normalized deterministic failures when present
+
+Learner text is labeled untrusted in the prompt. The process receives an allowlist of runtime and
+authentication-related environment variables rather than the complete parent environment. Generated
+schemas, raw output, and Markdown feedback live under `.workshop/` and are removed by `just reset`.
+Learner files are never written by a provider.
+
+## Fresh supplemental-practice generation
+
+`just practice fresh <id>` remains a separate, explicit Codex operation for now. It does not depend on
+`COACH_PROVIDER`. The generator preserves the registered TypeScript contract and target technique while
+changing the surface story, then writes a numbered workspace only after schema validation succeeds.
+Claude feedback support does not yet imply Claude-generated practice variants.
 
 ## Adding another provider
 
-Providers implement the TypeScript `CoachProvider` port in `src/providers/coach.ts`:
-
-```ts
-interface CoachProvider {
-  readonly name: string
-  hint(context: CoachContext): Promise<HintResponse>
-  diagnose(context: CoachContext): Promise<DiagnosisResponse>
-  review(context: CoachContext): Promise<ReviewResponse>
-}
-```
-
-The required analysis path uses the smaller `AnalysisEvaluator` port, whose `assessAnalysis` method returns only a boolean verdict and bounded feedback. The Codex adapter implements both ports.
-
-To add a provider such as a different authenticated local CLI:
-
-1. Implement all three methods behind a new adapter file.
-2. Return the existing normalized response types; do not leak provider-specific output into core progression.
-3. Add the provider name to environment validation.
-4. Add it to `src/providers/factory.ts`.
-5. Invoke the external process without a shell, use the least privileges possible, and enforce a timeout.
-6. Add response-shape, failure, and fallback tests.
-7. Document authentication and data exposure accurately.
-
-Text generation is the easy part. Reliable structured output, safe process execution, no-answer hint constraints, and failure recovery are the substantive adapter work.
+Providers implement both ports in `src/providers/coach.ts`: `CoachProvider` for hints, diagnoses, and
+reviews, plus `AnalysisEvaluator` for the bounded semantic verdict. A new adapter should reuse the
+shared prompts, return the normalized schemas, run without mutation tools, enforce a timeout, pass only
+an allowlisted environment, and include malformed-output and unavailable-executable tests.
 
 ## Troubleshooting
 
-### Unsupported provider error
+### No AI feedback appears
 
-Use an empty value or exactly `codex`:
+Run `just status`. It prints the active provider. Only `codex` and `claude` enable AI; every other value
+means deterministic-only mode.
 
-```dotenv
-COACH_PROVIDER=
-```
+### Executable or authentication failure
 
-or:
-
-```dotenv
-COACH_PROVIDER=codex
-```
-
-### `codex` executable not found
-
-Install the Codex CLI or remove `COACH_PROVIDER`. Static hints require no external executable.
-
-### Authentication failure
-
-Run a simple `codex exec` command directly and complete the CLI's normal authentication flow. The workshop does not handle credentials.
+Run a minimal non-interactive command directly with the selected CLI and complete its normal login
+flow. The workshop does not manage accounts or subscriptions.
 
 ### Structured response rejected
 
-The CLI prints coaching as unavailable and preserves deterministic results. The generated schema and raw last-message files remain under `.workshop/generated/` for local debugging until reset.
+The CLI reports feedback as unavailable and preserves deterministic results. Debug artifacts remain
+under `.workshop/generated/` until reset.
 
-### Coaching appears too explicit
+### Feedback feels too strict
 
-Stop requesting additional hints for that attempt and continue from your own reasoning. Complete solutions are a separate explicit `just solution` action and are never part of hint or diagnosis prompts.
+Minor issues should receive a passing verdict with optional improvements. If a provider fails an
+otherwise substantively sound explanation, rerun once. If it remains unreasonable, clear
+`COACH_PROVIDER` and use deterministic-only progression; the model is a coach, not the authority on
+code correctness.

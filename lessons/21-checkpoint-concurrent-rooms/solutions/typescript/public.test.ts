@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { minimumConcurrentRooms } from './solution.js'
+import { minimumConcurrentRooms } from './learner_solution.js'
 
 describe('minimumConcurrentRooms public examples', () => {
   it('returns peak room demand', () => {

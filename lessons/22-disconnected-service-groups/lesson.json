@@ -8,7 +8,7 @@
   "skills": ["graph representation", "DFS or BFS", "connected components", "visited sets"],
   "prerequisite": "Tree traversal from Lessons 17–18.",
   "functionNames": ["countServiceGroups"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 70,
   "hints": [

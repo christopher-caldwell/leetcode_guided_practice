@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { levelOrder, TreeNode } from './solution.js'
+import { levelOrder, TreeNode } from './learner_solution.js'
 
 describe('levelOrder public examples', () => {
   it('groups values by level', () => {

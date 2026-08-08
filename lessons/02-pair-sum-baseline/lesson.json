@@ -8,7 +8,7 @@
   "skills": ["brute-force baselines", "nested-loop cost", "distinct-index contracts"],
   "prerequisite": "Lesson 1 and the ability to trace a loop.",
   "functionNames": ["pairSumBaseline"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 40,
   "hints": [

@@ -8,7 +8,7 @@
   "skills": ["queues", "breadth-first search", "level boundaries"],
   "prerequisite": "Lesson 17 and array-based queue mechanics.",
   "functionNames": ["levelOrder"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 65,
   "hints": [

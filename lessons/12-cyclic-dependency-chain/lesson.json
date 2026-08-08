@@ -8,7 +8,7 @@
   "skills": ["fast and slow pointers", "linked-list cycles", "constant-space reasoning"],
   "prerequisite": "Linked-list traversal from Lesson 10.",
   "functionNames": ["hasCycle"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 60,
   "hints": [

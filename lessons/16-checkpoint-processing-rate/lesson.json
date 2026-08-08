@@ -8,7 +8,7 @@
   "skills": ["mixed retrieval", "monotonic feasibility reasoning"],
   "prerequisite": "Lessons 12–15. The relevant pattern is intentionally not announced.",
   "functionNames": ["minimumProcessingRate"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 45,
   "hints": [

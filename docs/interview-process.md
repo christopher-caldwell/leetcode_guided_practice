@@ -73,11 +73,16 @@ Restate final worst-case time and auxiliary space. Mention a meaningful alternat
 
 ## Coaching rubric
 
-Passing code is necessary but not sufficient evidence of readiness. Codex review scores four dimensions from 1–4:
+When AI feedback is enabled, the selected provider reviews four dimensions from 1–4:
 
 - Correctness: the invariant and termination argument support the result.
 - Complexity: variables and dominant operations justify the claimed bounds.
 - Clarity: the implementation reflects the explanation and contract.
 - Communication: assumptions, baseline, optimization, and tradeoffs are concise and interview-usable.
 
-These scores are advisory because model assessment is nondeterministic. Executable solution checks determine the code verdict. After code passes, Codex reads the learner's analysis and solution together and returns a separate semantic analysis pass or fail with feedback. It is instructed to accept substantively sound explanations despite differences in headings, keywords, notation, grammar, or phrasing, and to fail only materially missing, incorrect, or contradictory reasoning.
+These scores are advisory because model assessment is nondeterministic. Executable solution checks
+determine the code verdict. With Codex or experimental Claude feedback enabled, the selected agent
+reads the lesson contract, analysis, and verified solution together and returns a separate semantic
+analysis verdict. It must accept substantively sound explanations despite differences in headings,
+keywords, notation, grammar, or phrasing; minor issues remain passing suggestions. Without an AI
+provider, reasoning is self-assessed and deterministic checks alone advance the lesson.

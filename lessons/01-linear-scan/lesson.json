@@ -8,7 +8,7 @@
   "skills": ["input contracts", "linear scans", "operation counting", "O(n) reasoning"],
   "prerequisite": "Comfort reading and writing a TypeScript loop.",
   "functionNames": ["findFirstIndex"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 15,
   "hints": [

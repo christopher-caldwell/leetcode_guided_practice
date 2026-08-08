@@ -30,26 +30,26 @@ Select values from an array to maximize their sum without selecting adjacent ind
 - Does adjacency refer to indices or numeric values?
 - Are selected positions or only the sum required?
 
-These are prompts, not required individual answers. In `lessons/23-non-adjacent-value/analysis.md`, record only a contract detail that affected your implementation.
+These are prompts, not required individual answers. In `lessons/23-non-adjacent-value/learner_analysis.md`, record only a contract detail that affected your implementation.
 
 ## Expected workflow
 
 1. Read the contract and choose one representative edge case.
 2. Implement inside the TODO boundary.
 3. Run `just check`; PASS or FAIL reflects code verification only.
-4. Explain the solution in `analysis.md`; after code passes, Codex evaluates the analysis and solution together.
+4. Explain the solution in `learner_analysis.md`; after code passes, the configured AI provider evaluates the lesson contract, analysis, and solution. Without one, reasoning remains self-assessed.
 
 ## Editable files and TODO boundary
 
-- Reasoning: `lessons/23-non-adjacent-value/analysis.md`
-- Implementation: `lessons/23-non-adjacent-value/solutions/typescript/solution.ts`
+- Reasoning: `lessons/23-non-adjacent-value/learner_analysis.md`
+- Implementation: `lessons/23-non-adjacent-value/solutions/typescript/learner_solution.ts`
 - Visible examples: `lessons/23-non-adjacent-value/solutions/typescript/public.test.ts`
 
-Edit `analysis.md` and the TODO implementation in `solution.ts`. Supplied node or priority-queue code is infrastructure, not an exercise.
+Edit `learner_analysis.md` and the TODO implementation in `learner_solution.ts`. Supplied node or priority-queue code is infrastructure, not an exercise.
 
 ## Check and progression
 
-`just check` always runs the TypeScript and registered lesson verifiers first. Their PASS or FAIL reflects code verification. After code passes, Codex reads the analysis and submitted solution together, returns a separate analysis PASS or FAIL, and provides feedback in either case. It judges the meaning rather than requiring exact headings, keywords, or phrasing. The lesson advances when both verdicts pass.
+`just check` always runs the TypeScript and registered lesson verifiers first. Their PASS or FAIL reflects code verification. With a configured AI provider, the agent then returns a separate analysis PASS or FAIL with feedback. It judges meaning rather than exact headings, keywords, or phrasing, and minor issues must still pass. The lesson advances when both verdicts pass. Without AI feedback, the deterministic verdict alone advances.
 
 A focused TypeScript source policy enforces scalar O(1) auxiliary state instead of a full dynamic-programming table.
 

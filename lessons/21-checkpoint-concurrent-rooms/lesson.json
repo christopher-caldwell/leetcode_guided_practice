@@ -8,7 +8,7 @@
   "skills": ["mixed retrieval", "resource-lifetime reasoning"],
   "prerequisite": "Lessons 17–20. The relevant pattern is intentionally not announced.",
   "functionNames": ["minimumConcurrentRooms"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 45,
   "hints": [

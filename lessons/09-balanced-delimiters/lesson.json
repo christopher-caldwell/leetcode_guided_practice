@@ -8,7 +8,7 @@
   "skills": ["stacks", "last-in-first-out reasoning", "local invariants"],
   "prerequisite": "Arrays and basic iteration.",
   "functionNames": ["hasBalancedDelimiters"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 50,
   "hints": [

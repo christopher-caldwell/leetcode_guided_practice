@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ListNode, mergeSortedStreams } from './solution.js'
+import { ListNode, mergeSortedStreams } from './learner_solution.js'
 
 const list = (...values: number[]): ListNode | null =>
   values.reduceRight<ListNode | null>((next, value) => new ListNode(value, next), null)

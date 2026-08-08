@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { longestUniqueRun } from './solution.js'
+import { longestUniqueRun } from './learner_solution.js'
 
 describe('longestUniqueRun public examples', () => {
   it('finds the longest unique contiguous segment', () => {

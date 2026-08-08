@@ -3,6 +3,7 @@ import type { CheckFailure, LessonManifest } from '../core/models.js'
 
 export interface CoachContext {
   lesson: LessonManifest
+  instructions: string
   source: string
   analysis: string
   attempts: number

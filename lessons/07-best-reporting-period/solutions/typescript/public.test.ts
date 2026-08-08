@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { maxWindowSum } from './solution.js'
+import { maxWindowSum } from './learner_solution.js'
 
 describe('maxWindowSum public examples', () => {
   it('finds the best fixed window', () => {

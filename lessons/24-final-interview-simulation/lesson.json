@@ -12,7 +12,7 @@
   ],
   "prerequisite": "Lessons 1–23. Relevant patterns are intentionally not announced.",
   "functionNames": ["smallestCoveringRange", "shortestRoute"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 75,
   "hints": [

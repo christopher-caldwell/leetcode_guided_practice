@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { minimumProcessingRate } from './solution.js'
+import { minimumProcessingRate } from './learner_solution.js'
 
 describe('minimumProcessingRate public examples', () => {
   it('finds the minimum feasible rate', () => {

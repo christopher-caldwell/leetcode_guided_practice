@@ -8,7 +8,7 @@
   "skills": ["fixed sliding windows", "incremental aggregates", "O(n) reasoning"],
   "prerequisite": "Comfort with array indexing and Lesson 2 cost analysis.",
   "functionNames": ["maxWindowSum"],
-  "source": "solutions/typescript/solution.ts",
+  "source": "solutions/typescript/learner_solution.ts",
   "publicTest": "solutions/typescript/public.test.ts",
   "recommendedMinutes": 50,
   "hints": [

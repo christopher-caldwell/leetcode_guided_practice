@@ -10,7 +10,7 @@ if (!lessonId || !/^\d{2}-[a-z0-9-]+$/.test(lessonId)) {
 const sourceOverride = process.env.WORKSHOP_SOLUTION_PATH
 const source = sourceOverride
   ? path.resolve(sourceOverride)
-  : path.join(process.cwd(), 'lessons', lessonId, 'solutions', 'typescript', 'solution.ts')
+  : path.join(process.cwd(), 'lessons', lessonId, 'solutions', 'typescript', 'learner_solution.ts')
 const subject = (await import(`${pathToFileURL(source).href}?check=${Date.now()}`)) as Record<
   string,
   unknown
