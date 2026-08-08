@@ -3,10 +3,10 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { z } from 'zod'
-import { loadLessons } from '../src/core/lessons.js'
-import { runProcess } from '../src/core/process.js'
-import { stateDirectory } from '../src/core/state.js'
-import { checkTypeScript } from '../src/verification/typescript-adapter.js'
+import { loadLessons } from '../core/lessons.js'
+import { runProcess } from '../core/process.js'
+import { stateDirectory } from '../core/state.js'
+import { checkTypeScript } from '../verification/typescript-adapter.js'
 
 const EntrySchema = z.object({
   encoding: z.literal('base64'),
@@ -32,7 +32,7 @@ export async function prepareReferenceValidation(
   const lessons = await loadLessons(root)
   const bundle = BundleSchema.parse(
     JSON.parse(
-      await readFile(path.join(root, 'assets', 'reference-solutions.json'), 'utf8'),
+      await readFile(path.join(root, 'lessons', 'reference-solutions.json'), 'utf8'),
     ) as unknown,
   )
   const prepared: PreparedReference[] = []

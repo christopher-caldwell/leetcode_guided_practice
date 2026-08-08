@@ -16,7 +16,7 @@ describe('lesson-specific source policies', () => {
   it('accepts every packaged reference governed by a source policy', async () => {
     const bundle = BundleSchema.parse(
       JSON.parse(
-        await readFile(path.join(process.cwd(), 'assets', 'reference-solutions.json'), 'utf8'),
+        await readFile(path.join(process.cwd(), 'lessons', 'reference-solutions.json'), 'utf8'),
       ) as unknown,
     )
     const governed = [

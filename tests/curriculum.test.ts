@@ -60,7 +60,7 @@ describe('curriculum integrity', () => {
     })
     const bundle = schema.parse(
       JSON.parse(
-        await readFile(path.join(root, 'assets/reference-solutions.json'), 'utf8'),
+        await readFile(path.join(root, 'lessons/reference-solutions.json'), 'utf8'),
       ) as unknown,
     )
     const lessons = await loadLessons(root)

@@ -18,7 +18,7 @@ const ReferenceBundleSchema = z.object({
 export async function revealReference(root: string, lessonId: string): Promise<string> {
   const bundle = ReferenceBundleSchema.parse(
     JSON.parse(
-      await readFile(path.join(root, 'assets', 'reference-solutions.json'), 'utf8'),
+      await readFile(path.join(root, 'lessons', 'reference-solutions.json'), 'utf8'),
     ) as unknown,
   )
   const entry = bundle.lessons[lessonId]

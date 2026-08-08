@@ -82,7 +82,7 @@ This boundary is independent of solution language: a future Rust verifier could 
 ## Reference boundary
 
 Readable complete solutions are absent from tracked lesson starters and runner source. Ignored
-learner files are created locally by `just bootstrap`. `assets/reference-solutions.json` contains
+learner files are created locally by `just bootstrap`. `lessons/reference-solutions.json` contains
 base64-packaged content with SHA-256 integrity hashes. Encoding is not claimed as encryption; its
 purpose is to keep solutions out of the ordinary browsing path, not defeat deliberate reverse
 engineering.

@@ -7,7 +7,7 @@ export default tseslint.config(
       'node_modules',
       'dist',
       '.workshop',
-      'assets/reference-solutions.json',
+      'lessons/reference-solutions.json',
       'lessons/*/solutions/*/learner_solution.*',
     ],
   },

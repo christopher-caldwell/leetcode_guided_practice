@@ -3,7 +3,7 @@ set dotenv-load := true
 # Install the pinned project dependencies.
 bootstrap:
     pnpm install --frozen-lockfile
-    pnpm bootstrap:learners
+    pnpm workshop bootstrap
 
 # Show the current lesson, files, progress, coaching, and timer state.
 status:

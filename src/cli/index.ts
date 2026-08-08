@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { loadConfig } from '../core/config.js'
 import { saveAnalysisAssessment, saveDiagnosis, saveReview } from '../core/feedback.js'
-import { LEARNER_ANALYSIS } from '../core/learner-files.js'
+import { ensureLearnerFiles, LEARNER_ANALYSIS } from '../core/learner-files.js'
 import { currentLesson, loadLessons } from '../core/lessons.js'
 import type { CheckFailure, LessonManifest, WorkshopState } from '../core/models.js'
 import { assessReadiness } from '../core/readiness.js'
@@ -39,6 +39,10 @@ const root = process.cwd()
 async function main(): Promise<void> {
   const command = process.argv[2] ?? 'status'
   if (await handleResetCommand(root, command)) return
+  if (command === 'bootstrap') {
+    await bootstrapLearnerWorkspace()
+    return
+  }
 
   const config = loadConfig()
   const lessons = await loadLessons(root)
@@ -70,8 +74,18 @@ async function main(): Promise<void> {
       break
     default:
       throw new Error(
-        `Unknown command "${command}". Use status, start, check, hint, review, solution, reset, or timer.`,
+        `Unknown command "${command}". Use bootstrap, status, start, check, hint, review, solution, reset, or timer.`,
       )
+  }
+}
+
+async function bootstrapLearnerWorkspace(): Promise<void> {
+  const result = await ensureLearnerFiles(await loadLessons(root))
+  console.log(
+    `Learner workspace ready: created ${result.created.length}, preserved ${result.preserved.length}.`,
+  )
+  if (result.created.length > 0) {
+    console.log(`Created files are ignored by Git. Start with ${relative(result.created[0]!)}`)
   }
 }
 

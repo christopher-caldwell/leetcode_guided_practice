@@ -1,7 +1,7 @@
 node_modules
 dist
 .workshop
-assets/reference-solutions.json
+lessons/reference-solutions.json
 leetcode-interview-prep-project-prompt.md
 lessons/*/learner_analysis.md
 lessons/*/solutions/*/learner_solution.*
