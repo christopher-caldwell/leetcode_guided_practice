@@ -74,7 +74,8 @@ export class ClaudeCoachProvider implements CoachProvider, AnalysisEvaluator {
     await Promise.all([mkdir(generated, { recursive: true }), mkdir(sandbox, { recursive: true })])
 
     const nonce = `${context.lesson.id}-${Date.now()}`
-    const schemaJson = JSON.stringify(z.toJSONSchema(schema))
+    const { $schema: _$schema, ...jsonSchema } = z.toJSONSchema(schema)
+    const schemaJson = JSON.stringify(jsonSchema)
     const prompt =
       operation === 'analysis-assessment'
         ? buildAnalysisAssessmentPrompt(context, instruction)
